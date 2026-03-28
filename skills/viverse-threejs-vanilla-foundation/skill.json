@@ -1,0 +1,27 @@
+{
+  "id": "viverse-threejs-vanilla-foundation",
+  "name": "viverse-threejs-vanilla-foundation",
+  "version": "0.1.0",
+  "status": "active",
+  "description": "Build VIVERSE-enabled browser games in vanilla Three.js using @pmndrs/viverse and @viverse/sdk. Use when you want Three.js without React.",
+  "tags": [
+    "viverse",
+    "threejs",
+    "vanilla",
+    "browser-game",
+    "foundation"
+  ],
+  "prerequisites": [
+    "three",
+    "@pmndrs/viverse",
+    "@viverse/sdk",
+    "VITE VIVERSE app id"
+  ],
+  "entrypoint": "SKILL.md",
+  "read_order": [
+    "SKILL.md"
+  ],
+  "dependencies": [
+    "bundle:resilience"
+  ]
+}

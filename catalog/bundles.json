@@ -1,0 +1,8 @@
+{
+  "bundles": [
+    {
+      "id": "resilience",
+      "path": "bundles/resilience/RESILIENCE.md"
+    }
+  ]
+}

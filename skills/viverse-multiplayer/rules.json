@@ -1,0 +1,139 @@
+{
+  "rules": [
+    {
+      "id": "mp-new-matchmaking-client",
+      "profiles": ["multiplayer"],
+      "phases": ["gameplay", "fix"],
+      "type": "required_any",
+      "pattern": "newMatchmakingClient\\s*\\(",
+      "message": "Matchmaking must be initialized via playClient.newMatchmakingClient(appId).",
+      "severity": "high"
+    },
+    {
+      "id": "mp-setactor-after-connect",
+      "profiles": ["multiplayer"],
+      "phases": ["gameplay", "fix"],
+      "type": "required_any",
+      "pattern": "setActor\\s*\\(",
+      "message": "Matchmaking flow must set actor session info via setActor().",
+      "severity": "high"
+    },
+    {
+      "id": "mp-setactor-capability-guard",
+      "profiles": ["multiplayer"],
+      "phases": ["gameplay", "fix"],
+      "type": "required_any",
+      "pattern": "setActor\\?\\.|if\\s*\\([^\\n\\)]*setActor[^\\)]*\\)",
+      "message": "setActor must be capability-guarded for SDK variants (optional chaining or explicit method guard).",
+      "severity": "high"
+    },
+    {
+      "id": "mp-connect-signal-or-connect-call",
+      "profiles": ["multiplayer"],
+      "phases": ["gameplay", "fix"],
+      "type": "required_any",
+      "pattern": "connect\\s*\\(|onConnect|on\\s*\\(\\s*['\\\"]onConnect['\\\"]",
+      "message": "Matchmaking flow should explicitly connect or handle connect signal.",
+      "severity": "medium"
+    },
+    {
+      "id": "mp-host-create-room",
+      "profiles": ["multiplayer"],
+      "phases": ["gameplay", "fix"],
+      "type": "required_any",
+      "pattern": "createRoom\\s*\\(",
+      "message": "Host room lifecycle must include room creation logic.",
+      "severity": "high"
+    },
+    {
+      "id": "mp-host-attach-after-create",
+      "profiles": ["multiplayer"],
+      "phases": ["gameplay", "fix"],
+      "type": "required_any",
+      "pattern": "joinRoom\\s*\\(|getMyRoomActors\\s*\\(|session_id\\s*===\\s*actorSessionId",
+      "message": "After room creation, host attach/verification path is required (joinRoom or verified actor binding).",
+      "severity": "high"
+    },
+    {
+      "id": "mp-room-discovery-before-join",
+      "profiles": ["multiplayer"],
+      "phases": ["gameplay", "fix"],
+      "type": "required_any",
+      "pattern": "getAvailableRooms\\s*\\(|getRooms\\s*\\(",
+      "message": "Matchmaking must discover rooms before deciding join/create.",
+      "severity": "high"
+    },
+    {
+      "id": "mp-forbid-synthetic-roomid-join",
+      "profiles": ["multiplayer"],
+      "phases": ["gameplay", "fix"],
+      "type": "forbidden_any",
+      "pattern": "joinRoom\\s*\\(\\s*ROOM_ID\\s*\\)",
+      "message": "Do not join using synthetic room key directly; resolve real roomId first.",
+      "severity": "high"
+    },
+    {
+      "id": "mp-host-actor-binding-verification",
+      "profiles": ["multiplayer"],
+      "phases": ["gameplay", "fix"],
+      "type": "required_any",
+      "pattern": "session_id\\s*===\\s*actorSessionId|session_id\\s*===\\s*sessionIdRef\\.current|properties\\?\\.sessionId\\s*===\\s*sessionIdRef\\.current|Creator not attached|getMyRoomActors|getActorList\\s*\\(",
+      "message": "Host actor binding verification/retry is missing.",
+      "severity": "high"
+    },
+    {
+      "id": "mp-rooms-api-compat",
+      "profiles": ["multiplayer"],
+      "phases": ["gameplay", "fix"],
+      "type": "required_any",
+      "pattern": "getRooms\\s*\\(|getAvailableRooms\\s*\\(|joinRoom\\s*\\(",
+      "message": "Room access compatibility path is missing (room list API or direct room join).",
+      "severity": "medium"
+    },
+    {
+      "id": "mp-roomid-hard-guard-before-mpclient",
+      "profiles": ["multiplayer"],
+      "phases": ["gameplay", "fix"],
+      "type": "required_any",
+      "pattern": "roomId\\s*=.*\\|\\|.*\\|\\||if\\s*\\(!\\s*roomId\\s*\\)\\s*throw\\s+new\\s+Error\\s*\\(\\s*['\\\"`]roomId is required['\\\"`]",
+      "message": "MultiplayerClient initialization must normalize roomId and hard-fail when roomId is missing.",
+      "severity": "high"
+    },
+    {
+      "id": "mp-room-leave-lifecycle",
+      "profiles": ["multiplayer"],
+      "phases": ["gameplay", "fix"],
+      "type": "required_any",
+      "pattern": "leaveRoom\\s*\\(|closeRoom\\s*\\(",
+      "message": "Room lifecycle cleanup path is required (leaveRoom and host closeRoom when applicable).",
+      "severity": "high"
+    },
+    {
+      "id": "mp-start-game-path",
+      "profiles": ["multiplayer"],
+      "phases": ["gameplay", "fix"],
+      "type": "required_any",
+      "pattern": "startGame\\s*\\(",
+      "message": "Matchmaking flow should include a startGame path (or equivalent start gate) for room sessions.",
+      "severity": "medium"
+    },
+    {
+      "id": "mp-null-safe-actor-room-normalization",
+      "profiles": ["multiplayer"],
+      "phases": ["gameplay", "fix"],
+      "type": "required_any",
+      "pattern": "if\\s*\\(!\\s*actor\\s*\\|\\|\\s*typeof\\s+actor\\s*!==\\s*['\\\"]object['\\\"]\\)\\s*return\\s*['\\\"]['\\\"]|asObject\\s*=\\s*\\(|actorIdOf\\s*=\\s*\\(",
+      "message": "Actor/room payload normalization must guard null/non-object entries before any .id access.",
+      "severity": "high"
+    },
+    {
+      "id": "mp-late-join-state-recovery",
+      "profiles": ["multiplayer"],
+      "phases": ["gameplay", "fix"],
+      "type": "required_any",
+      "pattern": "requestState|gameStateUpdate|stateVersion|setInterval\\s*\\(",
+      "message": "Multiplayer flow must include late-join state recovery (requestState or host replay with versioning).",
+      "severity": "high"
+    }
+  ]
+}

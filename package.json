@@ -1,0 +1,10 @@
+{
+  "name": "viverse-sdk-skills",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "validate": "node scripts/validate-skills.mjs",
+    "build:index": "node scripts/build-index.mjs"
+  }
+}

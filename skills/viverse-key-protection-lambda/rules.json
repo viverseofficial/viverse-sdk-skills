@@ -1,0 +1,41 @@
+{
+  "rules": [
+    {
+      "id": "kp-no-production-secret-in-vite",
+      "profiles": ["security", "lambda"],
+      "phases": ["generate", "fix", "review"],
+      "type": "forbidden_any",
+      "pattern": "VITE_.*(API_KEY|SECRET|TOKEN)",
+      "message": "Production secret-like values must not be introduced in VITE_* env keys.",
+      "severity": "high"
+    },
+    {
+      "id": "kp-client-must-use-lambda-invoke",
+      "profiles": ["security", "lambda"],
+      "phases": ["generate", "fix", "review"],
+      "type": "required_any",
+      "pattern": "lambda\\.invoke\\(",
+      "message": "Client must invoke Play Lambda for secret-bearing calls.",
+      "severity": "high"
+    },
+    {
+      "id": "kp-script-must-read-getenv",
+      "profiles": ["security", "lambda"],
+      "phases": ["generate", "fix", "review"],
+      "type": "required_any",
+      "pattern": "getEnv\\(",
+      "message": "Lambda scripts must read secrets from getEnv().",
+      "severity": "high"
+    },
+    {
+      "id": "kp-authkey-not-in-client",
+      "profiles": ["security", "lambda"],
+      "phases": ["generate", "fix", "review"],
+      "type": "forbidden_any",
+      "pattern": "Authkey\\s*:|LAMBDA_AUTHKEY",
+      "message": "Authkey must not appear in client runtime code.",
+      "severity": "high"
+    }
+  ]
+}
+

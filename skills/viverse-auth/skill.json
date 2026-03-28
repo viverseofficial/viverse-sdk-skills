@@ -1,0 +1,28 @@
+{
+  "id": "viverse-auth",
+  "name": "viverse-auth",
+  "version": "0.1.0",
+  "status": "active",
+  "description": "VIVERSE Login SDK integration for user authentication and SSO",
+  "tags": [
+    "viverse",
+    "authentication",
+    "login",
+    "sso"
+  ],
+  "prerequisites": [
+    "VIVERSE SDK script tag",
+    "VIVERSE Studio App ID"
+  ],
+  "entrypoint": "SKILL.md",
+  "rules": "rules.json",
+  "patterns_dir": "patterns",
+  "examples_dir": "examples",
+  "read_order": [
+    "SKILL.md",
+    "patterns/robust-profile-fetch.md"
+  ],
+  "dependencies": [
+    "bundle:resilience"
+  ]
+}

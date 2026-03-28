@@ -1,0 +1,27 @@
+{
+  "id": "viverse-avatar-sdk",
+  "name": "viverse-avatar-sdk",
+  "version": "0.1.0",
+  "status": "active",
+  "description": "Loading and displaying VIVERSE user avatars (GLB/VRM) in 3D scenes",
+  "tags": [
+    "viverse",
+    "avatar",
+    "glb",
+    "vrm",
+    "playcanvas"
+  ],
+  "prerequisites": [
+    "VIVERSE Auth integration",
+    "PlayCanvas or Three.js"
+  ],
+  "entrypoint": "SKILL.md",
+  "patterns_dir": "patterns",
+  "examples_dir": "examples",
+  "read_order": [
+    "SKILL.md"
+  ],
+  "dependencies": [
+    "bundle:resilience"
+  ]
+}

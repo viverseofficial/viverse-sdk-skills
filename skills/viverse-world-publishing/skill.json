@@ -1,0 +1,27 @@
+{
+  "id": "viverse-world-publishing",
+  "name": "viverse-world-publishing",
+  "version": "0.1.0",
+  "status": "active",
+  "description": "Publishing PlayCanvas projects to VIVERSE Worlds via CLI",
+  "tags": [
+    "viverse",
+    "publishing",
+    "cli",
+    "deployment"
+  ],
+  "prerequisites": [
+    "Node.js",
+    "VIVERSE Studio account",
+    "VIVERSE CLI"
+  ],
+  "entrypoint": "SKILL.md",
+  "rules": "rules.json",
+  "examples_dir": "examples",
+  "read_order": [
+    "SKILL.md"
+  ],
+  "dependencies": [
+    "bundle:resilience"
+  ]
+}

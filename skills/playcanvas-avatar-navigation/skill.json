@@ -1,0 +1,28 @@
+{
+  "id": "playcanvas-avatar-navigation",
+  "name": "playcanvas-avatar-navigation",
+  "version": "0.1.0",
+  "status": "active",
+  "description": "Physics-based avatar movement, colliders, and camera follow in PlayCanvas + Ammo.js scenes",
+  "tags": [
+    "playcanvas",
+    "physics",
+    "avatar",
+    "navigation",
+    "ammo.js"
+  ],
+  "prerequisites": [
+    "PlayCanvas engine",
+    "Ammo.js physics",
+    "HTML canvas"
+  ],
+  "entrypoint": "SKILL.md",
+  "patterns_dir": "patterns",
+  "examples_dir": "examples",
+  "read_order": [
+    "SKILL.md"
+  ],
+  "dependencies": [
+    "bundle:resilience"
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "id": "vrma-animation-retargeting",
+  "name": "vrma-animation-retargeting",
+  "version": "0.1.0",
+  "status": "active",
+  "description": "How to correctly retarget VRMA animations onto VIVERSE avatars in PlayCanvas using per-bone frame correction",
+  "tags": [
+    "playcanvas",
+    "vrma",
+    "animation",
+    "retargeting",
+    "skeleton",
+    "viverse",
+    "avatar"
+  ],
+  "prerequisites": [
+    "PlayCanvas engine",
+    "VIVERSE Avatar SDK",
+    "VRMA animation files"
+  ],
+  "entrypoint": "SKILL.md",
+  "read_order": [
+    "SKILL.md"
+  ],
+  "dependencies": [
+    "bundle:resilience"
+  ]
+}

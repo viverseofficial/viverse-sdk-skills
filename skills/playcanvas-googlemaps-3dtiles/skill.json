@@ -1,0 +1,27 @@
+{
+  "id": "playcanvas-googlemaps-3dtiles",
+  "name": "playcanvas-googlemaps-3dtiles",
+  "version": "0.1.0",
+  "status": "active",
+  "description": "Streaming, rendering, and decoding Google Maps Photorealistic 3D Tiles in PlayCanvas",
+  "tags": [
+    "playcanvas",
+    "google-maps",
+    "3d-tiles",
+    "draco",
+    "gltf"
+  ],
+  "prerequisites": [
+    "PlayCanvas engine",
+    "3d-tiles-renderer",
+    "Google Maps API Key"
+  ],
+  "entrypoint": "SKILL.md",
+  "patterns_dir": "patterns",
+  "read_order": [
+    "SKILL.md"
+  ],
+  "dependencies": [
+    "bundle:resilience"
+  ]
+}

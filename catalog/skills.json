@@ -1,0 +1,62 @@
+{
+  "version": "0.1.0",
+  "generated_at": "2026-03-28T07:04:23.519Z",
+  "skills": [
+    {
+      "id": "playcanvas-avatar-navigation",
+      "path": "skills/playcanvas-avatar-navigation/skill.json"
+    },
+    {
+      "id": "playcanvas-googlemaps-3dtiles",
+      "path": "skills/playcanvas-googlemaps-3dtiles/skill.json"
+    },
+    {
+      "id": "viverse-auth",
+      "path": "skills/viverse-auth/skill.json"
+    },
+    {
+      "id": "viverse-avatar-sdk",
+      "path": "skills/viverse-avatar-sdk/skill.json"
+    },
+    {
+      "id": "viverse-design-system",
+      "path": "skills/viverse-design-system/skill.json"
+    },
+    {
+      "id": "viverse-key-protection-lambda",
+      "path": "skills/viverse-key-protection-lambda/skill.json"
+    },
+    {
+      "id": "viverse-leaderboard",
+      "path": "skills/viverse-leaderboard/skill.json"
+    },
+    {
+      "id": "viverse-multiplayer",
+      "path": "skills/viverse-multiplayer/skill.json"
+    },
+    {
+      "id": "viverse-r3f-foundation",
+      "path": "skills/viverse-r3f-foundation/skill.json"
+    },
+    {
+      "id": "viverse-r3f-profile-ui",
+      "path": "skills/viverse-r3f-profile-ui/skill.json"
+    },
+    {
+      "id": "viverse-template-generation",
+      "path": "skills/viverse-template-generation/skill.json"
+    },
+    {
+      "id": "viverse-threejs-vanilla-foundation",
+      "path": "skills/viverse-threejs-vanilla-foundation/skill.json"
+    },
+    {
+      "id": "viverse-world-publishing",
+      "path": "skills/viverse-world-publishing/skill.json"
+    },
+    {
+      "id": "vrma-animation-retargeting",
+      "path": "skills/vrma-animation-retargeting/skill.json"
+    }
+  ]
+}

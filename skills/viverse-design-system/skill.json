@@ -1,0 +1,18 @@
+{
+  "id": "viverse-design-system",
+  "name": "viverse-design-system",
+  "version": "0.1.0",
+  "status": "active",
+  "description": "viverse-design-system skill",
+  "tags": [],
+  "prerequisites": [],
+  "entrypoint": "SKILL.md",
+  "patterns_dir": "patterns",
+  "examples_dir": "examples",
+  "read_order": [
+    "SKILL.md"
+  ],
+  "dependencies": [
+    "bundle:resilience"
+  ]
+}

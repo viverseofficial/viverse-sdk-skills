@@ -1,0 +1,26 @@
+{
+  "id": "viverse-leaderboard",
+  "name": "viverse-leaderboard",
+  "version": "0.1.0",
+  "status": "active",
+  "description": "How to implement a global leaderboard for VIVERSE worlds using the official VIVERSE gameDashboard SDK",
+  "tags": [
+    "viverse",
+    "leaderboard",
+    "tracking",
+    "gamedashboard",
+    "api"
+  ],
+  "prerequisites": [
+    "VIVERSE Auth integration (checkAuth)",
+    "ViverseService",
+    "Viverse Studio App ID"
+  ],
+  "entrypoint": "SKILL.md",
+  "read_order": [
+    "SKILL.md"
+  ],
+  "dependencies": [
+    "bundle:resilience"
+  ]
+}

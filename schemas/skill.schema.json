@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Skill Metadata",
+  "type": "object",
+  "required": ["id", "name", "version", "status", "entrypoint"],
+  "properties": {
+    "id": { "type": "string" },
+    "name": { "type": "string" },
+    "version": { "type": "string" },
+    "status": { "type": "string", "enum": ["active", "experimental", "deprecated"] },
+    "description": { "type": "string" },
+    "tags": { "type": "array", "items": { "type": "string" } },
+    "prerequisites": { "type": "array", "items": { "type": "string" } },
+    "entrypoint": { "type": "string" },
+    "rules": { "type": "string" },
+    "patterns_dir": { "type": "string" },
+    "examples_dir": { "type": "string" },
+    "read_order": { "type": "array", "items": { "type": "string" } },
+    "dependencies": { "type": "array", "items": { "type": "string" } }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,28 @@
+{
+  "id": "viverse-template-generation",
+  "name": "viverse-template-generation",
+  "version": "0.1.0",
+  "status": "active",
+  "description": "Build, certify, and evolve file-backed VIVERSE templates with immutable/editable contracts and runtime-safe generation rules.",
+  "tags": [
+    "templates",
+    "architecture",
+    "orchestration",
+    "compliance",
+    "battletanks"
+  ],
+  "prerequisites": [
+    "template-registry",
+    "contract-schema",
+    "orchestrator-enforcement"
+  ],
+  "entrypoint": "SKILL.md",
+  "patterns_dir": "patterns",
+  "examples_dir": "examples",
+  "read_order": [
+    "SKILL.md"
+  ],
+  "dependencies": [
+    "bundle:resilience"
+  ]
+}

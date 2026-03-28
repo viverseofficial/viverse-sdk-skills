@@ -1,0 +1,40 @@
+{
+  "rules": [
+    {
+      "id": "publish-app-id-configured",
+      "profiles": ["publishing"],
+      "phases": ["publish", "verify", "fix"],
+      "type": "required_any",
+      "pattern": "VITE_VIVERSE_CLIENT_ID\\s*[=:]\\s*['\\\"]?[a-z0-9]{10}['\\\"]?",
+      "message": "Publishing requires a valid 10-char VITE_VIVERSE_CLIENT_ID in project config.",
+      "severity": "high"
+    },
+    {
+      "id": "publish-app-id-needs-digit",
+      "profiles": ["publishing"],
+      "phases": ["publish", "verify", "fix"],
+      "type": "forbidden_any",
+      "pattern": "VITE_VIVERSE_CLIENT_ID\\s*[=:]\\s*['\\\"]?[a-z]{10}['\\\"]?",
+      "message": "VITE_VIVERSE_CLIENT_ID must not be letters-only placeholder value.",
+      "severity": "high"
+    },
+    {
+      "id": "publish-source-app-id-reference",
+      "profiles": ["publishing"],
+      "phases": ["publish", "verify", "fix"],
+      "type": "required_any",
+      "pattern": "import\\.meta\\.env\\.VITE_VIVERSE_CLIENT_ID|process\\.env\\.VITE_VIVERSE_CLIENT_ID|VITE_VIVERSE_CLIENT_ID",
+      "message": "Publishing should reference VITE_VIVERSE_CLIENT_ID in source/config to avoid runtime mismatches.",
+      "severity": "medium"
+    },
+    {
+      "id": "publish-no-placeholder-appid",
+      "profiles": ["publishing"],
+      "phases": ["publish", "verify", "fix"],
+      "type": "forbidden_any",
+      "pattern": "YOUR_APP_ID|<APP_ID>|REPLACE_ME|PLACEHOLDER_APP_ID",
+      "message": "Publishing config/source contains placeholder App ID tokens.",
+      "severity": "high"
+    }
+  ]
+}

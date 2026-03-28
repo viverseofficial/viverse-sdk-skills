@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Skill Routes",
+  "type": "object",
+  "required": ["routes"],
+  "properties": {
+    "routes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["intent", "skills"],
+        "properties": {
+          "intent": { "type": "array", "items": { "type": "string" } },
+          "skills": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    }
+  }
+}

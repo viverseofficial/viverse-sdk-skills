@@ -1,0 +1,25 @@
+{
+  "id": "viverse-r3f-profile-ui",
+  "name": "viverse-r3f-profile-ui",
+  "version": "0.1.0",
+  "status": "active",
+  "description": "Show VIVERSE user profile in React Three Fiber scenes using @react-three/viverse hooks. Use for player tag UI, avatar icon rendering, and profile-safe fallbacks.",
+  "tags": [
+    "viverse",
+    "r3f",
+    "profile",
+    "avatar",
+    "ui"
+  ],
+  "prerequisites": [
+    "@react-three/viverse",
+    "authenticated user session"
+  ],
+  "entrypoint": "SKILL.md",
+  "read_order": [
+    "SKILL.md"
+  ],
+  "dependencies": [
+    "bundle:resilience"
+  ]
+}

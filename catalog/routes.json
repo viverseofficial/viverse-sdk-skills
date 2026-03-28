@@ -1,0 +1,161 @@
+{
+  "routes": [
+    {
+      "intent": [
+        "auth",
+        "login",
+        "sso",
+        "checkauth",
+        "profile",
+        "identity"
+      ],
+      "skills": [
+        "viverse-auth"
+      ]
+    },
+    {
+      "intent": [
+        "avatar",
+        "glb",
+        "vrm",
+        "character"
+      ],
+      "skills": [
+        "viverse-avatar-sdk"
+      ]
+    },
+    {
+      "intent": [
+        "matchmaking",
+        "room",
+        "rooms",
+        "multiplayer",
+        "session",
+        "setactor"
+      ],
+      "skills": [
+        "viverse-multiplayer"
+      ]
+    },
+    {
+      "intent": [
+        "leaderboard",
+        "score",
+        "ranking",
+        "rank"
+      ],
+      "skills": [
+        "viverse-leaderboard"
+      ]
+    },
+    {
+      "intent": [
+        "publish",
+        "deployment",
+        "deploy",
+        "app id",
+        "viverse-cli"
+      ],
+      "skills": [
+        "viverse-world-publishing"
+      ]
+    },
+    {
+      "intent": [
+        "lambda",
+        "secret",
+        "apikey",
+        "proxy",
+        "backend boundary"
+      ],
+      "skills": [
+        "viverse-key-protection-lambda"
+      ]
+    },
+    {
+      "intent": [
+        "template",
+        "contract",
+        "certification",
+        "template generation"
+      ],
+      "skills": [
+        "viverse-template-generation"
+      ]
+    },
+    {
+      "intent": [
+        "r3f",
+        "react three fiber",
+        "three fiber",
+        "@react-three/viverse"
+      ],
+      "skills": [
+        "viverse-r3f-foundation"
+      ]
+    },
+    {
+      "intent": [
+        "profile ui",
+        "nametag",
+        "hud",
+        "profile badge"
+      ],
+      "skills": [
+        "viverse-r3f-profile-ui"
+      ]
+    },
+    {
+      "intent": [
+        "threejs",
+        "vanilla three",
+        "non-react three"
+      ],
+      "skills": [
+        "viverse-threejs-vanilla-foundation"
+      ]
+    },
+    {
+      "intent": [
+        "playcanvas",
+        "navigation",
+        "ammo",
+        "character controller"
+      ],
+      "skills": [
+        "playcanvas-avatar-navigation"
+      ]
+    },
+    {
+      "intent": [
+        "googlemaps",
+        "3dtiles",
+        "map tiles"
+      ],
+      "skills": [
+        "playcanvas-googlemaps-3dtiles"
+      ]
+    },
+    {
+      "intent": [
+        "vrma",
+        "animation retargeting",
+        "retarget"
+      ],
+      "skills": [
+        "vrma-animation-retargeting"
+      ]
+    },
+    {
+      "intent": [
+        "ui",
+        "design system",
+        "visual polish",
+        "premium dashboard"
+      ],
+      "skills": [
+        "viverse-design-system"
+      ]
+    }
+  ]
+}

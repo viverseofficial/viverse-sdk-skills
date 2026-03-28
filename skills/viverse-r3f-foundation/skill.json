@@ -1,0 +1,27 @@
+{
+  "id": "viverse-r3f-foundation",
+  "name": "viverse-r3f-foundation",
+  "version": "0.1.0",
+  "status": "active",
+  "description": "Build browser 3D games with React Three Fiber and @react-three/viverse. Use for initial scene setup, character controls, physics body setup, and VIVERSE-ready project foundations.",
+  "tags": [
+    "viverse",
+    "r3f",
+    "threejs",
+    "react",
+    "game-foundation"
+  ],
+  "prerequisites": [
+    "React",
+    "three",
+    "@react-three/fiber",
+    "VIVERSE app ID"
+  ],
+  "entrypoint": "SKILL.md",
+  "read_order": [
+    "SKILL.md"
+  ],
+  "dependencies": [
+    "bundle:resilience"
+  ]
+}

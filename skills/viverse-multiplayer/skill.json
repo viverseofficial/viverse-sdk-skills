@@ -1,0 +1,33 @@
+{
+  "id": "viverse-multiplayer",
+  "name": "viverse-multiplayer",
+  "version": "0.1.0",
+  "status": "active",
+  "description": "VIVERSE Matchmaking & Play SDK integration for multiplayer games. Use when building online 2-player games, turn-based sync, room create/join, or custom state sharing.",
+  "tags": [
+    "viverse",
+    "multiplayer",
+    "matchmaking",
+    "play-sdk",
+    "rooms",
+    "sync"
+  ],
+  "prerequisites": [
+    "VIVERSE Auth (checkAuth",
+    "account_id)",
+    "VIVERSE SDK script tag",
+    "VIVERSE Studio App ID"
+  ],
+  "entrypoint": "SKILL.md",
+  "rules": "rules.json",
+  "patterns_dir": "patterns",
+  "examples_dir": "examples",
+  "read_order": [
+    "SKILL.md",
+    "patterns/matchmaking-flow.md",
+    "patterns/move-sync-reliability.md"
+  ],
+  "dependencies": [
+    "bundle:resilience"
+  ]
+}
