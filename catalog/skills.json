@@ -57,6 +57,10 @@
     {
       "id": "vrma-animation-retargeting",
       "path": "skills/vrma-animation-retargeting/skill.json"
+    },
+    {
+      "id": "viverse-ps-cli",
+      "path": "skills/viverse-ps-cli/skill.json"
     }
   ]
 }

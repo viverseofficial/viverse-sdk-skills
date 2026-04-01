@@ -37,6 +37,7 @@ The agent auto-loads SKILL.md summaries on startup. When it detects a task match
 | [viverse-key-protection-lambda](./viverse-key-protection-lambda/) | Protect API keys with Play Lambda env/script/invoke boundaries, plus manual-approval CI sync flow |
 | [viverse-world-publishing](./viverse-world-publishing/) | Publishing PlayCanvas projects to VIVERSE Worlds |
 | [vrma-animation-retargeting](./vrma-animation-retargeting/) | VRMA animation retargeting for VIVERSE avatars |
+| [viverse-ps-cli](./viverse-ps-cli/) | Upload and replace 3D model assets (.zip/.glb/.obj) to VIVERSE via ps-cli |
 
 ## Creating a New Skill
 

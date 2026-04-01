@@ -1,0 +1,49 @@
+{
+  "rules": [
+    {
+      "id": "ps-cli-no-inline-credentials",
+      "profiles": ["upload", "replace"],
+      "phases": ["upload", "replace", "verify", "fix"],
+      "type": "forbidden_any",
+      "pattern": "--email=['\"]?[^$\\s]{1,}['\"]?|--password=['\"]?[^$\\s]{1,}['\"]?",
+      "message": "Never pass credentials as literal values in shell commands — use env vars ($PS_CLI_TEST_EMAIL, $PS_CLI_TEST_PASSWORD).",
+      "severity": "high"
+    },
+    {
+      "id": "ps-cli-env-vars-sourced",
+      "profiles": ["upload", "replace"],
+      "phases": ["upload", "replace"],
+      "type": "required_any",
+      "pattern": "source .env|\\$PS_CLI_TEST_EMAIL|\\$PS_CLI_TEST_PASSWORD",
+      "message": "Credentials must be loaded from env vars before running ps-cli commands.",
+      "severity": "high"
+    },
+    {
+      "id": "ps-cli-json-flag-for-agents",
+      "profiles": ["upload", "replace"],
+      "phases": ["upload", "replace"],
+      "type": "required_any",
+      "pattern": "--json",
+      "message": "Always pass --json when parsing upload/replace output programmatically.",
+      "severity": "medium"
+    },
+    {
+      "id": "ps-cli-stage-consistency",
+      "profiles": ["upload", "replace"],
+      "phases": ["upload", "replace", "verify"],
+      "type": "required_any",
+      "pattern": "ps-cli login.*--stage|bin/ps-cli login.*--stage",
+      "message": "When uploading with --stage, ensure login was also performed with --stage flag.",
+      "severity": "high"
+    },
+    {
+      "id": "ps-cli-binary-path",
+      "profiles": ["upload", "replace"],
+      "phases": ["build"],
+      "type": "required_any",
+      "pattern": "-o bin/ps-cli",
+      "message": "Build output must go to bin/. Never write binaries to the project root.",
+      "severity": "medium"
+    }
+  ]
+}
