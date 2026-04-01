@@ -156,6 +156,18 @@
       "skills": [
         "viverse-design-system"
       ]
+    },
+    {
+      "intent": [
+        "polygon streaming",
+        "ps-cli",
+        "glb convert",
+        "3d streaming",
+        "asset upload"
+      ],
+      "skills": [
+        "viverse-ps-cli"
+      ]
     }
   ]
 }
