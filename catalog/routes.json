@@ -160,13 +160,13 @@
     {
       "intent": [
         "polygon streaming",
-        "ps-cli",
+        "pls-cli",
         "glb convert",
         "3d streaming",
         "asset upload"
       ],
       "skills": [
-        "viverse-ps-cli"
+        "viverse-pls-cli"
       ]
     }
   ]

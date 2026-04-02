@@ -59,8 +59,8 @@
       "path": "skills/vrma-animation-retargeting/skill.json"
     },
     {
-      "id": "viverse-ps-cli",
-      "path": "skills/viverse-ps-cli/skill.json"
+      "id": "viverse-pls-cli",
+      "path": "skills/viverse-pls-cli/skill.json"
     }
   ]
 }
