@@ -1,0 +1,17 @@
+{
+  "id": "viverse-pls-cli",
+  "name": "viverse-pls-cli",
+  "version": "1.0.0",
+  "status": "active",
+  "description": "Upload and replace 3D model assets to VIVERSE using pls-cli",
+  "tags": ["viverse", "pls-cli", "upload", "assets", "3d-models", "cli"],
+  "prerequisites": [
+    "pls-cli binary (from GitHub Releases or built from source)",
+    "VIVERSE account credentials",
+    "Model files (.zip, .glb, or .obj)"
+  ],
+  "entrypoint": "SKILL.md",
+  "rules": "rules.json",
+  "read_order": ["SKILL.md"],
+  "dependencies": ["bundle:resilience"]
+}
