@@ -5,7 +5,7 @@
       "profiles": ["publishing"],
       "phases": ["publish", "verify", "fix"],
       "type": "required_any",
-      "pattern": "VITE_VIVERSE_CLIENT_ID\\s*[=:]\\s*['\\\"]?[a-z0-9]{10}['\\\"]?",
+      "pattern": "VITE_VIVERSE_CLIENT_ID\\s*[=:]\\s*['\\\"]?[a-z0-9]{10}['\\\"]?|AUTHORITATIVE_APP_ID\\s*=\\s*['\\\"]?[a-z0-9]{10}['\\\"]?",
       "message": "Publishing requires a valid 10-char VITE_VIVERSE_CLIENT_ID in project config.",
       "severity": "high"
     },

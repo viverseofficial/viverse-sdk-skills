@@ -59,7 +59,7 @@
       "profiles": ["multiplayer"],
       "phases": ["gameplay", "fix"],
       "type": "required_any",
-      "pattern": "getAvailableRooms\\s*\\(|getRooms\\s*\\(",
+      "pattern": "getAvailableRooms\\s*\\(|getRoomList\\s*\\(|getRooms\\s*\\(",
       "message": "Matchmaking must discover rooms before deciding join/create.",
       "severity": "high"
     },

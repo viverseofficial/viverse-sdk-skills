@@ -174,6 +174,8 @@ Also support response-shape fallback (`rankings`, `leaderboard_rankings`, nested
 - Keep scoring logic deterministic and documented.
 - Prefer gameplay-derived scores (for example kills) over label-derived scores when debugging ranking correctness.
 - Make leaderboard submit idempotent per match result (see below) to avoid duplicate score inflation.
+- Keep leaderboard UI collapsible when screen space is limited; default to a launcher icon or compact chip if a persistent panel would cover active gameplay.
+- Constrain leaderboard scrolling inside the panel (`max-height` + `overflow-y-auto`) instead of shrinking or obscuring the main game viewport.
 
 ## Idempotent Submit Rule (Required)
 
@@ -229,6 +231,7 @@ For test/prod:
 - [ ] Authenticated user can upload score successfully
 - [ ] Top ranking fetch returns rows in expected order
 - [ ] UI handles empty/error states
+- [ ] Leaderboard UI does not permanently cover gameplay-critical controls on small screens
 - [ ] Test/prod apps both have leaderboard configured in Studio
 - [ ] Console shows uploaded value equals expected gameplay score
 - [ ] If upload succeeds but list is empty, fallback fetch configs are attempted and logged
