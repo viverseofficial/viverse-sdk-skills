@@ -5,7 +5,7 @@
       "profiles": ["auth"],
       "phases": ["auth_preflight", "gameplay", "fix"],
       "type": "required_any",
-      "pattern": "window\\.vSdk\\s*\\|\\|\\s*window\\.viverse\\s*\\|\\|\\s*window\\.VIVERSE_SDK",
+      "pattern": "(?=[\\s\\S]*window\\.vSdk)(?=[\\s\\S]*window\\.viverse)(?=[\\s\\S]*window\\.VIVERSE_SDK)|const\\s+(?:vSdk|currentSdk|resolvedSdk)\\s*=\\s*\\(window\\s+as\\s+any\\)\\.vSdk\\s*\\|\\|\\s*\\(window\\s+as\\s+any\\)\\.viverse\\s*\\|\\|\\s*\\(window\\s+as\\s+any\\)\\.VIVERSE_SDK",
       "message": "Auth must detect SDK from all supported globals.",
       "severity": "high"
     },
@@ -71,7 +71,7 @@
       "profiles": ["auth"],
       "phases": ["auth_preflight", "gameplay", "fix"],
       "type": "required_any",
-      "pattern": "useRef\\s*\\(\\s*false\\s*\\)|initOnceRef|if\\s*\\(\\s*initOnceRef\\.current\\s*\\)\\s*return",
+      "pattern": "useRef\\s*\\(\\s*false\\s*\\)|initOnceRef|if\\s*\\(\\s*initOnceRef\\.current\\s*\\)\\s*return|initPromise\\s*:\\s*Promise<|if\\s*\\(\\s*this\\.initPromise\\s*\\)\\s*return\\s*this\\.initPromise",
       "message": "Auth initialization must be guarded as one-shot to prevent repeated checkAuth loops.",
       "severity": "high"
     },
@@ -89,7 +89,7 @@
       "profiles": ["auth"],
       "phases": ["auth_preflight", "gameplay", "fix"],
       "type": "required_any",
-      "pattern": "fetchProfile\\s*\\([^\\)]*resolvedSdk|resolvedSdk\\s*\\?\\.avatar|const\\s+sdkRef\\s*=\\s*resolvedSdk\\s*\\|\\|\\s*sdk",
+      "pattern": "fetchProfile\\s*\\([^\\)]*resolvedSdk|resolvedSdk\\s*\\?\\.avatar|const\\s+sdkRef\\s*=\\s*resolvedSdk\\s*\\|\\|\\s*sdk|const\\s+resolvedSdk\\s*=\\s*sdk\\s*\\|\\||const\\s+currentSdk\\s*=|enrichProfile\\s*\\([^\\)]*(?:currentSdk|resolvedSdk)",
       "message": "Profile fetch must use the currently detected SDK instance in the same init cycle.",
       "severity": "high"
     },

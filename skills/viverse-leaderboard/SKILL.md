@@ -70,8 +70,9 @@ Do not assume Studio setup exists even if code is correct.
 - [ ] Auth success (`access_token` present)
 - [ ] `VITE_VIVERSE_CLIENT_ID` matches target app
 - [ ] `VITE_VIVERSE_LEADERBOARD_NAME` matches Studio API name
-- [ ] Initialize client once per token
-- [ ] Prefer dashboard token from `client.getToken()`; fallback to `checkAuth().access_token`
+- [ ] Initialize `gameDashboard` client once per token
+- [ ] Use the current auth token directly if that is the only token source available in UI/component scope
+- [ ] Prefer dashboard token from `client.getToken()` only when an actual auth client instance is already available; otherwise fallback to `checkAuth().access_token`
 - [ ] Handle API errors in UI (not just console)
 
 ## Implementation Workflow
@@ -83,7 +84,7 @@ Do not assume Studio setup exists even if code is correct.
 ```javascript
 // Step A: Prefer specific dashboard token
 let dashboardToken = auth.access_token;
-if (client?.getToken) {
+if (client && typeof client.getToken === "function") {
     const res = await client.getToken();
     dashboardToken = typeof res === 'string' ? res : (res?.access_token || dashboardToken);
 }
@@ -99,6 +100,11 @@ const gameDashboardClient = new DashboardClass({
   communityBaseURL: "https://www.viverse.com/", // MANDATORY for production
 });
 ```
+
+Important:
+- Do **not** use `sdk.leaderboard`, `sdk.Leaderboard`, or constructor patterns like `new sdk.leaderboard(...)`.
+- The supported runtime path is `gameDashboard` / `GameDashboard` plus `uploadLeaderboardScore()` and `getLeaderboard()`.
+- If your component only receives `accessToken`, `sdk`, and `appId`, that is sufficient for a valid implementation.
 
 ### 2) Upload score
 

@@ -21,24 +21,56 @@ Use this when a project needs:
 1. This file
 2. [examples/publish-workflow.md](examples/publish-workflow.md)
 
-## Mandatory Compliance Gates (MUST PASS)
+## Core Rules
 
-These are release blockers for any publishing task:
+1. Keep one App ID authority per run:
+   - `.env`
+   - approved source/runtime fallback path
+   - built `dist/`
+2. After first app creation, write `.env` and treat that App ID as locked for the workspace.
+3. Rebuild after any App ID-related env or source change.
+4. Do not hardcode the authoritative App ID as a literal in editable source as a publish workaround.
+5. Verify `dist/` deterministically before publish or verifier rerun:
+   - expected App ID must appear
+   - `YOUR_APP_ID` must not appear
+6. If publish succeeded and only verifier is blocked, recover locally and rerun verification only.
 
-1. **MUST** maintain a single App ID authority per run (the target App ID) and keep it consistent across:
-   - `.env` (`VITE_VIVERSE_CLIENT_ID`)
-   - source/config fallback path
-   - built `dist/` assets
-2. **MUST** verify App ID propagation after every build:
-   - Run one deterministic check that the expected App ID appears in `dist/`.
-   - If the check fails, fix root cause (`.env`, source wiring, stale build) before any retry.
-3. **MUST NOT** perform repeated equivalent grep checks without state change.
-   - Retrying the same command with unchanged files/build output is invalid.
-4. **MUST** perform a fresh build before `viverse-cli app publish` if `.env` or App ID-related source changed.
-5. **MUST** lock App ID after first app creation in a workspace/run:
-   - Immediately write `.env` with `VITE_VIVERSE_CLIENT_ID=<created_app_id>`.
-   - After this point, treat `VITE_VIVERSE_CLIENT_ID` as immutable for all fix/rebuild/republish steps.
-   - Republish reuses the same App ID; never rotate App ID unless user explicitly requests migration to a different app.
+## Deterministic App ID Propagation Workflow
+
+Use this whenever publish/auth/leaderboard issues might be caused by App ID drift.
+
+### App ID authority order
+
+1. `.env` `VITE_VIVERSE_CLIENT_ID`
+2. approved runtime config path already allowed by the project/template contract
+3. hostname-derived world App ID fallback, only for Worlds iframe runtime
+
+### Verification sequence
+
+1. Read `.env` and confirm `VITE_VIVERSE_CLIENT_ID=<expected_app_id>`.
+2. Inspect source/config fallback path and confirm it resolves from env/runtime authority rather than a hardcoded literal.
+3. Rebuild after any env or App ID-related source change.
+4. Run one deterministic grep check on `dist/`:
+   - expected App ID must appear
+   - `YOUR_APP_ID` must not appear
+5. Only after those pass, publish or rerun verifier.
+
+### Failure interpretation
+
+- `dist/ contains YOUR_APP_ID`
+  Root cause is unresolved placeholder or stale build. Fix source/env, then rebuild.
+- `source contains hardcoded app id literal`
+  Root cause is invalid source workaround. Remove literal, restore env/runtime resolution, then rebuild.
+- `publish succeeded but verifier failed on App ID propagation`
+  Treat this as a deterministic recovery task, not a full workflow restart.
+
+## Verifier Recovery Path
+
+1. Read the exact verifier reason.
+2. Patch only the concrete propagation defect.
+3. Rebuild once.
+4. Re-run deterministic verification only.
+5. Publish again only if the fix changed the actual shipped bundle and the published target still needs updating.
 
 ## CLI Workflow
 
@@ -99,6 +131,9 @@ viverse-cli app publish ./dist --auto-create-app --name "<APP_NAME>" --type worl
 - [ ] Preview URL opens and assets load
 - [ ] Runtime console confirms latest bundle hash/build tag (avoid stale cached build confusion)
 - [ ] Auth flow works in the published target app
+- [ ] `.env` App ID matches the published target app
+- [ ] Source contains no hardcoded App ID workaround literals
+- [ ] `dist/` contains expected App ID and does not contain `YOUR_APP_ID`
 - [ ] Studio review/submission step completed if required
 
 ## Gotchas
@@ -106,6 +141,7 @@ viverse-cli app publish ./dist --auto-create-app --name "<APP_NAME>" --type worl
 - `import.meta.env` is build-time in Vite; rebuild after env changes.
 - Publishing to app A with build configured for app B can break auth and leaderboard.
 - Hardcoded runtime fallback App IDs are release blockers. Runtime must read `VITE_VIVERSE_CLIENT_ID` from env wiring.
+- Built `dist/` containing the real target App ID is expected after env injection; the release blocker is unresolved placeholder or invalid source hardcoding.
 - Asset paths must be deployment-safe (relative/public).
 - Review state in Studio may block full live rollout after upload.
 - After publish, browser/app cache can still run old bundle hash; hard refresh or add temporary build-tag log for verification during hotfix debugging.

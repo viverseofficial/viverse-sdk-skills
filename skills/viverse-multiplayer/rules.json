@@ -23,7 +23,7 @@
       "profiles": ["multiplayer"],
       "phases": ["gameplay", "fix"],
       "type": "required_any",
-      "pattern": "setActor\\?\\.|if\\s*\\([^\\n\\)]*setActor[^\\)]*\\)",
+      "pattern": "setActor\\?\\.|if\\s*\\([^\\n\\)]*setActor[^\\)]*\\)|typeof\\s+\\w+\\.setActor\\s*(?:={2,3}|!={1,2})\\s*['\\\"]function['\\\"]",
       "message": "setActor must be capability-guarded for SDK variants (optional chaining or explicit method guard).",
       "severity": "high"
     },
@@ -59,7 +59,7 @@
       "profiles": ["multiplayer"],
       "phases": ["gameplay", "fix"],
       "type": "required_any",
-      "pattern": "getAvailableRooms\\s*\\(|getRoomList\\s*\\(|getRooms\\s*\\(",
+      "pattern": "getAvailableRooms(?:\\?\\.)?\\s*\\(|getRoomList(?:\\?\\.)?\\s*\\(|getRooms(?:\\?\\.)?\\s*\\(",
       "message": "Matchmaking must discover rooms before deciding join/create.",
       "severity": "high"
     },
@@ -95,7 +95,7 @@
       "profiles": ["multiplayer"],
       "phases": ["gameplay", "fix"],
       "type": "required_any",
-      "pattern": "roomId\\s*=.*\\|\\|.*\\|\\||if\\s*\\(!\\s*roomId\\s*\\)\\s*throw\\s+new\\s+Error\\s*\\(\\s*['\\\"`]roomId is required['\\\"`]",
+      "pattern": "roomIdOf\\s*\\(|(?:roomId|rawRid|normalizedRid|rid)\\s*=.*\\|\\||if\\s*\\(!\\s*(?:roomId|rawRid|normalizedRid|rid)\\s*\\)\\s*throw\\s+new\\s+Error\\s*\\([^\\)]*roomId is required",
       "message": "MultiplayerClient initialization must normalize roomId and hard-fail when roomId is missing.",
       "severity": "high"
     },

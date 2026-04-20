@@ -35,6 +35,7 @@ The agent auto-loads SKILL.md summaries on startup. When it detects a task match
 | [viverse-multiplayer](./viverse-multiplayer/) | Matchmaking & Play SDK — rooms, create/join, custom state sync |
 | [viverse-template-generation](./viverse-template-generation/) | File-backed template registry, contract enforcement, and certification workflow |
 | [viverse-key-protection-lambda](./viverse-key-protection-lambda/) | Protect API keys with Play Lambda env/script/invoke boundaries, plus manual-approval CI sync flow |
+| [viverse-utility-app](./viverse-utility-app/) | Build mobile-first utility tools and widgets using blank-webapp-v1 (no Lambda) or lambda-tool-v1 (Lambda-backed APIs) |
 | [viverse-world-publishing](./viverse-world-publishing/) | Publishing PlayCanvas projects to VIVERSE Worlds |
 | [vrma-animation-retargeting](./vrma-animation-retargeting/) | VRMA animation retargeting for VIVERSE avatars |
 | [viverse-pls-cli](./viverse-pls-cli/) | Upload and replace 3D model assets (.zip/.glb/.obj) to VIVERSE via pls-cli |

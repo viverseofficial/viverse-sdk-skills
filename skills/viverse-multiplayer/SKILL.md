@@ -67,6 +67,54 @@ Use when a project needs:
 17. **MUST** guard actor/room normalization against `null` SDK entries; never read `.id` from untrusted payloads without object checks.
 18. **MUST** provide late-join state recovery (`requestState` flow or host replay of authoritative state) so joiners cannot stay stuck in pre-start UI.
 
+## Canonical Reviewer Failure Signatures
+
+If review or verifier reports any of the following, treat them as direct mappings to this skill:
+
+- `Matchmaking 'setActor' is called without a method capability guard`
+- `MatchmakingClient listeners use '.on()' without fallback to 'addEventListener'`
+- `joinRoom invokes initSocket without validating roomId exists`
+- `Actor/room payload normalization must guard null/non-object entries before any .id access`
+- `Matchmaking must discover rooms before deciding join/create`
+
+These are not style issues. They are release blockers.
+
+## Hardened Helper Layer (Use By Default)
+
+Define these helpers before wiring room lifecycle code:
+
+```javascript
+const onSdkEvent = (emitter, eventName, cb) => {
+  if (!emitter) return;
+  if (typeof emitter.on === "function") {
+    emitter.on(eventName, cb);
+    return;
+  }
+  if (typeof emitter.addEventListener === "function") {
+    emitter.addEventListener(eventName, cb);
+    return;
+  }
+  console.warn(`Emitter does not support on()/addEventListener() for ${eventName}`);
+};
+
+const asObject = (value) =>
+  value && typeof value === "object" ? value : null;
+
+const actorIdOf = (actor) => {
+  const a = asObject(actor);
+  if (!a) return "";
+  return String(a.id || a.actor_id || a.actorId || a.session_id || a.sessionId || "").trim();
+};
+
+const roomIdOf = (room) => {
+  const r = asObject(room);
+  if (!r) return "";
+  return String(r.id || r.roomId || r.game_session || "").trim();
+};
+```
+
+Use these helpers consistently. Do not open-code raw `.id` access against unknown SDK payloads.
+
 ## Implementation Workflow
 
 > [!IMPORTANT]
@@ -91,8 +139,8 @@ const actorSessionId = `${user.accountId}-${Date.now()}-${Math.random().toString
 const isConnected = await new Promise((resolve) => {
     let resolved = false;
     const done = (val) => { if (!resolved) { resolved = true; resolve(val); } };
-    mc.on("onConnect", () => done(true));
-    mc.on("connect", () => done(true));
+    onSdkEvent(mc, "onConnect", () => done(true));
+    onSdkEvent(mc, "connect", () => done(true));
     setTimeout(() => done(false), 5000); // 5s timeout
     if (typeof mc.connect === 'function') mc.connect().catch(() => {});
 });
@@ -112,6 +160,19 @@ if (typeof mc.setActor === "function") {
 }
 ```
 
+### 2) Discover Before Join (Mandatory)
+
+Never decide `join` vs `create` without scanning real rooms first.
+
+```javascript
+const roomsRes = await mc.getAvailableRooms?.();
+const rooms = Array.isArray(roomsRes?.rooms) ? roomsRes.rooms : (Array.isArray(roomsRes) ? roomsRes : []);
+const openRooms = rooms.filter((room) => roomIdOf(room));
+const existing = openRooms.find((room) => room.name === lobbyName);
+```
+
+If you skip this step and call `joinRoom(ROOM_KEY)` or another synthetic key directly, you are violating the room lifecycle contract.
+
 ### 3) Join or Create Room (Robust Flow)
 
 **CRITICAL**: `joinRoom` requires a raw **Room ID string**, not an object.
@@ -119,13 +180,14 @@ if (typeof mc.setActor === "function") {
 ```javascript
 // Scan for existing lobby
 const roomsRes = await mc.getAvailableRooms();
-const rooms = roomsRes?.rooms || roomsRes || [];
-const existing = rooms.find(r => r.name === "My_Game_Lobby");
+const rooms = Array.isArray(roomsRes?.rooms) ? roomsRes.rooms : (Array.isArray(roomsRes) ? roomsRes : []);
+const existing = rooms.find(r => r?.name === "My_Game_Lobby" && roomIdOf(r));
 
 let room;
 if (existing) {
   // Join by ID
-  const res = await mc.joinRoom(existing.id || existing.roomId);
+  const joinId = roomIdOf(existing);
+  const res = await mc.joinRoom(joinId);
   room = res?.room || res;
 } else {
   // Create
@@ -138,14 +200,14 @@ if (existing) {
   room = res?.room || res;
   
   // MANDATORY: Host auto-join (ensures session consistency)
-  const roomId = room?.id || room?.roomId;
+  const roomId = roomIdOf(room);
   if (roomId) await mc.joinRoom(roomId);
 
   // MANDATORY: verify creator is actually in actor list
   let bound = false;
   for (let i = 0; i < 6; i++) {
     const actors = (await mc.getMyRoomActors?.().catch(() => [])) || room?.actors || [];
-    if (actors.some(a => a.session_id === actorSessionId)) {
+    if (actors.some(a => asObject(a)?.session_id === actorSessionId || asObject(a)?.sessionId === actorSessionId)) {
       bound = true;
       break;
     }
@@ -187,6 +249,17 @@ try {
 }
 await mp.init({ modules: { general: { enabled: true } } });
 ```
+
+### 5A) Template-Bound Projects
+
+If the project is template-bound and core matchmaking files are immutable:
+
+- do not keep retrying writes to immutable core files
+- reroute resilience fixes through the allowed adapter/shim layer
+- preserve original room lifecycle semantics while patching
+- keep the fix scope limited to matchmaking/runtime coordination only
+
+This is especially important in template systems that expose editable hooks but protect `js/viverseMultiplayer.js`, `src/viverseMultiplayer.js`, or equivalent bootstrap-owned files.
 
 Register listeners before/around init when possible, then bridge both receive channels.
 
@@ -290,6 +363,11 @@ For collectible gameplay state (pickups, temporary buffs):
 - [ ] Host-authoritative pickup/buff flow stays consistent for both peers
 - [ ] Respawn/snapshot payloads restore full combat state (not just transform/hp)
 - [ ] Room list remains usable under auto-refresh (stable ordering + interaction-safe polling)
+- [ ] `setActor` is method-guarded
+- [ ] listener registration uses `onSdkEvent(...)`-style fallback
+- [ ] `roomIdOf(room)` returns a non-empty string before `joinRoom(...)` and before `new MultiplayerClient(...)`
+- [ ] no actor/room normalization path reads `.id` from null/non-object payloads
+- [ ] room discovery happens before join/create decision
 
 ## Critical Gotchas
 
@@ -306,6 +384,7 @@ For collectible gameplay state (pickups, temporary buffs):
 - Reuse of fixed session id can cause stale room rebinding; use fresh per-connect id.
 - Adding send handlers without updating parser allowlist causes silent message loss in production.
 - If joiner can directly mutate gameplay-critical state, desync and exploit risk increase; use host-authoritative apply + rebroadcast.
+- In template-bound projects, a correct resilience fix can still fail enforcement if it targets immutable core files. Move the fix into the allowed adapter/shim layer instead of retrying the blocked write.
 
 ## References
 

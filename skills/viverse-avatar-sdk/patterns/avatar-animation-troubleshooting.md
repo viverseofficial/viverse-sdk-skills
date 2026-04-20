@@ -77,6 +77,45 @@ app.on('update', () => {
 | Finger bones unmatched | Avatar uses `HandThumb1/2/3` not `ThumbMetacarpal/Proximal/Distal` | Add numbered finger aliases (see BONE_ALIASES in avatar-animation.md) |
 | `leftEye`/`rightEye` unmatched | Avatar uses `EyeL`/`EyeR` | Add aliases: `'eyel': 'lefteye', 'eyer': 'righteye'` |
 | `setFloat('speed')` throws error | State graph not compiled on first frame | Wrap in `try/catch` |
+| **Three.js: Avatar invisible after bone rename** | `SkinnedMesh.skeleton` uses bone index references; renaming bones corrupts skin matrix lookup | **Never rename bones in Three.js** — clone clip tracks and rewrite `.name` field instead |
+| **Three.js: Avatar invisible despite loading** | VRM scene root nodes loaded with `visible=false` | Traverse entire scene after load and force `child.visible = true` |
+| **Three.js: Avatar disappears mid-game** | Frustum culling discards mesh after skeleton manipulation shifts bounding box | Set `child.frustumCulled = false` on all `isMesh` nodes after load |
+| **Three.js: Only hair/accessories visible, body underground** | Targeting `Normalized_Avatar_*` bones in vanilla Three.js — VRM constraint system (Normalized→Avatar) only runs inside `@pixiv/three-vrm` loader. Without it, `Normalized_Avatar_*` bones move but do NOT deform the SkinnedMesh body | In vanilla Three.js, **target `Avatar_*` bones** for animation tracks. Only use `Normalized_Avatar_*` when using the `@pixiv/three-vrm` package. |
+| **Three.js `three-vrm-animation`: SyntaxError Unexpected token `<`** | Loading a `.vrma` file on Vite/SPA servers without proper MIME types falls back to `index.html` | Rename the asset to `.glb` (e.g., `Walk_vrma.glb`) to force the server to load it as binary data. |
+| **Three.js `three-vrm-animation`: TypeError `u is not a function`** | Destructuring a generic `createVRM...` function for the animation plugin but passing `undefined` | The plugin is a class. Import `VRMAnimationLoaderPlugin` and instantiate with `new VRMAnimationLoaderPlugin(parser)` inside `.register()`. |
+
+> [!CAUTION]
+> **Normalized_Avatar_* vs Avatar_* hierarchy guidance is loader-dependent:**
+> - **With `@pixiv/three-vrm`**: Target `Normalized_Avatar_*` bones — the VRM constraint system propagates motion to `Avatar_*` which drives the skin.
+> - **With vanilla GLTFLoader (no VRM loader)**: Target `Avatar_*` bones directly — the constraint system is NOT active, so `Normalized_Avatar_*` bones are orphaned (only child meshes like hair move). The SkinnedMesh is bound to `Avatar_*` and they must be driven directly.
+
+
+### Three.js: Invisible Avatar Checklist
+
+If an avatar loads (no errors logged) but is not visible in Three.js:
+
+1. **Check `visible` flag** — VRM roots can load hidden:
+   ```javascript
+   model.traverse(child => { child.visible = true; });
+   ```
+
+2. **Disable frustum culling** — retargeting shifts bounds:
+   ```javascript
+   model.traverse(child => {
+       if (child.isMesh) child.frustumCulled = false;
+   });
+   ```
+
+3. **Check if mesh was added to scene** — log `scene.children.length` before and after `scene.add(model)`.
+
+4. **Check scale** — VRM avatars sometimes have `scale = 0` from an upstream parent node:
+   ```javascript
+   model.traverse(child => console.log(child.name, child.scale));
+   ```
+
+5. **Check bone renaming** — if you renamed any bones, the SkinnedMesh will silently break. Revert bone names, use track remapping instead (see `vrma-animation-retargeting` skill).
+
+
 
 ### Critical Lessons Learned
 

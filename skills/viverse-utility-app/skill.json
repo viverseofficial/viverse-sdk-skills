@@ -1,0 +1,36 @@
+{
+  "id": "viverse-utility-app",
+  "name": "viverse-utility-app",
+  "version": "1.0.0",
+  "status": "active",
+  "description": "Build mobile-first VIVERSE utility tools and widgets using blank-webapp-v1 (no Lambda) or lambda-tool-v1 (Lambda-backed external APIs). Covers polls, countdowns, tickers, dashboards, and any iframe-embeddable tool app.",
+  "tags": [
+    "viverse",
+    "utility",
+    "tool",
+    "mobile",
+    "iframe",
+    "widget",
+    "lambda",
+    "blank-webapp",
+    "lambda-tool"
+  ],
+  "prerequisites": [
+    "viverse-auth",
+    "viverse-key-protection-lambda",
+    "viverse-template-generation"
+  ],
+  "entrypoint": "SKILL.md",
+  "patterns_dir": "patterns",
+  "examples_dir": "examples",
+  "read_order": [
+    "SKILL.md",
+    "patterns/auth-optional.md",
+    "patterns/lambda-invoke.md"
+  ],
+  "dependencies": [
+    "bundle:resilience",
+    "skill:viverse-auth",
+    "skill:viverse-key-protection-lambda"
+  ]
+}
