@@ -33,6 +33,21 @@ Use this skill when implementing or evolving the internal template system (regis
 7. Overlay panels must not permanently cover active gameplay.
 8. Preview-shell success is not runtime certification; require browser/probe evidence.
 
+9. **`template.json` MUST declare `buildConfig`** or agents default to the blank-webapp Vite pattern
+   (creating `vite.config.js`, running `npm run build`) — which breaks static PlayCanvas/game templates.
+   Minimum for static templates: `"buildConfig": {"type":"static","command":"<cp command>","outputDir":"dist","entryHtml":"index.html"}`
+   Minimum for Vite templates: `"buildConfig": {"command":"npm run build","outputDir":"dist","entryHtml":"index.html"}`
+
+10. **Static PlayCanvas templates MUST set `enforcement.defaultMode: "enforce"`** (not `"audit"`).
+    With `"audit"`, contract violations (writing `vite.config.js`, `src.js`) are silently allowed,
+    causing the Coder to build a Vite app instead of the PlayCanvas game — blank runtime at publish time.
+
+11. **Never read `playcanvas-stable.min.js`, `*.min.js`, or binary/media files** — they blow the LLM
+    context window and cause auth/logic tasks to timeout. The file service now blocks these reads
+    automatically, returning `[FILE BLOCKED]`. Use `grep` or targeted file inspection instead.
+    For App ID injection in non-Vite templates, use a sed-style replacement on the placeholder
+    `YOUR_APP_ID` — pre-inject this placeholder in the template source's config file.
+
 ## Template Checklist
 
 - [ ] Registry entry exists and template path is real
@@ -44,6 +59,11 @@ Use this skill when implementing or evolving the internal template system (regis
 - [ ] Gameplay remains usable on short/mobile-height viewports
 - [ ] Secondary overlays do not obscure active play
 - [ ] Run report contains template events and blocked-write reasons
+- [ ] `template.json` includes `buildConfig` with correct `type` (static or vite)
+- [ ] `enforcement.defaultMode` is `"enforce"` not `"audit"`
+- [ ] Static templates: large engine files (*.min.js, *.bin) are NOT in editablePaths
+- [ ] Static templates: App ID placeholder `YOUR_APP_ID` is pre-injected in the config file
+  that `appIdPropagation.approvedConfigFiles` points to
 
 ## Output Requirements
 
