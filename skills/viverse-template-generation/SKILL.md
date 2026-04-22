@@ -19,6 +19,11 @@ Use this skill when implementing or evolving the internal template system (regis
 
 ## High-Signal Lessons
 
+0. **Every template directory MUST have `rulesets/default.json`** or `TemplateCertificationService`
+   blocks all runs with 'no ruleset files found'. Minimum content:
+   `{"id":"default","name":"Default","description":"...","authRequired":true,"mobileFirst":true,"iframeEmbeddable":true}`
+   See `templates/REQUIRED_STRUCTURE.md` for the full required directory layout.
+
 1. Do not replace game bootstrap with an auth-only shell. Startup must still launch the world/game loop.
 2. Gameplay/UI changes must not rewrite protected bootstrap/runtime files unless a verified blocker proves it is necessary.
 3. Template shells must remain playable on short viewports; avoid fixed full-screen layouts that hide gameplay/UI below the fold.
