@@ -151,7 +151,7 @@
         "fix"
       ],
       "type": "required_any",
-      "pattern": "fetchProfile\\s*\\([^\\)]*resolvedSdk|resolvedSdk\\s*\\?\\.avatar|const\\s+sdkRef\\s*=\\s*resolvedSdk\\s*\\|\\|\\s*sdk|const\\s+resolvedSdk\\s*=\\s*sdk\\s*\\|\\||const\\s+currentSdk\\s*=|enrichProfile\\s*\\([^\\)]*(?:currentSdk|resolvedSdk)",
+      "pattern": "fetchProfile\\s*\\([^\\)]*resolvedSdk|resolvedSdk\\s*\\?\\.avatar|const\\s+sdkRef\\s*=\\s*resolvedSdk\\s*\\|\\|\\s*sdk|const\\s+resolvedSdk\\s*=\\s*sdk\\s*\\|\\||const\\s+currentSdk\\s*=|enrichProfile\\s*\\([^\\)]*(?:currentSdk|resolvedSdk)|fetchViverseProfile\\s*\\(|fetchProfile\\s*\\(vSdk|fetchProfile\\s*\\(sdk",
       "message": "Profile fetch must use the currently detected SDK instance in the same init cycle.",
       "severity": "high",
       "skipIfBuildType": "static",
