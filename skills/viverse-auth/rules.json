@@ -2,8 +2,14 @@
   "rules": [
     {
       "id": "auth-sdk-global-detection",
-      "profiles": ["auth"],
-      "phases": ["auth_preflight", "gameplay", "fix"],
+      "profiles": [
+        "auth"
+      ],
+      "phases": [
+        "auth_preflight",
+        "gameplay",
+        "fix"
+      ],
       "type": "required_any",
       "pattern": "(?=[\\s\\S]*window\\.vSdk)(?=[\\s\\S]*window\\.viverse)(?=[\\s\\S]*window\\.VIVERSE_SDK)|const\\s+(?:vSdk|currentSdk|resolvedSdk)\\s*=\\s*\\(window\\s+as\\s+any\\)\\.vSdk\\s*\\|\\|\\s*\\(window\\s+as\\s+any\\)\\.viverse\\s*\\|\\|\\s*\\(window\\s+as\\s+any\\)\\.VIVERSE_SDK",
       "message": "Auth must detect SDK from all supported globals.",
@@ -11,8 +17,14 @@
     },
     {
       "id": "auth-domain-htcvive",
-      "profiles": ["auth"],
-      "phases": ["auth_preflight", "gameplay", "fix"],
+      "profiles": [
+        "auth"
+      ],
+      "phases": [
+        "auth_preflight",
+        "gameplay",
+        "fix"
+      ],
       "type": "required_any",
       "pattern": "account\\.htcvive\\.com",
       "message": "Auth client must use account.htcvive.com domain.",
@@ -20,8 +32,14 @@
     },
     {
       "id": "auth-no-accesstoken-header",
-      "profiles": ["auth"],
-      "phases": ["auth_preflight", "gameplay", "fix"],
+      "profiles": [
+        "auth"
+      ],
+      "phases": [
+        "auth_preflight",
+        "gameplay",
+        "fix"
+      ],
       "type": "forbidden_any",
       "pattern": "setRequestHeader\\s*\\(\\s*['\\\"]accesstoken['\\\"]|['\\\"]accesstoken['\\\"]\\s*:|\\baccesstoken\\s*:|headers?\\s*[:=][\\s\\S]{0,180}(?:['\\\"]accesstoken['\\\"]|\\baccesstoken)\\s*:",
       "message": "Forbidden key/header 'accesstoken' detected.",
@@ -29,8 +47,14 @@
     },
     {
       "id": "auth-profile-fallback-chain",
-      "profiles": ["auth"],
-      "phases": ["auth_preflight", "gameplay", "fix"],
+      "profiles": [
+        "auth"
+      ],
+      "phases": [
+        "auth_preflight",
+        "gameplay",
+        "fix"
+      ],
       "type": "required_sequence_anyfile",
       "patterns": [
         "getProfile\\s*\\(",
@@ -41,8 +65,14 @@
     },
     {
       "id": "auth-token-key-compat",
-      "profiles": ["auth"],
-      "phases": ["auth_preflight", "gameplay", "fix"],
+      "profiles": [
+        "auth"
+      ],
+      "phases": [
+        "auth_preflight",
+        "gameplay",
+        "fix"
+      ],
       "type": "required_any",
       "pattern": "accessToken\\s*:|access_token\\s*:|authorization\\s*:|token\\s*:",
       "message": "Auth token wiring is missing expected token key(s) (accessToken/access_token/token/authorization).",
@@ -50,8 +80,14 @@
     },
     {
       "id": "auth-avatar-field-normalization",
-      "profiles": ["auth"],
-      "phases": ["auth_preflight", "gameplay", "fix"],
+      "profiles": [
+        "auth"
+      ],
+      "phases": [
+        "auth_preflight",
+        "gameplay",
+        "fix"
+      ],
       "type": "required_any",
       "pattern": "headIconUrl|head_icon_url|snapshot_url|head_url|headUrl|thumbnail_url|thumbnailUrl|avatar_url|avatarUrl|photo_url|photoUrl|user_avatar|user_avatar_url|picture",
       "message": "Profile normalization must include avatar/head icon field variants.",
@@ -59,8 +95,14 @@
     },
     {
       "id": "auth-forbid-explorer-fallback",
-      "profiles": ["auth"],
-      "phases": ["auth_preflight", "gameplay", "fix"],
+      "profiles": [
+        "auth"
+      ],
+      "phases": [
+        "auth_preflight",
+        "gameplay",
+        "fix"
+      ],
       "type": "forbidden_any",
       "pattern": "(?:\\|\\||\\?\\?|:\\s*)\\s*['\\\"]VIVERSE Explorer['\\\"]|name\\s*:\\s*['\\\"]VIVERSE Explorer['\\\"]|displayName\\s*:\\s*['\\\"]VIVERSE Explorer['\\\"]",
       "message": "Fallback display name must not default to 'VIVERSE Explorer'.",
@@ -68,17 +110,31 @@
     },
     {
       "id": "auth-single-bootstrap-guard",
-      "profiles": ["auth"],
-      "phases": ["auth_preflight", "gameplay", "fix"],
+      "profiles": [
+        "auth"
+      ],
+      "phases": [
+        "auth_preflight",
+        "gameplay",
+        "fix"
+      ],
       "type": "required_any",
       "pattern": "useRef\\s*\\(\\s*false\\s*\\)|initOnceRef|if\\s*\\(\\s*initOnceRef\\.current\\s*\\)\\s*return|initPromise\\s*:\\s*Promise<|if\\s*\\(\\s*this\\.initPromise\\s*\\)\\s*return\\s*this\\.initPromise",
       "message": "Auth initialization must be guarded as one-shot to prevent repeated checkAuth loops.",
-      "severity": "high"
+      "severity": "high",
+      "skipIfBuildType": "static",
+      "skipReason": "Static/PlayCanvas templates use viverse-auth-overlay.js for auth bootstrap. This pattern is only required for hand-written auth code in Vite/React templates."
     },
     {
       "id": "auth-bridge-ready-delay",
-      "profiles": ["auth"],
-      "phases": ["auth_preflight", "gameplay", "fix"],
+      "profiles": [
+        "auth"
+      ],
+      "phases": [
+        "auth_preflight",
+        "gameplay",
+        "fix"
+      ],
       "type": "required_any",
       "pattern": "bridge\\?\\.isReady\\s*===\\s*false|bridge\\.isReady\\s*===\\s*false|setTimeout\\(.*500",
       "message": "Auth profile enrichment must apply 500ms bridge-ready delay when bridge is not ready.",
@@ -86,17 +142,30 @@
     },
     {
       "id": "auth-resolved-sdk-profile-fetch",
-      "profiles": ["auth"],
-      "phases": ["auth_preflight", "gameplay", "fix"],
+      "profiles": [
+        "auth"
+      ],
+      "phases": [
+        "auth_preflight",
+        "gameplay",
+        "fix"
+      ],
       "type": "required_any",
       "pattern": "fetchProfile\\s*\\([^\\)]*resolvedSdk|resolvedSdk\\s*\\?\\.avatar|const\\s+sdkRef\\s*=\\s*resolvedSdk\\s*\\|\\|\\s*sdk|const\\s+resolvedSdk\\s*=\\s*sdk\\s*\\|\\||const\\s+currentSdk\\s*=|enrichProfile\\s*\\([^\\)]*(?:currentSdk|resolvedSdk)",
       "message": "Profile fetch must use the currently detected SDK instance in the same init cycle.",
-      "severity": "high"
+      "severity": "high",
+      "skipIfBuildType": "static",
+      "skipReason": "Static/PlayCanvas templates use viverse-auth-overlay.js for auth bootstrap. This pattern is only required for hand-written auth code in Vite/React templates."
     },
     {
       "id": "auth-no-profile-downgrade",
-      "profiles": ["auth"],
-      "phases": ["gameplay", "fix"],
+      "profiles": [
+        "auth"
+      ],
+      "phases": [
+        "gameplay",
+        "fix"
+      ],
       "type": "required_any",
       "pattern": "VIVERSE Player|Player-.*(overwrite|downgrade)|isGeneric\\s*=|if\\s*\\(!isGeneric\\(",
       "message": "Auth/profile merge must avoid downgrading specific names to generic fallback.",
