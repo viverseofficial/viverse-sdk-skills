@@ -31,35 +31,60 @@ Use this when a project needs:
 
 ## Get Profile + Avatar URL
 
-After `checkAuth()` returns an `access_token`, use the **Avatar SDK** to fetch profile data:
+> [!CAUTION]
+> **When using `ViverseAuthController` (the standard auth module), do NOT call `avatarClient.getProfile()` yourself.**
+> `enrichProfile()` inside the auth controller already calls it internally and merges the full response into `state.profile.raw`.
+> Calling it a second time from `main.js` or your game code will throw **"This API is only available to logged-in users"** because the second call doesn't have the correct token context.
+
+### Pattern A — With ViverseAuthController (standard)
+
+The auth controller already fetches the avatar profile. Read the 3D URL directly from `state.profile.raw`:
 
 ```javascript
-const vSdk = window.viverse || window.VIVERSE_SDK;
-const avatarClient = new vSdk.avatar({
-    baseURL: 'https://sdk-api.viverse.com/',
-    accessToken: accessToken  // from checkAuth().access_token
-});
+// In your auth callback:
+const auth = new ViverseAuthController(async state => {
+    if (state.status !== 'ready' || !state.isAuthenticated) return;
 
+    // ✅ enrichProfile() already called getProfile() — read from raw
+    const raw = state.profile.raw || {};
+    const avatarUrl = raw.activeAvatar?.vrmUrl      // VRM-backed (check FIRST)
+                   || raw.activeAvatar?.avatarUrl   // GLB fallback
+                   || null;
+
+    // state.profile.avatarUrl = headIconUrl (2D icon only, NOT the 3D model URL)
+    // The 3D model URL lives in state.profile.raw.activeAvatar, not state.profile
+
+    if (avatarUrl) loadAvatarModel(avatarUrl);
+});
+```
+
+Key distinction:
+- `state.profile.avatarUrl` → **2D head icon URL only** (set by `normalizeProfile` from `headIconUrl`)
+- `state.profile.raw.activeAvatar.vrmUrl` → **3D model URL** (full raw response from `getProfile()`)
+
+### Pattern B — Without ViverseAuthController (manual)
+
+Only if managing auth yourself without the standard auth controller:
+
+```javascript
+const vSdk = window.vSdk || window.viverse || window.VIVERSE_SDK;
+const avatarClient = new vSdk.avatar({
+    baseURL:       'https://sdk-api.viverse.com/',
+    accessToken:   token,
+    token,                  // some SDK versions use this field
+    authorization: token,   // and/or this field
+});
 const profile = await avatarClient.getProfile();
+const avatarUrl = profile.activeAvatar?.vrmUrl
+               || profile.activeAvatar?.avatarUrl
+               || null;
 ```
 
 > [!CAUTION]
 > `checkAuth()` does **NOT** return avatar URLs or display name. You must use the Avatar SDK `getProfile()` method.
 
-Use:
-- `profile.activeAvatar?.avatarUrl` for 3D model (.glb)
-- `profile.activeAvatar?.vrmUrl` for 3D model (.vrm) — **check this FIRST**; VRM-backed avatars do NOT populate `avatarUrl`
-- `profile.activeAvatar?.headIconUrl` for 2D UI
-
 > [!CAUTION]
 > **Always check `vrmUrl` before `avatarUrl`.** The VIVERSE default avatar uses VRM format and will return `activeAvatar.vrmUrl` while leaving `avatarUrl` null. Checking only `avatarUrl` gives a false null and loads the fallback instead of the real avatar.
-
-```javascript
-// Correct extraction order:
-const avatarUrl = profile.activeAvatar?.vrmUrl
-               || profile.activeAvatar?.avatarUrl
-               || null;
-```
 
 ## PlayCanvas Load Pattern (Core)
 
@@ -150,6 +175,9 @@ For VIVERSE VRMA retargeting:
 
 ## Gotchas
 
+- **`getProfile()` is already called by `ViverseAuthController`** — calling it again from `main.js` throws "This API is only available to logged-in users". Read `state.profile.raw.activeAvatar` instead.
+- **`state.profile.avatarUrl` is the 2D head icon, NOT the 3D model** — `normalizeProfile()` maps `activeAvatar.headIconUrl` → `profile.avatarUrl`. For the 3D GLB/VRM URL, always read `state.profile.raw.activeAvatar.vrmUrl || state.profile.raw.activeAvatar.avatarUrl`.
+- **AvatarClass constructor needs multiple token fields** — pass `{ accessToken, token, authorization }` all set to the same token value; different SDK versions use different field names.
 - Avatar SDK requires auth token; `checkAuth()` alone has no avatar URL.
 - VIVERSE avatars may be VRM-backed GLB; force container handler where needed.
 - **`vrmUrl` takes priority over `avatarUrl`** — VRM profiles do not populate `avatarUrl`.
