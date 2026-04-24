@@ -70,6 +70,93 @@ avatarLocal = frameCorrect * delta * inv(frameCorrect)
 - **Vite/SPA Routing Bug**: `.vrma` files are not universally recognized MIME types. If hosted on VIVERSE or local Vite servers, fetching `assets/idle.vrma` may return the SPA wildcard fallback (`index.html`), causing `SyntaxError: Unexpected token '<'` during GLTF parsing. **Fix**: Rename the asset to `.glb` (e.g., `Walk_vrma.glb`) to force `model/gltf-binary` MIME type serving.
 - **VRMAnimationLoaderPlugin TypeError**: The `@pixiv/three-vrm-animation` package exports `VRMAnimationLoaderPlugin` as a class. Destructuring `createVRMAnimationLoaderPlugin` (which does not exist) and passing `undefined` to `GLTFLoader.register()` causes a silent failure that later manifests as `TypeError: u is not a function` during parsing.
 
+## Procedural Pose Animation (No VRMA file needed)
+
+For game characters that need specific poses (idle, aim, shoot) without a VRMA clip file, drive bones directly via `vrm.humanoid.getNormalizedBoneNode()`. This is lighter than loading VRMA and works well for tower defense / action games.
+
+### Step 0 — Always log available bones first
+
+VIVERSE avatar bone availability varies by avatar. Log before building poses:
+
+```javascript
+const testBones = ['leftUpperArm','rightUpperArm','leftLowerArm','rightLowerArm',
+  'leftHand','rightHand','spine','chest','upperChest','neck','head'];
+const found   = testBones.filter(b => vrm.humanoid.getNormalizedBoneNode(b));
+const missing = testBones.filter(b => !vrm.humanoid.getNormalizedBoneNode(b));
+console.log('[Anim] Found:', found.join(', '));
+console.log('[Anim] Missing:', missing.join(', '));
+// Build poses ONLY from confirmed-found bones
+```
+
+> [!CAUTION]
+> Only include bones in your pose tables that are confirmed present. Missing bones silently skip (no error), but if you assume a bone exists and build interpolation math around it, you get subtle wrong behavior.
+
+### Step 1 — Define named pose tables
+
+```javascript
+// Euler angles [rx, ry, rz] in radians
+const POSE_IDLE = {
+  leftUpperArm:  [0, 0,  1.0],   // arms lowered from T-pose (A-pose)
+  rightUpperArm: [0, 0, -1.0],
+  leftLowerArm:  [0, 0,  0.2],
+  rightLowerArm: [0, 0, -0.2],
+  spine: [0.05, 0, 0],
+};
+
+const POSE_AIM = {
+  leftUpperArm:  [-1.2, -0.2,  0.2],  // bow arm extends forward
+  leftLowerArm:  [-0.3,  0.0,  0.0],
+  rightUpperArm: [-1.0,  0.3, -1.4],  // draw arm pulls FAR back
+  rightLowerArm: [-1.6,  0.0,  0.0],
+  spine: [0.15, 0, 0],
+};
+```
+
+### Step 2 — Animate with eased lerp in render loop
+
+```javascript
+function updateAnim(dt, vrm, phase, t) {
+  const ease = t < 0.5 ? 2*t*t : -1+(4-2*t)*t; // ease-in-out
+  for (const bone of Object.keys(toPose)) {
+    const node = vrm.humanoid.getNormalizedBoneNode(bone);
+    if (!node) continue;
+    const from = fromPose[bone] || [0,0,0];
+    const to   = toPose[bone];
+    node.quaternion.setFromEuler(new THREE.Euler(
+      from[0] + (to[0]-from[0])*ease,
+      from[1] + (to[1]-from[1])*ease,
+      from[2] + (to[2]-from[2])*ease, 'XYZ'
+    ));
+  }
+}
+
+// CRITICAL: call vrm.update(dt) AFTER setting bones, not before
+vrm.update(dt);
+```
+
+### Facing Direction Gotcha (Three.js)
+
+> [!CAUTION]
+> **VRM faces -Z by default. Set `rotation.y = 0` when enemies are at negative Z.** Setting `rotation.y = Math.PI` (as many tutorials suggest for "facing the camera") will make the avatar face TOWARD the camera and AWAY from enemies.
+
+```javascript
+// If enemies are at z = -30 (negative Z), avatar should face -Z:
+vrm.scene.rotation.y = 0;        // ✅ faces enemies
+// vrm.scene.rotation.y = Math.PI; // ❌ faces camera (common mistake)
+```
+
+### aimAt formula when VRM faces -Z
+
+When VRM default is `rotation.y = 0` (facing -Z), the aim formula must use `atan2(x, -z)` not `atan2(x, z)`:
+
+```javascript
+// ❌ Wrong — gives π when enemy is straight ahead at z=-30
+model.rotation.y = Math.atan2(dir.x, dir.z);
+
+// ✅ Correct — gives 0 when enemy is straight ahead at z=-30
+model.rotation.y = Math.atan2(dir.x, -dir.z);
+```
+
 ## Native VRMA Loading (Three.js - Recommended)
 
 The 100% native solution for Three.js VRM avatars is to use `.vrma` animation files loaded via `@pixiv/three-vrm-animation`. This guarantees perfect rest pose alignment without complex retargeting math.
