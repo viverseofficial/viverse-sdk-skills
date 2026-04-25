@@ -145,6 +145,18 @@ vrm.scene.rotation.y = 0;        // ✅ faces enemies
 // vrm.scene.rotation.y = Math.PI; // ❌ faces camera (common mistake)
 ```
 
+### ry axis direction for arm bones (verified by screenshot testing)
+
+```
+leftUpperArm  (bone points -X): ry- = FORWARD (-Z, toward enemies)  ry+ = BACKWARD ✗
+rightUpperArm (bone points +X): ry+ = BACKWARD (+Z, behind head)    ry- = FORWARD  ✗
+rightUpperArm (bone points +X): rz+ = RAISES arm                    rz- = LOWERS   ✓
+leftUpperArm  (bone points -X): rz- = RAISES arm                    rz+ = LOWERS   ✓
+```
+
+This is a common gotcha — ry sign is OPPOSITE between left and right arms. Easy to get wrong because
+it looks intuitive to use ry+ for both "forward" motions.
+
 ### aimAt formula when VRM faces -Z
 
 When VRM default is `rotation.y = 0` (facing -Z), the aim formula must use `atan2(x, -z)` not `atan2(x, z)`:
