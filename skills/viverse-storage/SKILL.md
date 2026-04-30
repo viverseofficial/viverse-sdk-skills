@@ -1,6 +1,6 @@
 ---
 name: viverse-storage
-description: Persist user game state to VIVERSE cloud using the Storage SDK (CloudSaveClient). Covers cloud save, local fallback, and first-login merge.
+description: Persist user game state to VIVERSE cloud using the Storage SDK (CloudSaveClient). Covers cloud save, local fallback, first-login merge, async timing pitfalls, and exit-save patterns.
 prerequisites: [VIVERSE Auth integration (access token), VIVERSE Studio App ID]
 tags: [viverse, storage, cloud-save, persistence, save-data]
 ---
@@ -174,17 +174,164 @@ async function mergeLocalToCloud(token) {
 // Call this immediately after auth resolves
 ```
 
+### 7. Full integration sequence (main.js)
+
+Auth resolves asynchronously — always follow this order to avoid races:
+
+```javascript
+const gameSave = new ViverseGameSave(appId);
+const game = new Game(gameSave); // loads local save into _pendingSave immediately in constructor
+
+// ... later, when auth resolves:
+game.setAuthToken(token);
+await gameSave.mergeLocalToCloud(token); // first-login: local → cloud (clears local after)
+game.loadSave();                         // fire-and-forget; phase-aware application
+```
+
+**Why this order matters:**
+- `new Game()` grabs local save synchronously before any async auth completes — guest progress is never lost
+- `mergeLocalToCloud()` must complete before `loadSave()` so the cloud save exists to load
+- `loadSave()` is phase-aware; it handles every game state correctly (see Phase-Aware Loading below)
+
 ---
 
 ## Save Trigger Matrix
 
 | Trigger | Cloud | Local |
 |---------|-------|-------|
-| Wave/round start | ✅ | ✅ |
-| Shop closed | ✅ | ✅ |
+| Wave/round start (auto-save) | ✅ | ✅ |
+| Shop "Save & Leave" | ✅ | ✅ |
 | Game over | ✅ | ✅ |
-| `visibilitychange` (tab hide) | best-effort | ✅ |
+| `visibilitychange` (tab hide) | best-effort beacon | ✅ sync |
+| `beforeunload` | best-effort beacon | ✅ sync |
 | Every N seconds periodic | ❌ (too frequent) | ✅ |
+
+---
+
+## Exit Save Pattern (visibilitychange / beforeunload)
+
+**CRITICAL**: Do NOT use `navigator.sendBeacon()` for cloud save. `sendBeacon` does not support custom request headers, but the Storage SDK endpoint requires an `AccessToken` header.
+
+**Correct approach**: Use `fetch` with `keepalive: true` — it survives page close and supports custom headers:
+
+```javascript
+function saveBeacon(token, data) {
+  if (!appId || !token) return;
+  const url = `https://broadcasting-gateway-gaming.vrprod.viveport.com/api/webrtcbot-service/v1/cloudsave/${appId}/upsert/game_save`;
+  try {
+    fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'AccessToken': token },
+      body: JSON.stringify(data),
+      keepalive: true,   // survives page close, like sendBeacon
+    }).catch(() => {}); // best-effort only
+  } catch {}
+}
+```
+
+**Exit save guard** — only save during active gameplay phases (not menus/game-over to avoid overwriting progress):
+
+```javascript
+function _exitSave() {
+  const ACTIVE_PHASES = new Set(['fighting', 'countdown', 'shop']);
+  if (!ACTIVE_PHASES.has(this.phase)) return;
+  const snap = this._buildSnapshot();
+  this._saveService.saveLocal(snap);              // synchronous — safe in beforeunload
+  if (this._authToken) {
+    this._saveService.saveBeacon(this._authToken, snap); // async keepalive
+  }
+}
+
+document.addEventListener('visibilitychange', () => { if (document.hidden) _exitSave(); });
+window.addEventListener('beforeunload', () => _exitSave());
+```
+
+---
+
+## Phase-Aware Save Loading
+
+When `loadSave()` is called, the game may already be running. Handle all states:
+
+```javascript
+async loadSave() {
+  let snap = await loadCloud(token).catch(() => null) ?? loadLocal();
+  if (!snap || snap.v !== SAVE_VERSION) return;
+
+  if (this.phase === 'title') {
+    // Title screen already showing — refresh it with fresher cloud save
+    this._pendingSave = snap;
+    this.hud.showTitleScreen(snap, onContinue, onNewGame);
+
+  } else if (this.totalWave <= 1 && this.phase === 'countdown') {
+    // Wave 1 countdown is live — reset to apply save (waveGen++ invalidates old countdown)
+    this._pendingSave = snap;
+    this._reset();
+
+  } else if (this.totalWave <= 1 && this.phase === 'intro') {
+    // Pre-wave — just stash, _startNextWave() will apply it
+    this._pendingSave = snap;
+
+  } else {
+    // Active gameplay — queue for next restart with a notification banner
+    this._pendingSave = snap;
+    this.hud.showBanner('☁ Save found — resumes on restart', 4000);
+  }
+}
+```
+
+---
+
+## Generation Counter Pattern (Prevent Double-Start)
+
+When save loading is async, a stale countdown callback can fire after a reset, spawning a second wave. Use a generation counter to invalidate stale closures:
+
+```javascript
+// In constructor / state:
+this._waveGen = 0;
+
+// In _reset():
+this._waveGen++; // invalidate all in-flight callbacks from previous run
+
+// In countdown callback — capture gen at creation time:
+const gen = this._waveGen;
+showCountdown(3, () => {
+  if (this._waveGen !== gen) return; // stale callback — discard
+  this.enemies.spawnWave(...);
+});
+```
+
+**When this matters**: If auth resolves after game start, `loadSave()` may call `_reset()` which increments `_waveGen`. Any countdown callback captured before the reset will see a mismatched generation and bail out cleanly, preventing double-spawn.
+
+---
+
+## Startup Title Screen (Continue vs New Game)
+
+When a save exists, show a title screen before starting wave 1 to let the player choose:
+
+```javascript
+// In _startNextWave() at wave 0, before starting the intro:
+if (this.totalWave === 0 && this._pendingSave) {
+  const snap = this._pendingSave;
+  this.phase = 'title';
+  this.hud.showTitleScreen(
+    snap,
+    () => { this._applySnapshot(snap); },          // Continue
+    () => { this._pendingSave = null; this._saveService?.clearLocal(); this._startNextWave(); }, // New Game
+  );
+  return;
+}
+```
+
+Title screen UI should display save metadata (stage, wave, date) so the player knows what they're continuing:
+
+```javascript
+function showTitleScreen(snap, onContinue, onNewGame) {
+  const label = snap
+    ? `Stage ${(snap.stageIdx ?? 0) + 1} · Wave ${snap.waveInStage ?? 1}`
+    : null;
+  // render overlay with Continue / New Game buttons + label
+}
+```
 
 ---
 
@@ -208,6 +355,15 @@ Every method throws synchronously if the token resolves to empty — do NOT call
 ### 6. SDK is separate from core VIVERSE SDK
 `window.viverse` does NOT include Storage. You must load the separate script URL. Do not assume `window.viverse.storage` exists — it doesn't.
 
+### 7. sendBeacon does NOT work for cloud save
+`navigator.sendBeacon(url, blob)` cannot send custom headers. The Storage API requires `AccessToken` header. Use `fetch(..., { keepalive: true })` instead — same unload survival, full header support.
+
+### 8. mergeLocalToCloud clears local save — load cloud AFTER merge
+After `mergeLocalToCloud(token)` runs, `loadLocal()` returns `null` (the local data was promoted and cleared). Always call `loadSave()` after `mergeLocalToCloud()` completes, not before or concurrently.
+
+### 9. Async save load can race with game start
+The game constructor may call `_reset()` → `_startNextWave()` before auth resolves. The save may arrive mid-countdown. Use `_pendingSave` + phase-aware application in `loadSave()` — never directly call `_reset()` from save load unless you are certain the game is at wave 0.
+
 ---
 
 ## Guest UX Pattern (Sign-up Driver)
@@ -222,32 +378,51 @@ Show a cloud save CTA on game-over/victory screens for non-authenticated users:
 </div>
 ```
 
-Key UX rules:
+Additional UX rules:
 - Guest progress is saved to `localStorage` silently (no "saved locally" toast needed)
 - CTA appears on natural pauses (end screen, between rounds) — never as a blocking modal
 - On first login, automatically merge local → cloud (no manual action required from user)
+- Add a "Save & Leave" button in the shop/pause menu — saves locally for guests, cloud+local for auth users, then reloads
+
+```javascript
+// Save & Leave handler (works for both guests and auth users)
+async function onSaveAndLeave() {
+  const snap = buildSnapshot();
+  saveLocal(snap);
+  if (authToken) {
+    await saveCloud(authToken, snap).catch(() => {});
+  }
+  location.reload();
+}
+```
 
 ---
 
 ## Save Data Schema Best Practices
 
-- Include a version field (`v: 1`) for future schema migrations
-- Include a `savedAt` timestamp (epoch ms) for conflict resolution
+- Include a version constant `SAVE_VERSION = 1` — gate all save reads on `snap.v === SAVE_VERSION`
+- Include a `savedAt` timestamp (epoch ms) for conflict resolution and display
 - Keep the payload small — no scene objects, no meshes, no 3D state
 - Store IDs, levels, and counters — not computed values that can be re-derived
+- Tag local saves with `_local: true` so `mergeLocalToCloud` can distinguish them from cloud copies
 
 ```javascript
-// Example schema
+const SAVE_VERSION = 1;
+
 const snapshot = {
-  v: 1,
+  v: SAVE_VERSION,
   savedAt: Date.now(),
   stageIdx: 2,
-  wave: 4,
+  waveInStage: 4,
+  totalWave: 14,
   gold: 450,
   score: 12000,
+  castleHp: 380,
+  kills: 147,
   ownedWeaponIds: ['inferno', 'frost'],
   weaponLevels: { inferno: 3, frost: 1 },
   bowLevels: { pierce: 2, fireRate: 1, damage: 3 },
+  slotAssignments: ['bow', 'inferno', null],
 };
 ```
 
@@ -261,3 +436,7 @@ const snapshot = {
 - [ ] `getPlayerData` returns `null` (no save) vs throws (bad token/appId)
 - [ ] Not calling save methods for guest/unauthenticated users
 - [ ] Save payload contains no circular references or non-serializable values
+- [ ] `mergeLocalToCloud` awaited before `loadSave()` is called
+- [ ] Exit save uses `fetch+keepalive`, NOT `navigator.sendBeacon`
+- [ ] Phase guard in `_exitSave()` prevents saving over progress from menu/gameover phases
+- [ ] Generation counter guards all countdown callbacks after `_reset()`
