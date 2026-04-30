@@ -1,0 +1,30 @@
+{
+  "id": "vrm-weapon-attach",
+  "name": "vrm-weapon-attach",
+  "version": "0.1.0",
+  "status": "active",
+  "description": "Attach weapon/prop GLB models to VRM avatar hand bones in Three.js + @pixiv/three-vrm. Covers world-space holder pattern, normalized vs raw bone hierarchy, palm center positioning, finger curl grip poses, weapon orientation debugging, emissive visual enhancement, and avatar facing direction formula.",
+  "tags": [
+    "threejs",
+    "vrm",
+    "three-vrm",
+    "weapon",
+    "attachment",
+    "hand-bone",
+    "grip",
+    "animation",
+    "viverse",
+    "avatar",
+    "prop"
+  ],
+  "prerequisites": [
+    "Three.js",
+    "@pixiv/three-vrm",
+    "VIVERSE Avatar SDK",
+    "Weapon GLB assets"
+  ],
+  "engine": "threejs",
+  "verified": true,
+  "verifiedDate": "2026-04-28",
+  "verifiedProject": "kingshot-archer"
+}

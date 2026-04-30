@@ -222,6 +222,7 @@ Interpretation:
 - If authenticated `getLeaderboard` remains empty, try `getGuestLeaderboard` as a read fallback for display.
 - `HTTP error ... /api/vrleaderboard/v1/apps/<appId>` with `404` means leaderboard backend cannot find that app id; verify leaderboard was created in Studio under the same app and try `VITE_VIVERSE_APP_ID` / `VITE_VIVERSE_CLIENT_ID` candidate fallback.
 - Error stacks that reference an old bundle hash (for example previous `index-*.js`) indicate stale cached build; verify latest published hash/build tag before debugging logic.
+- If every leaderboard row renders as `#1`, the cause is using `r.rank || i+1` — the API returns **0-based** ranks, so `rank=0` (1st place) is falsy and falls back to `i+1=1`, and `rank=1` (2nd place) is truthy but also renders as `#1`. Fix: `(typeof r.rank === 'number') ? r.rank + 1 : i + 1`.
 
 ## App Scope and Naming
 
@@ -253,6 +254,18 @@ For test/prod:
 - `Upload leaderboard record successfully` does not guarantee immediate non-empty ranking rows.
 - `THREE.WebGLRenderer: Context Lost` is graphics lifecycle related, not leaderboard API failure.
 - Duplicate end callbacks can repeatedly submit scores unless guarded by a per-match idempotency key.
+- **`r.rank` is 0-based — do not use it with `||` fallback**: The VIVERSE `getLeaderboard` API returns a **0-based** `rank` field (rank=0 is #1, rank=1 is #2, etc.). The pattern `r.rank || r.ranking || i + 1` is broken because `rank=0` is falsy and falls through to `i+1=1`, while `rank=1` is truthy and renders as `#1` — causing the first two rows to both show `#1`.
+
+  **Wrong:**
+  ```js
+  const rank = r.rank || r.ranking || i + 1; // rank=0 is falsy → #1; rank=1 truthy → also #1
+  ```
+
+  **Correct:**
+  ```js
+  // r.rank is 0-based; add 1 for 1-based display. Fallback to array index if field is absent.
+  const rank = (typeof r.rank === 'number') ? r.rank + 1 : i + 1;
+  ```
 
 ## References
 

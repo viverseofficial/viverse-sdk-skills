@@ -1,0 +1,15 @@
+{
+  "id": "viverse-storage",
+  "name": "viverse-storage",
+  "version": "0.1.0",
+  "status": "active",
+  "description": "Persist per-user game state to VIVERSE cloud using the Storage SDK (CloudSaveClient). Covers cloud save, local fallback, and first-login merge.",
+  "tags": [
+    "viverse",
+    "storage",
+    "cloud-save",
+    "persistence",
+    "save-data",
+    "cloudsaveclient"
+  ]
+}

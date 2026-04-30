@@ -32,6 +32,7 @@ The agent auto-loads SKILL.md summaries on startup. When it detects a task match
 | [viverse-r3f-profile-ui](./viverse-r3f-profile-ui/) | Profile/player-tag UI patterns using `useViverseProfile()` |
 | [viverse-threejs-vanilla-foundation](./viverse-threejs-vanilla-foundation/) | Vanilla Three.js + VIVERSE integration foundation without React |
 | [viverse-leaderboard](./viverse-leaderboard/) | Global leaderboards via VIVERSE gameDashboard SDK |
+| [viverse-storage](./viverse-storage/) | Cloud save per-user game state via VIVERSE Storage SDK (CloudSaveClient), local fallback, first-login merge |
 | [viverse-multiplayer](./viverse-multiplayer/) | Matchmaking & Play SDK — rooms, create/join, custom state sync |
 | [viverse-template-generation](./viverse-template-generation/) | File-backed template registry, contract enforcement, and certification workflow |
 | [viverse-key-protection-lambda](./viverse-key-protection-lambda/) | Protect API keys with Play Lambda env/script/invoke boundaries, plus manual-approval CI sync flow |

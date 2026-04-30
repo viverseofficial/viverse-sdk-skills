@@ -1,0 +1,263 @@
+---
+name: viverse-storage
+description: Persist user game state to VIVERSE cloud using the Storage SDK (CloudSaveClient). Covers cloud save, local fallback, and first-login merge.
+prerequisites: [VIVERSE Auth integration (access token), VIVERSE Studio App ID]
+tags: [viverse, storage, cloud-save, persistence, save-data]
+---
+
+# VIVERSE Storage SDK — Cloud Save
+
+Use the VIVERSE Storage SDK to persist per-user game state (progress, inventory, settings) to VIVERSE cloud. Requires a logged-in user with a valid access token.
+
+## When To Use This Skill
+
+- Save/restore game progress across devices or sessions
+- Persist loadout, upgrades, scores, unlocks for authenticated users
+- Show "sign in to save your progress" CTA to guests (sign-up driver)
+- First-login merge: promote local guest save to cloud on first auth
+
+## Read Order
+
+1. This file (constraints + workflow)
+2. [viverse-auth/SKILL.md](../viverse-auth/SKILL.md) — you need a valid access token first
+
+---
+
+## SDK URL
+
+```
+https://www.viverse.com/static-assets/storage-sdk/1.0.0/storage-sdk.umd.js
+```
+
+Exposes `globalThis.storage.CloudSaveClient` after script loads.
+
+---
+
+## Mandatory Compliance Gates (MUST PASS)
+
+1. **MUST** have a valid VIVERSE access token — all CloudSaveClient calls throw `"This API is only available to logged-in users."` if the token is invalid/empty.
+2. **MUST** pass `appId` (string, 10-char Studio app ID) to `new CloudSaveClient(appId)`.
+3. **MUST NOT** store secrets, credentials, or tokens in cloud save data — only non-secret user-scoped state.
+4. **MUST** handle the `204 No Content` case — `getPlayerData()` returns `null` when no save exists, not an error.
+5. **MUST** load SDK script before instantiating `CloudSaveClient` — it is NOT included in the VIVERSE core SDK bundle.
+6. **MUST NOT** call save on every frame or tick — save at checkpoints (wave start, shop close, game over, visibility change).
+
+---
+
+## CloudSaveClient API
+
+### Instantiation
+
+```javascript
+// Storage SDK exposes itself as globalThis.storage after script loads
+const client = new globalThis.storage.CloudSaveClient(appId);
+// appId must be a non-empty string (your Studio 10-char app ID)
+```
+
+### `setPlayerData(key, data, token)` → `Promise<void>`
+
+Upsert a named data blob for the current user.
+
+- `key` — non-empty string identifying the save slot (e.g. `"game_save"`)
+- `data` — non-null object (or valid JSON string)
+- `token` — VIVERSE access token string
+- Throws if key/data/token is empty string or null
+
+```javascript
+await client.setPlayerData('game_save', { wave: 5, gold: 300 }, accessToken);
+```
+
+Internally calls: `POST /api/webrtcbot-service/v1/cloudsave/{appId}/upsert/{key}`
+
+### `getPlayerData(key, token)` → `Promise<data | null>`
+
+Retrieve a named blob. Returns `null` if no save exists (HTTP 204).
+
+- `key` — non-empty string
+- `token` — VIVERSE access token string
+
+```javascript
+const save = await client.getPlayerData('game_save', accessToken);
+// save is null if not found, or the object you previously set
+```
+
+Internally calls: `GET /api/webrtcbot-service/v1/cloudsave/{appId}`  
+Response shape: `{ data: { player_data: { [key]: yourObject } } }`  
+`getPlayerData` handles the unwrapping — you get `yourObject` directly.
+
+### Other methods (lower-level, use sparingly)
+
+| Method | Description |
+|--------|-------------|
+| `client.userApp.save(data, token)` | Save entire userapp blob (alternative to CloudSave) |
+| `client.userApp.getLatest(token)` | Get most recent userapp snapshot |
+| `client.userApp.getAll(token)` | Get all userapp versions |
+| `client.userApp.delete(version, token)` | Delete a specific version |
+| `client.cloudSave.save(key, data, token)` | Low-level upsert (same as setPlayerData internals) |
+| `client.cloudSave.get(token)` | Low-level get all cloud save data |
+
+Prefer `setPlayerData` / `getPlayerData` — they wrap the low-level API with key-based access.
+
+---
+
+## Implementation Workflow
+
+### 1. Load Storage SDK
+
+```javascript
+async function loadStorageSdk() {
+  if (globalThis.storage?.CloudSaveClient) return; // already loaded
+  await new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = 'https://www.viverse.com/static-assets/storage-sdk/1.0.0/storage-sdk.umd.js';
+    s.onload = res;
+    s.onerror = () => rej(new Error('Storage SDK failed to load'));
+    document.head.appendChild(s);
+  });
+}
+```
+
+### 2. Instantiate Client
+
+```javascript
+await loadStorageSdk();
+const saveClient = new globalThis.storage.CloudSaveClient(appId);
+```
+
+### 3. Save
+
+```javascript
+async function saveToCloud(token, data) {
+  await saveClient.setPlayerData('game_save', data, token);
+}
+```
+
+### 4. Load
+
+```javascript
+async function loadFromCloud(token) {
+  const data = await saveClient.getPlayerData('game_save', token);
+  return data; // null if no save exists
+}
+```
+
+### 5. Local fallback for guests
+
+Always mirror cloud save in `localStorage` so guests don't lose progress:
+
+```javascript
+const LOCAL_KEY = 'myapp_v1_save';
+
+function saveLocal(data) {
+  localStorage.setItem(LOCAL_KEY, JSON.stringify(data));
+}
+
+function loadLocal() {
+  const raw = localStorage.getItem(LOCAL_KEY);
+  return raw ? JSON.parse(raw) : null;
+}
+```
+
+### 6. First-login merge
+
+When a guest logs in for the first time, upload their local save to cloud if no cloud save exists:
+
+```javascript
+async function mergeLocalToCloud(token) {
+  const local = loadLocal();
+  if (!local) return;
+  const existing = await loadFromCloud(token);
+  if (existing) return; // cloud save wins
+  await saveToCloud(token, local);
+  localStorage.removeItem(LOCAL_KEY);
+}
+// Call this immediately after auth resolves
+```
+
+---
+
+## Save Trigger Matrix
+
+| Trigger | Cloud | Local |
+|---------|-------|-------|
+| Wave/round start | ✅ | ✅ |
+| Shop closed | ✅ | ✅ |
+| Game over | ✅ | ✅ |
+| `visibilitychange` (tab hide) | best-effort | ✅ |
+| Every N seconds periodic | ❌ (too frequent) | ✅ |
+
+---
+
+## Critical Gotchas
+
+### 1. Response shape
+`getPlayerData(key, token)` returns the data you stored **directly** — no wrapping needed. Internally the API returns `{ data: { player_data: { [key]: data } } }` but `getPlayerData` unwraps all of that.
+
+### 2. 204 = no save (not an error)
+If no save exists, `getPlayerData` returns `null` (SDK converts 204 → `{}`→ `null`). Do not treat `null` as an error.
+
+### 3. Token must be access token (JWT), not auth key
+The SDK internally checks if the token is a JWT (`le(token)` check) and routes it to the correct header (`AccessToken` vs `AuthKey`). Always pass the `access_token` from `checkAuth()`.
+
+### 4. appId is required and must be a string
+`new CloudSaveClient(appId)` throws `"appId is required"` / `"appId must be a string"` if the value is undefined, null, or not a string.
+
+### 5. Not available without login
+Every method throws synchronously if the token resolves to empty — do NOT call any save methods for guest users. Check auth state before calling.
+
+### 6. SDK is separate from core VIVERSE SDK
+`window.viverse` does NOT include Storage. You must load the separate script URL. Do not assume `window.viverse.storage` exists — it doesn't.
+
+---
+
+## Guest UX Pattern (Sign-up Driver)
+
+Show a cloud save CTA on game-over/victory screens for non-authenticated users:
+
+```html
+<!-- Show only when isGuest === true -->
+<div class="save-cta">
+  🔐 <strong>Sign in to VIVERSE</strong>
+  <br>Save your progress to cloud and compete on global leaderboards.
+</div>
+```
+
+Key UX rules:
+- Guest progress is saved to `localStorage` silently (no "saved locally" toast needed)
+- CTA appears on natural pauses (end screen, between rounds) — never as a blocking modal
+- On first login, automatically merge local → cloud (no manual action required from user)
+
+---
+
+## Save Data Schema Best Practices
+
+- Include a version field (`v: 1`) for future schema migrations
+- Include a `savedAt` timestamp (epoch ms) for conflict resolution
+- Keep the payload small — no scene objects, no meshes, no 3D state
+- Store IDs, levels, and counters — not computed values that can be re-derived
+
+```javascript
+// Example schema
+const snapshot = {
+  v: 1,
+  savedAt: Date.now(),
+  stageIdx: 2,
+  wave: 4,
+  gold: 450,
+  score: 12000,
+  ownedWeaponIds: ['inferno', 'frost'],
+  weaponLevels: { inferno: 3, frost: 1 },
+  bowLevels: { pierce: 2, fireRate: 1, damage: 3 },
+};
+```
+
+---
+
+## Debugging Checklist
+
+- [ ] Storage SDK script loaded before `new CloudSaveClient()`
+- [ ] `appId` is a non-empty string matching Studio app
+- [ ] Token is a valid JWT (`access_token` from `checkAuth()`)
+- [ ] `getPlayerData` returns `null` (no save) vs throws (bad token/appId)
+- [ ] Not calling save methods for guest/unauthenticated users
+- [ ] Save payload contains no circular references or non-serializable values
