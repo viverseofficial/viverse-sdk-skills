@@ -48,6 +48,32 @@ Use this skill when implementing or evolving the internal template system (regis
     For App ID injection in non-Vite templates, use a sed-style replacement on the placeholder
     `YOUR_APP_ID` — pre-inject this placeholder in the template source's config file.
 
+12. **Fast-path template modification (visual/asset-only changes) must NOT re-scaffold.** When the user
+    requests only cosmetic changes to a seeded template workspace (e.g. "change ring to bird", "stylize
+    the aircraft"), the workspace is already copied from the template source. Do NOT run `npm install`,
+    do NOT re-seed, do NOT re-create the folder structure. Apply ONLY the specific string/value changes
+    to editable files, then build if `build.required` is true. Leave `YOUR_APP_ID` in place for the
+    publish step.
+
+13. **`CONTRACT.json` is auto-generated for fast-path runs** — it does NOT need to be created by an
+    Architect task. The system derives it from `template.json` `buildConfig` at seeding time. Do NOT
+    search for it in nested paths or run `find` commands to locate it; it is always at the workspace
+    root. If a `cat CONTRACT.json` returns an error, run `pwd && ls -la` to confirm you are in the
+    correct workspace root (not a double-nested path like `workspaces/.../workspaces/...`).
+
+14. **Scope for `[TEMPLATE_MODIFICATION_ONLY]` tasks is `gameplay + ui + platform-core.bootstrap`.**
+    The template contract enforces subsystem scopes. `index.html` is classified as
+    `platform-core.bootstrap` — if the scope only includes `gameplay + ui`, writing cosmetic title/theme
+    changes to `index.html` will be blocked. The fast-path modify task has `platform-core.bootstrap`
+    in its allowed subsystems specifically to permit this. Do NOT escalate scope beyond these three.
+
+15. **`[FAST_PATH]` publish tasks do not emit a formal `SKILL_COMPLIANCE_REPORT` block.** They are
+    3-step CLI tasks (login → app create → publish). Absence of the structured compliance report is
+    expected and tolerated; the task is not aborted for non-PASS skill compliance. The App ID obtained
+    from `viverse-cli app create` is automatically synced to `CONTRACT.json` by the orchestrator —
+    there is no need to manually patch it with `sed` unless the build output still contains the
+    `YOUR_APP_ID` placeholder.
+
 ## Template Checklist
 
 - [ ] Registry entry exists and template path is real
@@ -64,6 +90,15 @@ Use this skill when implementing or evolving the internal template system (regis
 - [ ] Static templates: large engine files (*.min.js, *.bin) are NOT in editablePaths
 - [ ] Static templates: App ID placeholder `YOUR_APP_ID` is pre-injected in the config file
   that `appIdPropagation.approvedConfigFiles` points to
+
+### Fast-Path (Visual/Asset Modification) Checklist
+
+- [ ] Workspace is already seeded — do NOT re-scaffold or re-run npm install
+- [ ] Read `CONTRACT.json` at workspace root (not a nested path) to get `editablePaths` and `build.required`
+- [ ] Apply only the specific named changes (swap strings/values in editable files)
+- [ ] If `build.required` is true, run `build.command` once — do NOT run it again in the publish task
+- [ ] Leave `YOUR_APP_ID` in source files; the publish step replaces it after `app create`
+- [ ] Scope is limited to `gameplay`, `ui`, `platform-core.bootstrap` — do NOT touch auth/matchmaking files
 
 ## Output Requirements
 
