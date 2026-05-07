@@ -168,6 +168,26 @@
       "skills": [
         "viverse-pls-cli"
       ]
+    },
+    {
+      "intent": [
+        "texture",
+        "image",
+        "sprite",
+        "symbol",
+        "overlay",
+        "icon",
+        "asset swap",
+        "replace image",
+        "block texture",
+        "cell texture",
+        "shapetype",
+        "shape type",
+        "block shape"
+      ],
+      "skills": [
+        "playcanvas-asset-art"
+      ]
     }
   ]
 }
