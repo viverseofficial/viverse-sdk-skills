@@ -1,0 +1,35 @@
+{
+  "rules": [
+    {
+      "id": "no-immutable-files",
+      "description": "Never modify immutable PlayCanvas files",
+      "pattern": "(__game-scripts\\.js|__modules__\\.js|__start__\\.js|__loading__\\.js|playcanvas-stable\\.min\\.js|viverse-auth-overlay\\.js)",
+      "severity": "error",
+      "message": "This file is part of the compiled PlayCanvas engine/bundle and must not be modified."
+    },
+    {
+      "id": "valid-enum-only",
+      "description": "Only use valid enum values from config.json — never invent values",
+      "severity": "error",
+      "message": "Read config.json assets.*.data.scripts.*.attributes.*.enum.options before setting any script attribute."
+    },
+    {
+      "id": "verify-asset-path",
+      "description": "Asset replacement path must match config.json url field exactly",
+      "severity": "warning",
+      "message": "Look up the asset's url in config.json before overwriting — path must be exact."
+    },
+    {
+      "id": "image-dimensions",
+      "description": "Replacement images should match original dimensions",
+      "severity": "warning",
+      "message": "Use sips or PIL to resize to original dimensions to avoid layout issues."
+    },
+    {
+      "id": "per-color-not-possible",
+      "description": "Per-color texture routing is not achievable in static templates",
+      "severity": "info",
+      "message": "Different textures per block color requires compiled script changes. Offer single-texture swap or shapeType change as alternatives."
+    }
+  ]
+}

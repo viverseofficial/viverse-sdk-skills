@@ -1,0 +1,27 @@
+{
+  "id": "playcanvas-asset-art",
+  "name": "playcanvas-asset-art",
+  "version": "0.1.0",
+  "status": "active",
+  "description": "Replace, fetch, and process texture/image assets in static PlayCanvas templates",
+  "tags": [
+    "playcanvas",
+    "texture",
+    "image",
+    "asset",
+    "art",
+    "symbol",
+    "overlay",
+    "sprite"
+  ],
+  "prerequisites": [
+    "PlayCanvas static template workspace"
+  ],
+  "entrypoint": "SKILL.md",
+  "rules": "rules.json",
+  "patterns_dir": "patterns",
+  "read_order": [
+    "SKILL.md"
+  ],
+  "dependencies": []
+}
