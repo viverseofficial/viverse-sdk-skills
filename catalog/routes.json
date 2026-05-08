@@ -183,7 +183,14 @@
         "cell texture",
         "shapetype",
         "shape type",
-        "block shape"
+        "block shape",
+        "bird",
+        "fire",
+        "animal",
+        "emoji",
+        "logo",
+        "fetch image",
+        "custom image"
       ],
       "skills": [
         "playcanvas-asset-art"
