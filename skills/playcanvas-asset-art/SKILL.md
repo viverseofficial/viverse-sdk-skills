@@ -16,6 +16,7 @@ Use this skill when the user request involves visual/art changes in a **compiled
 |---|---|
 | Change block/cell shape | Set `shapeType` enum in scene JSON |
 | Replace a texture with a custom image | Overwrite `files/assets/<id>/1/<filename>` |
+| Different texture per color | Patch `__game-scripts.js` to add per-color texture lookup, add per-color assets |
 | Fetch a symbol/icon from the web | `curl` from Iconify, SVG CDN, or public PNG |
 | Resize/convert an image | `sips` (macOS built-in) or `python3 PIL` |
 | Add a watermark or logo overlay | Composite with `python3 PIL` or `sips` |
@@ -24,7 +25,6 @@ Use this skill when the user request involves visual/art changes in a **compiled
 ### ❌ NOT POSSIBLE — compiled script is immutable
 | Request | Why blocked |
 |---|---|
-| Different texture per color (bird on blue, fire on red) | Requires logic in `__game-scripts.js` — immutable |
 | Add new script components | Compiled bundle — cannot add new scripts |
 | Per-entity custom shaders | Compiled engine — no runtime shader injection |
 
@@ -153,12 +153,93 @@ print('shapeType updated')
 
 If user asks for **different images on different colored blocks** (e.g. bird on blue, fire on red):
 
-1. Acknowledge the limitation first:
-   > "This template uses a single texture slot for all block cells — per-color custom textures would require modifying the compiled game script, which is locked. I can apply one symbol to all blocks, or change the block shape instead."
+### Step-by-Step: Patch `__game-scripts.js` for per-color textures
 
-2. Then ask (or infer from context) which alternative they prefer:
-   - **One symbol on all blocks** → fetch image + swap texture asset
-   - **Shape change** → update shapeType enum
+The compiled script uses one `textureBlock` for all colors. To support per-color textures, surgically patch it:
+
+#### 1. Add per-color texture attributes
+Find the line that registers `textureBlock`:
+```
+GridRenderer.attributes.add("textureBlock",{type:"asset",assetType:"texture",title:"Grid block"})
+```
+Add per-color attributes right after it:
+```js
+GridRenderer.attributes.add("textureBlockRed",{type:"asset",assetType:"texture",title:"Block texture (red)"})
+GridRenderer.attributes.add("textureBlockBlue",{type:"asset",assetType:"texture",title:"Block texture (blue)"})
+GridRenderer.attributes.add("textureBlockGreen",{type:"asset",assetType:"texture",title:"Block texture (green)"})
+GridRenderer.attributes.add("textureBlockYellow",{type:"asset",assetType:"texture",title:"Block texture (yellow)"})
+GridRenderer.attributes.add("textureBlockOrange",{type:"asset",assetType:"texture",title:"Block texture (orange)"})
+GridRenderer.attributes.add("textureBlockPurple",{type:"asset",assetType:"texture",title:"Block texture (purple)"})
+GridRenderer.attributes.add("textureBlockMaroon",{type:"asset",assetType:"texture",title:"Block texture (maroon)"})
+```
+
+#### 2. Add per-color lookup function
+Find `GridRenderer.prototype.initialize=function` and insert a lookup helper before it:
+```js
+GridRenderer.prototype._getPerColorBlockTexture=function(hex){
+  var m={
+    "#ff0000":"textureBlockRed","#cc0000":"textureBlockRed","#e74c3c":"textureBlockRed",
+    "#0000ff":"textureBlockBlue","#0066ff":"textureBlockBlue","#3498db":"textureBlockBlue",
+    "#00ff00":"textureBlockGreen","#00cc00":"textureBlockGreen","#2ecc71":"textureBlockGreen",
+    "#ffff00":"textureBlockYellow","#f1c40f":"textureBlockYellow",
+    "#ff8800":"textureBlockOrange","#ff6600":"textureBlockOrange","#e67e22":"textureBlockOrange",
+    "#800080":"textureBlockPurple","#9b59b6":"textureBlockPurple",
+    "#800000":"textureBlockMaroon","#8b0000":"textureBlockMaroon"
+  };
+  var h=(hex||"").toLowerCase(),attr=m[h];
+  if(!attr)for(var k in m)if(h.indexOf(k.slice(1,4))>=0){attr=m[k];break}
+  if(attr&&this[attr]&&this[attr].resource)return this[attr].resource;
+  return null;
+};
+```
+
+#### 3. Patch `_paintCellFrame` to use per-color textures
+Find the code that applies the block texture (look for `"block"===r` or frame==="block"):
+```js
+if("block"===r)
+```
+Wrap the texture application to check per-color first:
+```js
+if("block"===r){var _pcTex=this._getPerColorBlockTexture(/* hex color variable */);if(_pcTex){/* use _pcTex, set emissive to white (1,1,1) to show original colors */}}
+```
+
+**IMPORTANT**: The exact hex variable name depends on context in the minified code. Read the surrounding code to find the parsed hex color variable (usually the result of `_parseHexColor`).
+
+#### 4. Create per-color texture assets
+For each color, create an asset entry in `config.json` and the texture file:
+
+```bash
+# Create new asset IDs (pick unused numbers)
+# Add to config.json assets section
+# Create files/assets/<newId>/1/<name>.png
+
+# Example: fetch bird emoji for blue blocks
+curl -L "https://raw.githubusercontent.com/twitter/twemoji/master/assets/72x72/1f426.png" -o /tmp/bird.png
+sips -z 256 256 /tmp/bird.png --out files/assets/NEWID/1/block_blue.png
+
+# Example: fetch fire emoji for red blocks
+curl -L "https://raw.githubusercontent.com/twitter/twemoji/master/assets/72x72/1f525.png" -o /tmp/fire.png
+sips -z 256 256 /tmp/fire.png --out files/assets/NEWID/1/block_red.png
+```
+
+#### 5. Wire attributes in scene JSON
+```python
+import json
+from pathlib import Path
+p = Path('2453710.json')
+data = json.loads(p.read_text())
+for ent in data['entities'].values():
+    sc = ent.get('components', {}).get('script', {}).get('scripts', {})
+    if 'gridRenderer' in sc:
+        attrs = sc['gridRenderer']['attributes']
+        attrs['textureBlockRed'] = NEW_RED_ASSET_ID      # int
+        attrs['textureBlockBlue'] = NEW_BLUE_ASSET_ID    # int
+        # ... etc
+p.write_text(json.dumps(data, ensure_ascii=False, separators=(',', ':')))
+```
+
+### Fallback: One symbol for all blocks
+If patching the script is too complex for the request, fall back to replacing the single `textureBlock` asset with one symbol that applies to all blocks. Use white-on-transparent so the runtime color tinting works.
 
 ---
 
@@ -179,4 +260,5 @@ If user asks for **different images on different colored blocks** (e.g. bird on 
 - [ ] File is a valid PNG (check with `sips -g format`)
 - [ ] Dimensions match original (use `sips -g pixelWidth pixelHeight`)
 - [ ] `shapeType` value is from the valid enum list (not invented)
-- [ ] No immutable files (`__game-scripts.js`, `__modules__.js`, etc.) were modified
+- [ ] If `__game-scripts.js` was patched: verify game still loads (no syntax errors in patch)
+- [ ] Check CONTRACT.json immutablePaths — only files NOT listed may be modified
