@@ -5,6 +5,7 @@
       "profiles": ["publishing"],
       "phases": ["publish", "verify", "fix"],
       "type": "required_any",
+      "skipIfBuildType": "static",
       "pattern": "VITE_VIVERSE_CLIENT_ID\\s*[=:]\\s*['\\\"]?[a-z0-9]{10}['\\\"]?|AUTHORITATIVE_APP_ID\\s*=\\s*['\\\"]?[a-z0-9]{10}['\\\"]?",
       "message": "Publishing requires a valid 10-char VITE_VIVERSE_CLIENT_ID in project config.",
       "severity": "high"
@@ -14,6 +15,7 @@
       "profiles": ["publishing"],
       "phases": ["publish", "verify", "fix"],
       "type": "forbidden_any",
+      "skipIfBuildType": "static",
       "pattern": "VITE_VIVERSE_CLIENT_ID\\s*[=:]\\s*['\\\"]?[a-z]{10}['\\\"]?",
       "message": "VITE_VIVERSE_CLIENT_ID must not be letters-only placeholder value.",
       "severity": "high"
@@ -23,6 +25,7 @@
       "profiles": ["publishing"],
       "phases": ["publish", "verify", "fix"],
       "type": "required_any",
+      "skipIfBuildType": "static",
       "pattern": "import\\.meta\\.env\\.VITE_VIVERSE_CLIENT_ID|process\\.env\\.VITE_VIVERSE_CLIENT_ID|VITE_VIVERSE_CLIENT_ID",
       "message": "Publishing should reference VITE_VIVERSE_CLIENT_ID in source/config to avoid runtime mismatches.",
       "severity": "medium"

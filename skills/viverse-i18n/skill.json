@@ -1,0 +1,7 @@
+{
+  "name": "viverse-i18n",
+  "version": "1.0.0",
+  "description": "VIVERSE language detection via _htc_lang_code cookie and minimal i18n system for browser games",
+  "tags": ["viverse", "i18n", "localization", "language", "translation"],
+  "author": "viverse-sdk-skills"
+}

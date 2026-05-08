@@ -100,21 +100,42 @@ viverse-cli app list
 
 ### 5) Publish to existing app
 
+**Vite/bundled app** (has `npm run build` → produces `dist/`):
 ```bash
+npm run build
 viverse-cli app publish ./dist --app-id <APP_ID>
 ```
+
+**Static HTML app** (no build step — pure HTML/JS/assets folder, no `package.json` build):
+```bash
+viverse-cli app publish <template-folder> --app-id <APP_ID>
+```
+
+> [!IMPORTANT]
+> Never run `npm run build` or reference `dist/` for a static HTML app. The publish source is the template/project folder itself. Check `CONTRACT.json` `build.required` and `paths.publishSource` to determine which strategy applies.
 
 ### 5A) First publish vs republish policy
 
 - First publish (new app):
-  1. `viverse-cli app create --name "<APP_NAME>"`
+  1. `viverse-cli app create --name "<APP_NAME>" --type world`
   2. Extract App ID from stdout.
-  3. Write `.env` with `VITE_VIVERSE_CLIENT_ID=<APP_ID>`.
-  4. Build and publish with the same App ID.
+  3. Write `.env` with `VITE_VIVERSE_CLIENT_ID=<APP_ID>` (bundled apps only).
+  4. Build (if bundled) and publish with the same App ID.
 - Republish (existing app):
-  1. Read App ID from `.env`.
-  2. Build and publish with that same App ID.
-  3. Do not rewrite `.env` App ID.
+  1. Read App ID from `.env` or CONTRACT.json `app.appId`.
+  2. Build (if `build.required: true`) and publish with that same App ID.
+  3. Do not rewrite App ID.
+  4. If `app.createAppAllowed: false` in CONTRACT.json — **skip** `app create` entirely.
+
+### 5B) Determining publish strategy from CONTRACT.json
+
+| `build.required` | `paths.publishSource` | Strategy |
+|---|---|---|
+| `true` | `dist/` or similar | Run build command, then `app publish dist/` |
+| `false` | template folder path | Skip build, `app publish <publishSource>` directly |
+| `false` | `dist/` | Skip build but still publish `dist/` if it exists |
+
+Always read `CONTRACT.json` before deciding. Never assume `dist/`.
 
 ### 6) (Optional) Auto-create app + publish
 
@@ -145,6 +166,11 @@ viverse-cli app publish ./dist --auto-create-app --name "<APP_NAME>" --type worl
 - Asset paths must be deployment-safe (relative/public).
 - Review state in Studio may block full live rollout after upload.
 - After publish, browser/app cache can still run old bundle hash; hard refresh or add temporary build-tag log for verification during hotfix debugging.
+- **Static HTML apps must NOT publish `dist/`** — there is no build step and no `dist/` folder. Always use the template/source folder as the publish target. Publishing a non-existent `dist/` will fail or upload an empty package.
+- **`viverse-cli app create` must be skipped for republish** — if CONTRACT.json has `app.createAppAllowed: false`, running `app create` will create a new orphan app and the App ID in the publish will be wrong.
+- **App type must be `--type world`** for web/iframe VIVERSE apps. Creating without this flag defaults to `mobile` and breaks `checkAuth()`.
+- **CONTRACT.json `publishCommand` may contain `<APP_ID>` as a template placeholder** — this is intentional. CONTRACT.json is a reference document, not shipped source. The compliance `publish-no-placeholder-appid` rule deliberately ignores `CONTRACT.json`. Do NOT treat this as a violation or attempt to patch it.
+- **Compliance fix tasks for static templates must never run a build** — if a compliance gate fires on a static template (`build.required: false`), the fix is always: patch source files and re-publish with `viverse-cli app publish <publishSource>`. There is no `dist/`, no `npm run build`, and no `npm install` to run.
 
 ## References
 
