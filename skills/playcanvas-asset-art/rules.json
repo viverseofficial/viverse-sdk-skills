@@ -1,11 +1,11 @@
 {
   "rules": [
     {
-      "id": "no-immutable-files",
-      "description": "Never modify immutable PlayCanvas files",
-      "pattern": "(__game-scripts\\.js|__modules__\\.js|__start__\\.js|__loading__\\.js|playcanvas-stable\\.min\\.js|viverse-auth-overlay\\.js)",
-      "severity": "error",
-      "message": "This file is part of the compiled PlayCanvas engine/bundle and must not be modified."
+      "id": "high-risk-engine-files",
+      "description": "Warn when modifying compiled PlayCanvas engine/bundle files",
+      "pattern": "(__modules__\\.js|__start__\\.js|__loading__\\.js|playcanvas-stable\\.min\\.js|viverse-auth-overlay\\.js)",
+      "severity": "warning",
+      "message": "This file is part of the compiled PlayCanvas engine/bundle. Read fully before editing, patch surgically, and verify syntax."
     },
     {
       "id": "valid-enum-only",

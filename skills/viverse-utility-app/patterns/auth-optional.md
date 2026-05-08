@@ -7,7 +7,7 @@ Use this pattern when auth improves the experience but the app must work without
 **Mount first. Auth second. Never gate mount on auth.**
 
 ```js
-// main.js (immutable — shown for reference)
+// main.js (high-risk — shown for reference)
 const app = createApp(root);
 app.mount({ appId, appName });        // immediate — no waiting
 

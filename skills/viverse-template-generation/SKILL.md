@@ -1,6 +1,6 @@
 ---
 name: viverse-template-generation
-description: Build, certify, and evolve file-backed VIVERSE templates with immutable/editable contracts and runtime-safe generation rules.
+description: Build, certify, and evolve file-backed VIVERSE templates with high-risk/editable contracts and runtime-safe generation rules.
 prerequisites: [template-registry, contract-schema, orchestrator-enforcement]
 tags: [templates, architecture, orchestration, compliance, battletanks]
 ---
@@ -12,10 +12,10 @@ Use this skill when implementing or evolving the internal template system (regis
 ## Core Rules
 
 1. Load registry entry, `template.json`, and `TEMPLATE.md` before generation.
-2. Enforce immutable vs editable paths strictly.
+2. Prefer building in editable paths. High-risk (immutablePaths) files CAN be modified when needed — read fully, patch surgically, verify syntax.
 3. Validate scenario/ruleset compatibility before workspace creation.
 4. Run static/build/runtime gates before promoting template changes.
-5. Record explicit run-report events for template selection, blocked writes, and gate outcomes.
+5. Record explicit run-report events for template selection, high-risk file writes, and gate outcomes.
 
 ## High-Signal Lessons
 
@@ -77,14 +77,14 @@ Use this skill when implementing or evolving the internal template system (regis
 ## Template Checklist
 
 - [ ] Registry entry exists and template path is real
-- [ ] Contract includes `immutablePaths`, `editablePaths`, `injectionHooks`, `requiredGates`
+- [ ] Contract includes `immutablePaths` (advisory high-risk), `editablePaths`, `injectionHooks`, `requiredGates`
 - [ ] `scenario.schema.json` exists and matches template/rulesets
 - [ ] `rulesets/` exists; if schema references `default`, `rulesets/default.json` exists
-- [ ] Enforcement blocks immutable writes
+- [ ] High-risk file writes are warned (advisory, non-blocking)
 - [ ] Startup/bootstrap still launches the world after auth/bootstrap
 - [ ] Gameplay remains usable on short/mobile-height viewports
 - [ ] Secondary overlays do not obscure active play
-- [ ] Run report contains template events and blocked-write reasons
+- [ ] Run report contains template events and high-risk-write advisory reasons
 - [ ] `template.json` includes `buildConfig` with correct `type` (static or vite)
 - [ ] `enforcement.defaultMode` is `"enforce"` not `"audit"`
 - [ ] Static templates: large engine files (*.min.js, *.bin) are NOT in editablePaths

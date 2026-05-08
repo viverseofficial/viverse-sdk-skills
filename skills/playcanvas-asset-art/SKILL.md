@@ -22,13 +22,13 @@ Use this skill when the user request involves visual/art changes in a **compiled
 | Add a watermark or logo overlay | Composite with `python3 PIL` or `sips` |
 | Change background/UI colors | Edit `styles.css` or `__settings__.js` |
 
-### ❌ NOT POSSIBLE — compiled script is immutable
-| Request | Why blocked |
+### ⚠️ DIFFICULT — requires careful surgical editing of compiled scripts
+| Request | Approach |
 |---|---|
-| Add new script components | Compiled bundle — cannot add new scripts |
-| Per-entity custom shaders | Compiled engine — no runtime shader injection |
+| Add new script components | Compiled bundle — very complex; prefer runtime hooks or patching existing scripts |
+| Per-entity custom shaders | Compiled engine — no runtime shader injection; consider material property changes instead |
 
-When the user requests something in the ❌ list, explain the limitation and offer the closest ✅ alternative.
+When the user requests something in the ⚠️ list, explain the difficulty and offer the closest ✅ alternative first.
 
 ---
 
@@ -261,4 +261,4 @@ If patching the script is too complex for the request, fall back to replacing th
 - [ ] Dimensions match original (use `sips -g pixelWidth pixelHeight`)
 - [ ] `shapeType` value is from the valid enum list (not invented)
 - [ ] If `__game-scripts.js` was patched: verify game still loads (no syntax errors in patch)
-- [ ] Check CONTRACT.json immutablePaths — only files NOT listed may be modified
+- [ ] CONTRACT.json immutablePaths lists high-risk files — if any were modified, verify syntax and existing behavior is preserved

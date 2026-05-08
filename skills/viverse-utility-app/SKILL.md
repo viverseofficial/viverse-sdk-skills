@@ -38,13 +38,15 @@ Do NOT use for game templates (tankarena-3d-v1, starter-kit-racing-v1, redpointf
 
 1. Load registry to confirm template exists and is active.
 2. Load contract from `templates/<id>/template.json` and `TEMPLATE.md`.
-3. Respect immutable/editable split — never modify immutable files.
+3. Review the immutablePaths (high-risk files) — prefer building in the editable surface, but you CAN modify high-risk files if the user request requires it (read fully first, patch surgically, verify syntax).
 4. Build app logic only in `src/app.js` and editable surface.
 5. For Lambda templates: add event scripts in `lambda/` only, never hardcode secrets.
 6. Run static certification gates before marking complete.
 7. Emit run report with files changed and gate outcomes.
 
-## Immutable Files — Never Touch
+## High-Risk Files — Edit With Caution
+
+These files are core platform plumbing. Prefer building around them, but if the user request requires modification, read the entire file first, make surgical edits, and verify syntax.
 
 ### blank-webapp-v1
 - `src/viverseConfig.js` — App ID resolution (runtime-config-or-hostname)
@@ -54,7 +56,7 @@ Do NOT use for game templates (tankarena-3d-v1, starter-kit-racing-v1, redpointf
 ### lambda-tool-v1 (includes all of above, plus)
 - `src/viverseLambda.js` — Play SDK invoke wrapper; roomId synthesis, Key/Value decode, timeouts
 
-**If you find yourself editing these files for any reason, stop. The issue is elsewhere.**
+**If you edit these files, verify the existing behavior is preserved after your change.**
 
 ## Editable Surface
 
@@ -159,14 +161,14 @@ Both templates use a runtime config block in `index.html`:
 3. **`viverseLambda.js` Key/Value decode is essential.** Play SDK returns `[{Key, Value}]` arrays — skipping `_decodePlayLambdaValue` gives you unusable data.
 4. **Refresh timer minimum is 30s.** `invoke()` has overhead — tighter intervals will stack and degrade UX.
 5. **`clientId: "YOUR_APP_ID"` must stay in template.** Never commit a real App ID to the template source.
-6. **`lambda/` scripts are editable — add freely.** One file per API capability. Keep immutable `viverseLambda.js` untouched.
+6. **`lambda/` scripts are editable — add freely.** One file per API capability. `viverseLambda.js` is high-risk — edit only when needed.
 7. **`overflow: hidden` on body breaks iframe embedding.** Use `min-height: 100dvh` + `overflow-y: auto` instead.
 8. **Test graceful degradation first.** Run the app locally without a real App ID — it should render and show a login prompt, not a JS error.
 
 ## Checklist
 
 - [ ] Template selected correctly (blank-webapp-v1 vs lambda-tool-v1)
-- [ ] Immutable files untouched (viverseConfig, viverseAuth, main, viverseLambda if applicable)
+- [ ] High-risk files preserved or surgically patched (viverseConfig, viverseAuth, main, viverseLambda if applicable)
 - [ ] `src/app.js` exports `createApp(el)` with `mount()` and `onAuthChange()` shape
 - [ ] `index.html` has `window.__APP_CONFIG__` block with `clientId: "YOUR_APP_ID"`
 - [ ] Root layout uses `min-height: 100dvh`, no `overflow: hidden`
@@ -175,7 +177,7 @@ Both templates use a runtime config block in `index.html`:
 - [ ] Lambda only: `invoke()` not called in tight loop (min 30s interval)
 - [ ] Lambda only: event script uses `getEnv()`, validates input, sanitizes output
 - [ ] Lambda only: all non-success statuses handled in client
-- [ ] Certification gates pass (registry entry, immutable paths, rulesets dir)
+- [ ] Certification gates pass (registry entry, high-risk path advisory, rulesets dir)
 - [ ] Run report lists files changed and gate outcomes
 
 ## Output Requirements

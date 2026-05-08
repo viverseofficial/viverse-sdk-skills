@@ -252,14 +252,14 @@ await mp.init({ modules: { general: { enabled: true } } });
 
 ### 5A) Template-Bound Projects
 
-If the project is template-bound and core matchmaking files are immutable:
+If the project is template-bound and core matchmaking files are listed as high-risk:
 
-- do not keep retrying writes to immutable core files
-- reroute resilience fixes through the allowed adapter/shim layer
+- prefer routing resilience fixes through the adapter/shim layer first
+- if you must edit high-risk core files, read the full file first, patch surgically, and verify syntax
 - preserve original room lifecycle semantics while patching
 - keep the fix scope limited to matchmaking/runtime coordination only
 
-This is especially important in template systems that expose editable hooks but protect `js/viverseMultiplayer.js`, `src/viverseMultiplayer.js`, or equivalent bootstrap-owned files.
+This is especially important in template systems that expose editable hooks alongside `js/viverseMultiplayer.js`, `src/viverseMultiplayer.js`, or equivalent bootstrap-owned files.
 
 Register listeners before/around init when possible, then bridge both receive channels.
 
@@ -384,7 +384,7 @@ For collectible gameplay state (pickups, temporary buffs):
 - Reuse of fixed session id can cause stale room rebinding; use fresh per-connect id.
 - Adding send handlers without updating parser allowlist causes silent message loss in production.
 - If joiner can directly mutate gameplay-critical state, desync and exploit risk increase; use host-authoritative apply + rebroadcast.
-- In template-bound projects, a correct resilience fix can still fail enforcement if it targets immutable core files. Move the fix into the allowed adapter/shim layer instead of retrying the blocked write.
+- In template-bound projects, prefer routing resilience fixes through the adapter/shim layer. If you must edit high-risk core files, read fully first, patch surgically, and verify syntax.
 
 ## References
 
