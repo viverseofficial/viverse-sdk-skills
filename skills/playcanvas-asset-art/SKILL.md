@@ -1,7 +1,7 @@
 ---
 name: playcanvas-asset-art
 description: Replace, fetch, and process texture/image assets in static PlayCanvas templates
-prerequisites: [PlayCanvas static template workspace, sips available (macOS)]
+prerequisites: [PlayCanvas static template workspace, sips available (macOS), Python PIL available]
 tags: [playcanvas, texture, image, asset, art, symbol, overlay, sprite]
 ---
 
@@ -16,10 +16,9 @@ Use this skill when the user request involves visual/art changes in a **compiled
 > If you download an SVG, you MUST convert it to PNG before placing it in `files/assets/`.
 > Use `sips` (macOS) or `rsvg-convert` to do the conversion. Never rename `.svg` → `.png`.
 
-> **Python PIL/Pillow is NOT available.**
-> `python3 -c "from PIL import Image"` will fail with `ModuleNotFoundError`.
-> Do NOT attempt to generate images with PIL. Use the pre-bundled symbol library
-> (see "Symbol Library" section below) or `curl` + `sips` instead.
+> **Python PIL/Pillow IS available.**
+> `python3 -c "from PIL import Image"` works. Use PIL to generate custom textures
+> when the pre-bundled symbol library doesn't have what the user wants.
 
 ## Capability Boundaries
 
@@ -28,10 +27,10 @@ Use this skill when the user request involves visual/art changes in a **compiled
 |---|---|
 | Change block/cell shape | Set `shapeType` enum in scene JSON |
 | Replace a texture with a custom image | Overwrite `files/assets/<id>/1/<filename>` |
-| Different texture per color | Copy from pre-bundled symbol library to per-color asset paths |
+| Different texture per color | Copy from symbol library, or generate with PIL, to per-color asset paths |
 | Fetch a symbol/icon from the web | `curl` from Iconify/Twemoji, then convert to PNG with `sips` |
-| Resize/convert an image | `sips` (macOS built-in) — PIL is NOT available |
-| Add a watermark or logo overlay | `sips` compositing — PIL is NOT available |
+| Resize/convert an image | `sips` (macOS built-in) or `python3 PIL` |
+| Add a watermark or logo overlay | Composite with `python3 PIL` or `sips` |
 | Change background/UI colors | Edit `styles.css` or `__settings__.js` |
 
 ### ⚠️ DIFFICULT — requires careful surgical editing of compiled scripts
@@ -127,6 +126,25 @@ sips -s format png /tmp/symbol.svg --out /tmp/symbol.png 2>/dev/null \
 cp files/assets/symbol_library/star.png /tmp/symbol.png
 ```
 
+**Option D — Generate with Python PIL (for custom symbols not in library):**
+```python
+from PIL import Image, ImageDraw
+SZ = 256
+BG = (153, 153, 153, 255)   # gray background (0.6 brightness)
+FG = (255, 255, 255, 255)   # white symbol (full brightness)
+img = Image.new('RGBA', (SZ, SZ), BG)
+d = ImageDraw.Draw(img)
+# Draw your shape in white on gray — white areas will be bright, gray areas dimmer
+# Example: cross / plus sign
+d.rectangle([108, 20, 148, 236], fill=FG)
+d.rectangle([20, 108, 236, 148], fill=FG)
+img.save('/tmp/symbol.png')
+```
+> **Important**: Use gray `(153,153,153)` background + white `(255,255,255)` foreground.
+> The rendering engine multiplies this texture by the block's emissive color, so:
+> - White areas → full color brightness (symbol stands out)
+> - Gray areas → dimmer color (still shows color, just darker)
+
 **NEVER do this:**
 ```bash
 # WRONG — creates an SVG file with .png extension. PlayCanvas will fail to load it.
@@ -137,6 +155,13 @@ echo '<svg ...>' > files/assets/123/1/symbol.png   # ← BROKEN
 ```bash
 # macOS built-in (no dependencies):
 sips -z 128 128 /tmp/symbol.png --out files/assets/282971613/1/block.png
+
+# Or Python PIL:
+python3 -c "
+from PIL import Image
+img = Image.open('/tmp/symbol.png').convert('RGBA').resize((128, 128), Image.LANCZOS)
+img.save('files/assets/282971613/1/block.png')
+"
 ```
 
 ### 5. Verify the replacement
@@ -252,9 +277,8 @@ When the user says something like "bird on blue, fire on red":
 3. `cp files/assets/symbol_library/<symbol>.png files/assets/<block_id>/1/<block_file>.png`
 
 If the user requests a symbol NOT in the library (e.g. "skull", "tree"):
-1. Try `curl` from Twemoji: `curl -L "https://raw.githubusercontent.com/twitter/twemoji/master/assets/72x72/<codepoint>.png" -o /tmp/symbol.png`
-2. Resize: `sips -z 256 256 /tmp/symbol.png --out <asset_path>`
-3. **Do NOT use Python PIL** — it is not available
+1. **Best**: Generate with Python PIL (white shape on gray `(153,153,153)` background, 256×256 RGBA)
+2. **Alt**: `curl` from Twemoji: `curl -L "https://raw.githubusercontent.com/twitter/twemoji/master/assets/72x72/<codepoint>.png" -o /tmp/symbol.png` then `sips -z 256 256`
 
 #### Pre-wired asset paths (just overwrite these files)
 
