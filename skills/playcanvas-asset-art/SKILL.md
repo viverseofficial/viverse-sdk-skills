@@ -58,7 +58,7 @@ PY
 ## ⛔ NEVER DO THESE (common mistakes that break the game)
 
 1. **NEVER modify `textureBlock` or `textureEndpointCircle` values in `2453710.json`** — these are GLOBAL defaults that affect ALL cells. Changing them breaks all obstacles or all endpoints.
-2. **NEVER modify `config.json` asset entries** — per-color assets are already registered.
+2. **NEVER modify `config.json` asset entries for existing per-color assets** — they are already registered with correct format and `preload: true`.
 3. **NEVER patch `__game-scripts.js`** for per-color — it's already patched with `_getPerColorEndpointTexture()`.
 4. **NEVER save SVG content as a `.png` file** — PlayCanvas requires real raster PNG data.
 5. **NEVER modify `2453710.json` attribute values** for per-color work — they're pre-wired.
@@ -121,6 +121,71 @@ Every cell is painted with a **frame type** that determines its texture:
 _paintCellFrame → _createMaterialForGridFrame → _applyGridFrameToCell → _getTextureAssetForFrame(frameName)
   → TEXTURE_ATTR_BY_FRAME[frameName] → attribute name → this[attrName].resource
 ```
+
+### Per-color overlay rendering (already patched in template)
+The IIFE in `_paintCellFrame` does:
+```
+var _pt = this._getPerColorEndpointTexture(i);  // i = pc.Color
+if (!_pt) _pt = this._getPerColorBlockTexture(i);
+if (_pt) {
+  n.diffuseMap = _pt;        // texture as diffuse
+  n.emissiveMap = _pt;       // texture as emissive (multiplied by emissive color)
+  n.blendType = pc.BLEND_NORMAL;  // enable alpha blending
+  n.alphaTest = 0.05;        // discard near-transparent pixels
+}
+```
+- The texture acts as a **brightness modulator**: white = full color, gray = dimmer
+- Both diffuseMap AND emissiveMap must be set (emissiveMap alone is too dim)
+- `_getPerColorEndpointTexture(colorObj)` converts the pc.Color to hex, fuzzy-matches (distance < 30) to the closest PATH_COLOR_HEX, and returns `this[attrName].resource`
+
+---
+
+## PlayCanvas config.json Asset Format Reference
+
+When adding NEW texture assets to `config.json`, each entry **must** follow this exact structure.
+Missing or incorrect fields (especially `preload: true`) will cause `.resource` to be `null` at runtime.
+
+```json
+{
+  "name": "endpoint_red.png",
+  "type": "texture",
+  "file": {
+    "filename": "endpoint_red.png",
+    "size": 850,
+    "hash": "unique_hash_string",
+    "variants": {},
+    "url": "files/assets/283500001/1/endpoint_red.png"
+  },
+  "data": {
+    "addressu": "repeat",
+    "addressv": "repeat",
+    "minfilter": "linear_mip_linear",
+    "magfilter": "linear",
+    "anisotropy": 1,
+    "rgbm": false,
+    "srgb": true,
+    "mipmaps": true
+  },
+  "preload": true,
+  "tags": [],
+  "i18n": {},
+  "id": "283500001"
+}
+```
+
+### Critical fields:
+| Field | Required | What happens if wrong |
+|---|---|---|
+| `preload: true` | **YES** | Asset never loaded → `.resource` is `null` → texture invisible |
+| `file.url` | **YES** | Must match actual file path exactly |
+| `file.filename` | **YES** | PlayCanvas uses this for type detection |
+| `file.variants: {}` | **YES** | Missing = asset registry skips it |
+| `data.minfilter` | Use strings | Numeric values (`5`) break — use `"linear_mip_linear"` |
+| `data.magfilter` | Use strings | Numeric values (`1`) break — use `"linear"` |
+| `data.srgb: true` | Recommended | Without it, colors may look washed out |
+| `id` | **YES** | Must match the key in `assets` object |
+
+> ⚠️ **Common mistake**: Using numeric enum values (`minFilter: 5`) instead of string names (`"linear_mip_linear"`). The built-in PlayCanvas assets always use string names.
 
 ---
 
@@ -290,3 +355,27 @@ If the user just wants one symbol on ALL endpoints (same symbol, no per-color), 
 - [ ] `shapeType` value is from the valid enum list (not invented)
 - [ ] If `__game-scripts.js` was patched: verify game still loads (no syntax errors in patch)
 - [ ] CONTRACT.json immutablePaths lists high-risk files — if any were modified, verify syntax and existing behavior is preserved
+
+---
+
+## Troubleshooting: Textures Not Showing
+
+If per-color symbol textures are correctly placed as PNG files but don't appear in-game:
+
+| Symptom | Cause | Fix |
+|---|---|---|
+| Symbol invisible, no errors | `preload: true` missing in config.json | Add `"preload": true` to the asset entry |
+| Symbol invisible, no errors | config.json `file` structure wrong | `url` must be inside `file: { ... }`, not at root level |
+| Symbol invisible, no errors | config.json `data` uses numeric enums | Use `"linear_mip_linear"` not `5`, `"linear"` not `1` |
+| Symbol invisible, no errors | Only `emissiveMap` set | Must set BOTH `diffuseMap` and `emissiveMap` + blend mode |
+| Colors washed out | `srgb: false` in asset data | Set `"srgb": true` |
+| PNG file exists but shows white | File is all-white placeholder | Replace with actual symbol from symbol_library |
+| "not a PNG" error | SVG saved with .png extension | Convert with `sips -s format png` first |
+
+### Debug: verify asset loaded at runtime
+Add to `_getPerColorEndpointTexture` temporarily:
+```js
+console.log('color hex:', h, 'attr:', a, 'asset:', this[a], 'resource:', this[a] && this[a].resource);
+```
+If `asset` is `null` → attribute not wired in 2453710.json.
+If `asset` exists but `resource` is `null` → config.json entry is malformed or `preload: true` is missing.
