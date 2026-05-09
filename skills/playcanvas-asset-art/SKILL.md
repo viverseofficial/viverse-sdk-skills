@@ -1,7 +1,7 @@
 ---
 name: playcanvas-asset-art
 description: Replace, fetch, and process texture/image assets in static PlayCanvas templates
-prerequisites: [PlayCanvas static template workspace, sips or Python PIL available]
+prerequisites: [PlayCanvas static template workspace, sips available (macOS)]
 tags: [playcanvas, texture, image, asset, art, symbol, overlay, sprite]
 ---
 
@@ -16,6 +16,11 @@ Use this skill when the user request involves visual/art changes in a **compiled
 > If you download an SVG, you MUST convert it to PNG before placing it in `files/assets/`.
 > Use `sips` (macOS) or `rsvg-convert` to do the conversion. Never rename `.svg` → `.png`.
 
+> **Python PIL/Pillow is NOT available.**
+> `python3 -c "from PIL import Image"` will fail with `ModuleNotFoundError`.
+> Do NOT attempt to generate images with PIL. Use the pre-bundled symbol library
+> (see "Symbol Library" section below) or `curl` + `sips` instead.
+
 ## Capability Boundaries
 
 ### ✅ POSSIBLE — agent can do these
@@ -23,10 +28,10 @@ Use this skill when the user request involves visual/art changes in a **compiled
 |---|---|
 | Change block/cell shape | Set `shapeType` enum in scene JSON |
 | Replace a texture with a custom image | Overwrite `files/assets/<id>/1/<filename>` |
-| Different texture per color | Patch `__game-scripts.js` to add per-color texture lookup + create per-color PNG assets |
+| Different texture per color | Copy from pre-bundled symbol library to per-color asset paths |
 | Fetch a symbol/icon from the web | `curl` from Iconify/Twemoji, then convert to PNG with `sips` |
-| Resize/convert an image | `sips` (macOS built-in) or `python3 PIL` |
-| Add a watermark or logo overlay | Composite with `python3 PIL` or `sips` |
+| Resize/convert an image | `sips` (macOS built-in) — PIL is NOT available |
+| Add a watermark or logo overlay | `sips` compositing — PIL is NOT available |
 | Change background/UI colors | Edit `styles.css` or `__settings__.js` |
 
 ### ⚠️ DIFFICULT — requires careful surgical editing of compiled scripts
@@ -56,7 +61,7 @@ Every cell is painted with a **frame type** that determines its texture:
 ### Color System
 - Each endpoint has a color key (`red`, `blue`, `green`, etc.) mapped to a hex via `GridRenderer.PATH_COLOR_HEX`
 - `_paintCellFrame(row, col, frameType, parsedColor, rotation)` applies the frame texture + color tint
-- Color is applied via `material.emissive` — the texture should be **white on transparent** so color tinting works
+- Color is applied via `material.emissive` — the per-color textures act as **brightness modulators** (white=full color, gray=dimmer)
 - **Start/end nodes ALWAYS use `endpoint_circle` frame**, not `block`
 
 ### Key lookup chain
@@ -116,15 +121,10 @@ sips -s format png /tmp/symbol.svg --out /tmp/symbol.png 2>/dev/null \
   || rsvg-convert -w 256 -h 256 -o /tmp/symbol.png /tmp/symbol.svg
 ```
 
-**Option C — Generate with Python PIL (if available):**
-```python
-from PIL import Image, ImageDraw
-img = Image.new('RGBA', (256, 256), (0, 0, 0, 0))
-draw = ImageDraw.Draw(img)
-# Example: white cross on transparent background
-draw.rectangle([108, 20, 148, 236], fill=(255, 255, 255, 220))
-draw.rectangle([20, 108, 236, 148], fill=(255, 255, 255, 220))
-img.save('/tmp/symbol.png')
+**Option C — Copy from the pre-bundled symbol library (fastest, no network needed):**
+```bash
+# See "Symbol Library" section above for available symbols
+cp files/assets/symbol_library/star.png /tmp/symbol.png
 ```
 
 **NEVER do this:**
@@ -137,13 +137,6 @@ echo '<svg ...>' > files/assets/123/1/symbol.png   # ← BROKEN
 ```bash
 # macOS built-in (no dependencies):
 sips -z 128 128 /tmp/symbol.png --out files/assets/282971613/1/block.png
-
-# Or Python PIL:
-python3 -c "
-from PIL import Image
-img = Image.open('/tmp/symbol.png').convert('RGBA').resize((128, 128), Image.LANCZOS)
-img.save('files/assets/282971613/1/block.png')
-"
 ```
 
 ### 5. Verify the replacement
@@ -209,28 +202,59 @@ If user asks for **different images on different colored endpoints** (e.g. bird 
 
 > **Everything is pre-wired.** The template already has placeholder white PNGs at
 > the correct asset paths, registered in config.json, and wired in the scene JSON.
-> You ONLY need to download real PNGs and overwrite the placeholder files.
+> You ONLY need to copy symbol PNGs from the built-in symbol library.
 
-#### 1. Download real PNG images and overwrite placeholders
+#### Symbol Library (pre-bundled — use these!)
+
+The template includes ready-to-use symbol PNGs at `files/assets/symbol_library/`:
+
+| File | Shape | Good match for |
+|---|---|---|
+| `bird.png` | Bird silhouette | bird, dove, eagle, animal |
+| `flame.png` | Flame / fire | fire, hot, burn |
+| `star.png` | 5-pointed star | star, gold, award |
+| `heart.png` | Heart | heart, love, life |
+| `diamond.png` | Diamond / rhombus | diamond, gem, jewel |
+| `cross.png` | Plus / cross | cross, plus, medical |
+| `moon.png` | Crescent moon | moon, night, dark |
+| `lightning.png` | Lightning bolt | lightning, thunder, electric, energy |
+| `circle_ring.png` | Circle ring | circle, ring, portal |
+| `triangle.png` | Triangle | triangle, arrow, pyramid |
+
+These are 256×256 RGBA PNGs with **white symbol on gray background** (gray=0.6).
+The rendering engine multiplies this texture by the block's emissive color, so:
+- **White areas (symbol) → full color brightness** (symbol stands out)
+- **Gray areas (background) → dimmer color** (still shows the color, just darker)
+
+#### 1. Copy symbol from library to the correct asset path
+
 ```bash
-# Use curl to download from Twemoji (pre-rendered PNG, no conversion needed)
-# Bird U+1F426, Fire U+1F525, Star U+2B50, Tree U+1F332, Lightning U+26A1
-# Format: https://raw.githubusercontent.com/twitter/twemoji/master/assets/72x72/<codepoint>.png
-
 # Example: bird on blue endpoints, fire on red endpoints
-curl -L "https://raw.githubusercontent.com/twitter/twemoji/master/assets/72x72/1f426.png" -o /tmp/bird.png
-curl -L "https://raw.githubusercontent.com/twitter/twemoji/master/assets/72x72/1f525.png" -o /tmp/fire.png
+cp files/assets/symbol_library/bird.png files/assets/283500002/1/endpoint_blue.png
+cp files/assets/symbol_library/flame.png files/assets/283500001/1/endpoint_red.png
 
-# Resize to 256x256
-sips -z 256 256 /tmp/bird.png --out files/assets/283500002/1/endpoint_blue.png
-sips -z 256 256 /tmp/fire.png --out files/assets/283500001/1/endpoint_red.png
+# Also copy to block paths so both endpoints AND path blocks show the symbol
+cp files/assets/symbol_library/bird.png files/assets/283500012/1/block_blue.png
+cp files/assets/symbol_library/flame.png files/assets/283500011/1/block_red.png
 
-# VERIFY they are real PNG
+# VERIFY
 file files/assets/283500002/1/endpoint_blue.png   # must say "PNG image data"
 file files/assets/283500001/1/endpoint_red.png
 ```
 
-That's it. No config.json edits. No scene JSON edits. No script patching.
+That's it. No config.json edits. No scene JSON edits. No script patching. No downloading.
+
+#### Mapping user requests to library symbols
+
+When the user says something like "bird on blue, fire on red":
+1. Find the closest symbol in the library table above
+2. `cp files/assets/symbol_library/<symbol>.png files/assets/<endpoint_id>/1/<endpoint_file>.png`
+3. `cp files/assets/symbol_library/<symbol>.png files/assets/<block_id>/1/<block_file>.png`
+
+If the user requests a symbol NOT in the library (e.g. "skull", "tree"):
+1. Try `curl` from Twemoji: `curl -L "https://raw.githubusercontent.com/twitter/twemoji/master/assets/72x72/<codepoint>.png" -o /tmp/symbol.png`
+2. Resize: `sips -z 256 256 /tmp/symbol.png --out <asset_path>`
+3. **Do NOT use Python PIL** — it is not available
 
 #### Pre-wired asset paths (just overwrite these files)
 
@@ -245,7 +269,7 @@ That's it. No config.json edits. No scene JSON edits. No script patching.
 
 > **Which to overwrite?** If user says "change the colored dots/start/end" → overwrite `endpoint_*.png`.
 > If "blocks/walls" → overwrite `block_*.png`. If ambiguous → overwrite both with same image.
-> Only overwrite colors the user mentions. Untouched placeholders show as white (invisible).
+> Only overwrite colors the user mentions. Untouched placeholders (all-white) have no visible effect — the block looks normal.
 
 ### Color → Attribute Mapping
 
