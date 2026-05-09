@@ -7,39 +7,71 @@ tags: [playcanvas, texture, image, asset, art, symbol, overlay, sprite]
 
 # PlayCanvas Asset & Art Skill
 
-Use this skill when the user request involves visual/art changes in a **compiled static PlayCanvas template** (flow-line-v1, starter-kit-racing-v1, etc.) — such as changing textures, adding symbols, overlaying images, or swapping sprites.
+## ★ QUICK START — Per-Color Symbols (flow-line-v1)
 
-## Critical Rules
+**If the user wants different symbols/images on different colored endpoints:**
 
-> **SVG files CANNOT be used as PlayCanvas textures.**
-> PlayCanvas loads textures via WebGL which requires raster formats (PNG, JPG).
-> If you download an SVG, you MUST convert it to PNG before placing it in `files/assets/`.
-> Use `sips` (macOS) or `rsvg-convert` to do the conversion. Never rename `.svg` → `.png`.
+**Step 1: Pick symbols** — `ls files/assets/symbol_library/` to see available PNGs:
+bird, flame, star, heart, diamond, cross, moon, lightning, circle_ring, triangle
 
-> **Python PIL/Pillow IS available.**
-> `python3 -c "from PIL import Image"` works. Use PIL to generate custom textures
-> when the pre-bundled symbol library doesn't have what the user wants.
+**Step 2: Copy to the pre-wired paths** — this is the ONLY thing you need to do:
+```bash
+# Example: bird on blue, fire on red
+cp files/assets/symbol_library/bird.png files/assets/283500002/1/endpoint_blue.png
+cp files/assets/symbol_library/flame.png files/assets/283500001/1/endpoint_red.png
+cp files/assets/symbol_library/bird.png files/assets/283500012/1/block_blue.png
+cp files/assets/symbol_library/flame.png files/assets/283500011/1/block_red.png
+```
 
-> **NEVER modify global texture attributes in `2453710.json`.**
-> The attributes `textureBlock`, `textureEndpointCircle`, `textureCellEmpty`,
-> `texturePipeStraight`, `texturePipeCorner` are GLOBAL defaults that affect ALL cells
-> of that type. Changing them breaks the entire game visually.
-> For per-color customization, use ONLY the pre-wired per-color attributes
-> (`textureEndpointRed`, `textureBlockRed`, etc.) — these are already wired in the scene JSON.
-> **You do NOT need to modify `2453710.json` or `config.json` at all.**
+**Step 3: Verify** — `file files/assets/283500002/1/endpoint_blue.png` → must say "PNG image data"
 
-## flow-line-v1 Game Terminology
+**DONE.** No config.json edits. No 2453710.json edits. No script patching. No downloading.
 
-| In-game element | Frame type | What it does | User might call it |
-|---|---|---|---|
-| **Start/end nodes** | `endpoint_circle` | Colored circles marking where paths begin/end. Each color pair must be connected. | "colored blocks", "start blocks", "end dots", "color blocks" |
-| **Obstacle/cross cells** | `block` | X-shaped or solid cells that CANNOT be filled by paths. Not color-coded. | "cross", "X", "wall", "blocker" |
-| **Path segments** | `pipe_straight` / `pipe_corner` | The lines the player draws to connect endpoints. | "pipes", "lines", "path" |
-| **Empty cells** | `cell_empty` | Unfilled grid cells the player can draw through. | "empty", "blank" |
+### Pre-wired paths (just overwrite the file — everything else is already set up)
 
-> When the user says "change the color blocks" or "change colored blocks", they mean
-> **start/end nodes** (`endpoint_circle`), NOT obstacles (`block`). The "color" in
-> "color block" refers to the path color (red, blue, green...), not the block shape.
+| Color | Endpoint path | Block path |
+|---|---|---|
+| red | `files/assets/283500001/1/endpoint_red.png` | `files/assets/283500011/1/block_red.png` |
+| blue | `files/assets/283500002/1/endpoint_blue.png` | `files/assets/283500012/1/block_blue.png` |
+| green | `files/assets/283500003/1/endpoint_green.png` | `files/assets/283500013/1/block_green.png` |
+| yellow | `files/assets/283500004/1/endpoint_yellow.png` | `files/assets/283500014/1/block_yellow.png` |
+| purple | `files/assets/283500005/1/endpoint_purple.png` | `files/assets/283500015/1/block_purple.png` |
+| teal | `files/assets/283500006/1/endpoint_teal.png` | `files/assets/283500016/1/block_teal.png` |
+
+### Custom symbol not in library? Generate with PIL:
+```bash
+python3 - <<'PY'
+from PIL import Image, ImageDraw
+SZ = 256
+BG = (153, 153, 153, 255)  # gray background
+FG = (255, 255, 255, 255)  # white foreground (symbol)
+img = Image.new('RGBA', (SZ, SZ), BG)
+d = ImageDraw.Draw(img)
+# Draw your symbol shape here in white
+d.polygon([(128, 18), (90, 80), (60, 150), (100, 230), (128, 240), (156, 230), (196, 150), (166, 80)], fill=FG)
+img.save('files/assets/283500001/1/endpoint_red.png')
+PY
+```
+
+---
+
+## ⛔ NEVER DO THESE (common mistakes that break the game)
+
+1. **NEVER modify `textureBlock` or `textureEndpointCircle` values in `2453710.json`** — these are GLOBAL defaults that affect ALL cells. Changing them breaks all obstacles or all endpoints.
+2. **NEVER modify `config.json` asset entries** — per-color assets are already registered.
+3. **NEVER patch `__game-scripts.js`** for per-color — it's already patched with `_getPerColorEndpointTexture()`.
+4. **NEVER save SVG content as a `.png` file** — PlayCanvas requires real raster PNG data.
+5. **NEVER modify `2453710.json` attribute values** for per-color work — they're pre-wired.
+
+## Game Terminology (flow-line-v1)
+
+| In-game element | Frame type | User might call it |
+|---|---|---|
+| **Start/end nodes** (colored circles where paths begin/end) | `endpoint_circle` | "colored blocks", "color blocks", "start blocks", "end dots" |
+| **Obstacle cells** (X-shaped, cannot be filled) | `block` | "cross", "X", "wall", "blocker" |
+
+> **"color blocks" = start/end nodes**, NOT obstacles. When user says "change color blocks",
+> they mean the colored endpoint circles, not the X-shaped obstacles.
 
 ## Capability Boundaries
 
@@ -232,130 +264,7 @@ print('shapeType updated')
 
 ## Handling Per-Color Requests
 
-If user asks for **different images on different colored endpoints** (e.g. bird on blue, fire on red):
-
-> **The template already has per-color endpoint support built in.**
-> `__game-scripts.js` has `_getPerColorEndpointTexture()` and attributes
-> `textureEndpointRed`, `textureEndpointBlue`, `textureEndpointGreen`,
-> `textureEndpointYellow`, `textureEndpointPurple`, `textureEndpointTeal`.
-> 
-> **DO NOT modify `2453710.json` or `config.json`.** Everything is already wired.
-> **DO NOT touch `textureBlock` or `textureEndpointCircle`** — these are globals.
-> Just:
-> 1. Copy/generate PNG images
-> 2. Place them at the pre-wired asset paths (see table below)
-> 3. That's ALL. Nothing else.
-
-### Step-by-Step: Per-Color Endpoint Textures (NO script patching needed)
-
-> **Everything is pre-wired.** The template already has placeholder white PNGs at
-> the correct asset paths, registered in config.json, and wired in the scene JSON.
-> You ONLY need to copy symbol PNGs from the built-in symbol library.
-
-#### Symbol Library (pre-bundled — use these!)
-
-The template includes ready-to-use symbol PNGs at `files/assets/symbol_library/`:
-
-| File | Shape | Good match for |
-|---|---|---|
-| `bird.png` | Bird silhouette | bird, dove, eagle, animal |
-| `flame.png` | Flame / fire | fire, hot, burn |
-| `star.png` | 5-pointed star | star, gold, award |
-| `heart.png` | Heart | heart, love, life |
-| `diamond.png` | Diamond / rhombus | diamond, gem, jewel |
-| `cross.png` | Plus / cross | cross, plus, medical |
-| `moon.png` | Crescent moon | moon, night, dark |
-| `lightning.png` | Lightning bolt | lightning, thunder, electric, energy |
-| `circle_ring.png` | Circle ring | circle, ring, portal |
-| `triangle.png` | Triangle | triangle, arrow, pyramid |
-
-These are 256×256 RGBA PNGs with **white symbol on gray background** (gray=0.6).
-The rendering engine multiplies this texture by the block's emissive color, so:
-- **White areas (symbol) → full color brightness** (symbol stands out)
-- **Gray areas (background) → dimmer color** (still shows the color, just darker)
-
-#### 1. Copy symbol from library to the correct asset path
-
-```bash
-# Example: bird on blue endpoints, fire on red endpoints
-cp files/assets/symbol_library/bird.png files/assets/283500002/1/endpoint_blue.png
-cp files/assets/symbol_library/flame.png files/assets/283500001/1/endpoint_red.png
-
-# Also copy to block paths so both endpoints AND path blocks show the symbol
-cp files/assets/symbol_library/bird.png files/assets/283500012/1/block_blue.png
-cp files/assets/symbol_library/flame.png files/assets/283500011/1/block_red.png
-
-# VERIFY
-file files/assets/283500002/1/endpoint_blue.png   # must say "PNG image data"
-file files/assets/283500001/1/endpoint_red.png
-```
-
-That's it. **No config.json edits. No scene JSON (2453710.json) edits. No script patching. No downloading required.**
-
-> ⚠️ **CRITICAL**: Do NOT modify `textureBlock` or `textureEndpointCircle` attributes
-> in `2453710.json`. Those are GLOBAL textures. Changing them breaks ALL cells of that type.
-> The per-color attributes (`textureEndpointRed`, `textureBlockRed`, etc.) are SEPARATE
-> and already wired. You only need to overwrite the PNG files at the paths above.
-
-#### Mapping user requests to library symbols
-
-When the user says something like "bird on blue, fire on red":
-1. Find the closest symbol in the library table above
-2. `cp files/assets/symbol_library/<symbol>.png files/assets/<endpoint_id>/1/<endpoint_file>.png`
-3. `cp files/assets/symbol_library/<symbol>.png files/assets/<block_id>/1/<block_file>.png`
-
-If the user requests a symbol NOT in the library (e.g. "skull", "tree"):
-1. **Best**: Generate with Python PIL (white shape on gray `(153,153,153)` background, 256×256 RGBA)
-2. **Alt**: `curl` from Twemoji: `curl -L "https://raw.githubusercontent.com/twitter/twemoji/master/assets/72x72/<codepoint>.png" -o /tmp/symbol.png` then `sips -z 256 256`
-
-#### Pre-wired asset paths (just overwrite these files)
-
-| Color | Endpoint asset path | Block asset path |
-|---|---|---|
-| red | `files/assets/283500001/1/endpoint_red.png` | `files/assets/283500011/1/block_red.png` |
-| blue | `files/assets/283500002/1/endpoint_blue.png` | `files/assets/283500012/1/block_blue.png` |
-| green | `files/assets/283500003/1/endpoint_green.png` | `files/assets/283500013/1/block_green.png` |
-| yellow | `files/assets/283500004/1/endpoint_yellow.png` | `files/assets/283500014/1/block_yellow.png` |
-| purple | `files/assets/283500005/1/endpoint_purple.png` | `files/assets/283500015/1/block_purple.png` |
-| teal | `files/assets/283500006/1/endpoint_teal.png` | `files/assets/283500016/1/block_teal.png` |
-
-> **Which to overwrite?** If user says "change the colored dots/start/end" → overwrite `endpoint_*.png`.
-> If "blocks/walls" → overwrite `block_*.png`. If ambiguous → overwrite both with same image.
-> Only overwrite colors the user mentions. Untouched placeholders (all-white) have no visible effect — the block looks normal.
-
-### Color → Attribute Mapping
-
-The template has pre-built per-color attributes for both **endpoints** (start/end nodes) and **blocks** (obstacles on the path). Wire the right one based on what the user wants to change.
-
-#### Endpoint attributes (start/end colored dots)
-| Color key | Hex (from PATH_COLOR_HEX) | Attribute name |
-|---|---|---|
-| red | #E24B4A | `textureEndpointRed` |
-| blue | #378ADD | `textureEndpointBlue` |
-| green | #639922 | `textureEndpointGreen` |
-| yellow | #BA7517 | `textureEndpointYellow` |
-| purple | #7F77DD | `textureEndpointPurple` |
-| teal | #17A589 | `textureEndpointTeal` |
-
-#### Block attributes (obstacles/walls)
-| Color key | Attribute name |
-|---|---|
-| red | `textureBlockRed` |
-| blue | `textureBlockBlue` |
-| green | `textureBlockGreen` |
-| yellow | `textureBlockYellow` |
-| purple | `textureBlockPurple` |
-| teal | `textureBlockTeal` |
-
-> **Which to use?** If the user says "change the colored dots/circles/start/end" or
-> "change color blocks" → use `textureEndpoint*` (these are the colored start/end nodes).
-> If they specifically say "change obstacle blocks" or "change the X/cross cells" → use `textureBlock*`.
-> When in doubt, "color blocks" = start/end nodes = `textureEndpoint*`.
-
-> ⚠️ **IMPORTANT**: These per-color attributes are ALREADY WIRED in `2453710.json`.
-> Do NOT modify `2453710.json` to change attribute values.
-> Do NOT reassign `textureBlock` or `textureEndpointCircle` to per-color asset IDs.
-> Just overwrite the PNG files at the pre-wired paths listed above.
+See **★ QUICK START** at the top of this skill. Everything below is reference only.
 
 ### Fallback: One symbol for all endpoints
 If the user just wants one symbol on ALL endpoints (same symbol, no per-color), replace the `textureEndpointCircle` asset file directly at its path in `files/assets/`. Do NOT change the attribute value in `2453710.json`.
