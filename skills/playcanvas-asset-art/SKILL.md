@@ -207,74 +207,45 @@ If user asks for **different images on different colored endpoints** (e.g. bird 
 
 ### Step-by-Step: Per-Color Endpoint Textures (NO script patching needed)
 
-#### 1. Download real PNG texture assets
+> **Everything is pre-wired.** The template already has placeholder white PNGs at
+> the correct asset paths, registered in config.json, and wired in the scene JSON.
+> You ONLY need to download real PNGs and overwrite the placeholder files.
+
+#### 1. Download real PNG images and overwrite placeholders
 ```bash
-# Use Twemoji for ready-made PNG files (no conversion needed)
+# Use curl to download from Twemoji (pre-rendered PNG, no conversion needed)
 # Bird U+1F426, Fire U+1F525, Star U+2B50, Tree U+1F332, Lightning U+26A1
+# Format: https://raw.githubusercontent.com/twitter/twemoji/master/assets/72x72/<codepoint>.png
+
+# Example: bird on blue endpoints, fire on red endpoints
 curl -L "https://raw.githubusercontent.com/twitter/twemoji/master/assets/72x72/1f426.png" -o /tmp/bird.png
 curl -L "https://raw.githubusercontent.com/twitter/twemoji/master/assets/72x72/1f525.png" -o /tmp/fire.png
 
-# Resize to 256×256 for quality
-sips -z 256 256 /tmp/bird.png --out /tmp/bird_256.png
-sips -z 256 256 /tmp/fire.png --out /tmp/fire_256.png
+# Resize to 256x256
+sips -z 256 256 /tmp/bird.png --out files/assets/283500002/1/endpoint_blue.png
+sips -z 256 256 /tmp/fire.png --out files/assets/283500001/1/endpoint_red.png
 
-# VERIFY they are real PNG (not SVG!)
-file /tmp/bird_256.png   # must say "PNG image data"
-file /tmp/fire_256.png
+# VERIFY they are real PNG
+file files/assets/283500002/1/endpoint_blue.png   # must say "PNG image data"
+file files/assets/283500001/1/endpoint_red.png
 ```
 
-#### 2. Place assets in workspace
-```bash
-mkdir -p files/assets/283500001/1 files/assets/283500002/1
-cp /tmp/bird_256.png files/assets/283500001/1/bird_blue.png
-cp /tmp/fire_256.png files/assets/283500002/1/fire_red.png
-```
+That's it. No config.json edits. No scene JSON edits. No script patching.
 
-#### 3. Register in config.json
-```python
-import json
-from pathlib import Path
-p = Path('config.json')
-cfg = json.loads(p.read_text())
-cfg['assets']['283500001'] = {
-    'region': 'none', 'filename': 'bird_blue.png', 'type': 'texture',
-    'file': {'size': 1, 'hash': 'bird_blue'},
-    'data': {'minFilter': 5, 'magFilter': 1, 'anisotropy': 1, 'addressU': 1, 'addressV': 1},
-    'url': 'files/assets/283500001/1/bird_blue.png'
-}
-cfg['assets']['283500002'] = {
-    'region': 'none', 'filename': 'fire_red.png', 'type': 'texture',
-    'file': {'size': 1, 'hash': 'fire_red'},
-    'data': {'minFilter': 5, 'magFilter': 1, 'anisotropy': 1, 'addressU': 1, 'addressV': 1},
-    'url': 'files/assets/283500002/1/fire_red.png'
-}
-p.write_text(json.dumps(cfg, ensure_ascii=False, separators=(',', ':')))
-```
+#### Pre-wired asset paths (just overwrite these files)
 
-#### 4. Wire attributes in scene JSON
-```python
-import json
-from pathlib import Path
-p = Path('2453710.json')
-data = json.loads(p.read_text())
-for ent in data['entities'].values():
-    sc = ent.get('components', {}).get('script', {}).get('scripts', {})
-    if 'gridRenderer' in sc:
-        attrs = sc['gridRenderer']['attributes']
-        attrs['textureEndpointBlue'] = 283500001   # bird
-        attrs['textureEndpointRed'] = 283500002    # fire
-p.write_text(json.dumps(data, ensure_ascii=False, separators=(',', ':')))
-```
+| Color | Endpoint asset path | Block asset path |
+|---|---|---|
+| red | `files/assets/283500001/1/endpoint_red.png` | `files/assets/283500011/1/block_red.png` |
+| blue | `files/assets/283500002/1/endpoint_blue.png` | `files/assets/283500012/1/block_blue.png` |
+| green | `files/assets/283500003/1/endpoint_green.png` | `files/assets/283500013/1/block_green.png` |
+| yellow | `files/assets/283500004/1/endpoint_yellow.png` | `files/assets/283500014/1/block_yellow.png` |
+| purple | `files/assets/283500005/1/endpoint_purple.png` | `files/assets/283500015/1/block_purple.png` |
+| teal | `files/assets/283500006/1/endpoint_teal.png` | `files/assets/283500016/1/block_teal.png` |
 
-#### 5. Verify
-```bash
-# Check PNG files are valid
-file files/assets/283500001/1/bird_blue.png  # must say "PNG image data"
-file files/assets/283500002/1/fire_red.png
-
-# Check scene JSON is valid
-node -e "JSON.parse(require('fs').readFileSync('2453710.json','utf8')); console.log('ok')"
-```
+> **Which to overwrite?** If user says "change the colored dots/start/end" → overwrite `endpoint_*.png`.
+> If "blocks/walls" → overwrite `block_*.png`. If ambiguous → overwrite both with same image.
+> Only overwrite colors the user mentions. Untouched placeholders show as white (invisible).
 
 ### Color → Attribute Mapping
 
