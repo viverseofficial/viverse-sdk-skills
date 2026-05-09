@@ -277,6 +277,10 @@ node -e "JSON.parse(require('fs').readFileSync('2453710.json','utf8')); console.
 ```
 
 ### Color → Attribute Mapping
+
+The template has pre-built per-color attributes for both **endpoints** (start/end nodes) and **blocks** (obstacles on the path). Wire the right one based on what the user wants to change.
+
+#### Endpoint attributes (start/end colored dots)
 | Color key | Hex (from PATH_COLOR_HEX) | Attribute name |
 |---|---|---|
 | red | #E24B4A | `textureEndpointRed` |
@@ -286,8 +290,20 @@ node -e "JSON.parse(require('fs').readFileSync('2453710.json','utf8')); console.
 | purple | #7F77DD | `textureEndpointPurple` |
 | teal | #17A589 | `textureEndpointTeal` |
 
+#### Block attributes (obstacles/walls)
+| Color key | Attribute name |
+|---|---|
+| red | `textureBlockRed` |
+| blue | `textureBlockBlue` |
+| green | `textureBlockGreen` |
+| yellow | `textureBlockYellow` |
+| purple | `textureBlockPurple` |
+| teal | `textureBlockTeal` |
+
+> **Which to use?** If the user says "change the colored dots/circles/start/end" → use `textureEndpoint*`. If they say "change blocks/walls/obstacles" → use `textureBlock*`. If ambiguous (e.g. "color blocks"), use **both** `textureEndpoint*` AND `textureBlock*` with the same images.
+
 ### Fallback: One symbol for all endpoints
-If the user just wants one symbol on all endpoints, replace the `textureEndpointCircle` asset directly instead of using per-color attributes.
+If the user just wants one symbol on all endpoints, replace the `textureEndpointCircle` asset directly instead of using per-color attributes. For one symbol on all blocks, replace the `textureBlock` asset.
 
 ---
 
