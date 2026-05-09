@@ -26,10 +26,22 @@
       "message": "Use sips or PIL to resize to original dimensions to avoid layout issues."
     },
     {
-      "id": "per-color-not-possible",
-      "description": "Per-color texture routing is not achievable in static templates",
-      "severity": "info",
-      "message": "Different textures per block color requires compiled script changes. Offer single-texture swap or shapeType change as alternatives."
+      "id": "no-svg-as-texture",
+      "description": "SVG files cannot be used as PlayCanvas textures",
+      "severity": "error",
+      "message": "PlayCanvas uses WebGL textures — only PNG/JPG are valid. If you download an SVG, convert to PNG with sips before placing in files/assets/. Never rename .svg to .png."
+    },
+    {
+      "id": "verify-patch-callsite",
+      "description": "Any helper function added to __game-scripts.js must be called",
+      "severity": "error",
+      "message": "After patching __game-scripts.js with a new function, verify it is called in the rendering path. Search for the function name — it must appear at least twice (definition + call site). Dead code = no effect."
+    },
+    {
+      "id": "endpoints-use-endpoint-circle",
+      "description": "Start/end nodes use endpoint_circle frame, not block",
+      "severity": "warning",
+      "message": "If the user wants to modify start/end node visuals, patch the endpoint_circle rendering path. Blocks are obstacles — endpoints are the colored dots."
     }
   ]
 }
