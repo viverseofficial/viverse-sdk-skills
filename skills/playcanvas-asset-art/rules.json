@@ -42,6 +42,18 @@
       "description": "Start/end nodes use endpoint_circle frame, not block",
       "severity": "warning",
       "message": "If the user wants to modify start/end node visuals, patch the endpoint_circle rendering path. Blocks are obstacles — endpoints are the colored dots."
+    },
+    {
+      "id": "no-modify-global-texture-attrs",
+      "description": "NEVER reassign textureBlock or textureEndpointCircle in 2453710.json",
+      "severity": "error",
+      "message": "textureBlock and textureEndpointCircle are GLOBAL defaults. Changing them breaks ALL cells of that type. For per-color customization, ONLY overwrite the PNG files at the pre-wired per-color asset paths (textureEndpointRed=283500001, etc.). Do NOT modify 2453710.json attribute values."
+    },
+    {
+      "id": "no-modify-scene-json-for-percolor",
+      "description": "Per-color textures are pre-wired — do not edit 2453710.json or config.json",
+      "severity": "error",
+      "message": "The per-color texture attributes (textureEndpointRed, textureBlockRed, etc.) are ALREADY wired in 2453710.json and config.json. Just overwrite the placeholder PNG files at files/assets/283500001-283500016/1/*.png. No JSON edits needed."
     }
   ]
 }

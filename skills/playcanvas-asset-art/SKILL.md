@@ -20,6 +20,27 @@ Use this skill when the user request involves visual/art changes in a **compiled
 > `python3 -c "from PIL import Image"` works. Use PIL to generate custom textures
 > when the pre-bundled symbol library doesn't have what the user wants.
 
+> **NEVER modify global texture attributes in `2453710.json`.**
+> The attributes `textureBlock`, `textureEndpointCircle`, `textureCellEmpty`,
+> `texturePipeStraight`, `texturePipeCorner` are GLOBAL defaults that affect ALL cells
+> of that type. Changing them breaks the entire game visually.
+> For per-color customization, use ONLY the pre-wired per-color attributes
+> (`textureEndpointRed`, `textureBlockRed`, etc.) — these are already wired in the scene JSON.
+> **You do NOT need to modify `2453710.json` or `config.json` at all.**
+
+## flow-line-v1 Game Terminology
+
+| In-game element | Frame type | What it does | User might call it |
+|---|---|---|---|
+| **Start/end nodes** | `endpoint_circle` | Colored circles marking where paths begin/end. Each color pair must be connected. | "colored blocks", "start blocks", "end dots", "color blocks" |
+| **Obstacle/cross cells** | `block` | X-shaped or solid cells that CANNOT be filled by paths. Not color-coded. | "cross", "X", "wall", "blocker" |
+| **Path segments** | `pipe_straight` / `pipe_corner` | The lines the player draws to connect endpoints. | "pipes", "lines", "path" |
+| **Empty cells** | `cell_empty` | Unfilled grid cells the player can draw through. | "empty", "blank" |
+
+> When the user says "change the color blocks" or "change colored blocks", they mean
+> **start/end nodes** (`endpoint_circle`), NOT obstacles (`block`). The "color" in
+> "color block" refers to the path color (red, blue, green...), not the block shape.
+
 ## Capability Boundaries
 
 ### ✅ POSSIBLE — agent can do these
@@ -217,11 +238,13 @@ If user asks for **different images on different colored endpoints** (e.g. bird 
 > `__game-scripts.js` has `_getPerColorEndpointTexture()` and attributes
 > `textureEndpointRed`, `textureEndpointBlue`, `textureEndpointGreen`,
 > `textureEndpointYellow`, `textureEndpointPurple`, `textureEndpointTeal`.
-> You do NOT need to patch `__game-scripts.js`. Just:
-> 1. Download real PNG images
-> 2. Place them in `files/assets/<id>/1/`
-> 3. Register in `config.json`
-> 4. Wire the attribute in `2453710.json`
+> 
+> **DO NOT modify `2453710.json` or `config.json`.** Everything is already wired.
+> **DO NOT touch `textureBlock` or `textureEndpointCircle`** — these are globals.
+> Just:
+> 1. Copy/generate PNG images
+> 2. Place them at the pre-wired asset paths (see table below)
+> 3. That's ALL. Nothing else.
 
 ### Step-by-Step: Per-Color Endpoint Textures (NO script patching needed)
 
@@ -267,7 +290,12 @@ file files/assets/283500002/1/endpoint_blue.png   # must say "PNG image data"
 file files/assets/283500001/1/endpoint_red.png
 ```
 
-That's it. No config.json edits. No scene JSON edits. No script patching. No downloading.
+That's it. **No config.json edits. No scene JSON (2453710.json) edits. No script patching. No downloading required.**
+
+> ⚠️ **CRITICAL**: Do NOT modify `textureBlock` or `textureEndpointCircle` attributes
+> in `2453710.json`. Those are GLOBAL textures. Changing them breaks ALL cells of that type.
+> The per-color attributes (`textureEndpointRed`, `textureBlockRed`, etc.) are SEPARATE
+> and already wired. You only need to overwrite the PNG files at the paths above.
 
 #### Mapping user requests to library symbols
 
@@ -319,10 +347,18 @@ The template has pre-built per-color attributes for both **endpoints** (start/en
 | purple | `textureBlockPurple` |
 | teal | `textureBlockTeal` |
 
-> **Which to use?** If the user says "change the colored dots/circles/start/end" → use `textureEndpoint*`. If they say "change blocks/walls/obstacles" → use `textureBlock*`. If ambiguous (e.g. "color blocks"), use **both** `textureEndpoint*` AND `textureBlock*` with the same images.
+> **Which to use?** If the user says "change the colored dots/circles/start/end" or
+> "change color blocks" → use `textureEndpoint*` (these are the colored start/end nodes).
+> If they specifically say "change obstacle blocks" or "change the X/cross cells" → use `textureBlock*`.
+> When in doubt, "color blocks" = start/end nodes = `textureEndpoint*`.
+
+> ⚠️ **IMPORTANT**: These per-color attributes are ALREADY WIRED in `2453710.json`.
+> Do NOT modify `2453710.json` to change attribute values.
+> Do NOT reassign `textureBlock` or `textureEndpointCircle` to per-color asset IDs.
+> Just overwrite the PNG files at the pre-wired paths listed above.
 
 ### Fallback: One symbol for all endpoints
-If the user just wants one symbol on all endpoints, replace the `textureEndpointCircle` asset directly instead of using per-color attributes. For one symbol on all blocks, replace the `textureBlock` asset.
+If the user just wants one symbol on ALL endpoints (same symbol, no per-color), replace the `textureEndpointCircle` asset file directly at its path in `files/assets/`. Do NOT change the attribute value in `2453710.json`.
 
 ---
 
