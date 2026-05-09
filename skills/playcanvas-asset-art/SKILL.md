@@ -193,35 +193,44 @@ print('shapeType updated')
 
 ## Handling Per-Color Requests
 
-If user asks for **different images on different colored blocks/endpoints** (e.g. bird on blue, fire on red):
+If user asks for **different images on different colored endpoints** (e.g. bird on blue, fire on red):
 
-> **IMPORTANT**: Start/end nodes use `endpoint_circle` frame, NOT `block`.
-> If the user wants symbols on the colored endpoint dots, you must patch the
-> `endpoint_circle` rendering path — not the `block` path.
+> **The template already has per-color endpoint support built in.**
+> `__game-scripts.js` has `_getPerColorEndpointTexture()` and attributes
+> `textureEndpointRed`, `textureEndpointBlue`, `textureEndpointGreen`,
+> `textureEndpointYellow`, `textureEndpointPurple`, `textureEndpointTeal`.
+> You do NOT need to patch `__game-scripts.js`. Just:
+> 1. Download real PNG images
+> 2. Place them in `files/assets/<id>/1/`
+> 3. Register in `config.json`
+> 4. Wire the attribute in `2453710.json`
 
-### Step-by-Step: Patch `__game-scripts.js` for per-color endpoint textures
+### Step-by-Step: Per-Color Endpoint Textures (NO script patching needed)
 
-#### 1. Create real PNG texture assets (not SVG!)
+#### 1. Download real PNG texture assets
 ```bash
-# Download PNGs directly from Twemoji — these are already raster format
+# Use Twemoji for ready-made PNG files (no conversion needed)
+# Bird U+1F426, Fire U+1F525, Star U+2B50, Tree U+1F332, Lightning U+26A1
 curl -L "https://raw.githubusercontent.com/twitter/twemoji/master/assets/72x72/1f426.png" -o /tmp/bird.png
 curl -L "https://raw.githubusercontent.com/twitter/twemoji/master/assets/72x72/1f525.png" -o /tmp/fire.png
 
-# Resize to 256×256 for better quality (sips is built into macOS)
+# Resize to 256×256 for quality
 sips -z 256 256 /tmp/bird.png --out /tmp/bird_256.png
 sips -z 256 256 /tmp/fire.png --out /tmp/fire_256.png
 
-# Verify they are valid PNG files
-file /tmp/bird_256.png  # must say "PNG image data", not "SVG"
+# VERIFY they are real PNG (not SVG!)
+file /tmp/bird_256.png   # must say "PNG image data"
 file /tmp/fire_256.png
+```
 
-# Create asset directories and copy
+#### 2. Place assets in workspace
+```bash
 mkdir -p files/assets/283500001/1 files/assets/283500002/1
 cp /tmp/bird_256.png files/assets/283500001/1/bird_blue.png
 cp /tmp/fire_256.png files/assets/283500002/1/fire_red.png
 ```
 
-#### 2. Register asset entries in config.json
+#### 3. Register in config.json
 ```python
 import json
 from pathlib import Path
@@ -242,50 +251,7 @@ cfg['assets']['283500002'] = {
 p.write_text(json.dumps(cfg, ensure_ascii=False, separators=(',', ':')))
 ```
 
-#### 3. Add per-color texture attributes to `__game-scripts.js`
-Find the line that registers `textureEndpointCircle`:
-```
-GridRenderer.attributes.add("textureEndpointCircle",{type:"asset",assetType:"texture",title:"Grid endpoint_circle"})
-```
-Insert per-color endpoint attributes right after it (keep on same line, no newlines):
-```js
-,GridRenderer.attributes.add("textureEndpointRed",{type:"asset",assetType:"texture",title:"Endpoint (red)"}),GridRenderer.attributes.add("textureEndpointBlue",{type:"asset",assetType:"texture",title:"Endpoint (blue)"})
-```
-
-#### 4. Add per-color lookup function
-Find `GridRenderer.prototype.initialize=function` and insert this helper **before** it:
-```js
-GridRenderer.prototype._getPerColorEndpointTexture=function(hex){
-  var m={
-    "#e24b4a":"textureEndpointRed","#ff0000":"textureEndpointRed","#cc0000":"textureEndpointRed","#e74c3c":"textureEndpointRed",
-    "#378add":"textureEndpointBlue","#0000ff":"textureEndpointBlue","#3498db":"textureEndpointBlue","#50aaff":"textureEndpointBlue"
-  };
-  var h=(hex||"").toLowerCase(),attr=m[h];
-  if(attr&&this[attr]&&this[attr].resource)return this[attr].resource;
-  return null;
-};
-```
-
-> **Hex values**: Read `GridRenderer.PATH_COLOR_HEX` from the minified code to get the exact hex values used at runtime. In flow-line-v1: `red:"#E24B4A"`, `blue:"#378ADD"`. Your lookup map MUST include these exact values (lowercased).
-
-#### 5. Patch `_paintCellFrame` to use per-color textures for endpoints
-This is the CRITICAL step. Find the `_paintCellFrame` function body.
-
-Locate where it builds the material and applies color:
-```js
-n.emissive=i,n.update()
-```
-
-Insert per-color texture application BEFORE `n.update()`:
-```js
-var _pcTex=this._getPerColorEndpointTexture(i.toString());if(_pcTex){n.diffuseMap=_pcTex;n.emissiveMap=_pcTex;n.diffuse.set(1,1,1);n.emissive.set(1,1,1)}
-```
-
-This replaces the solid color tint with the actual symbol texture when a per-color texture is available. The `emissive.set(1,1,1)` makes the texture show at full brightness instead of being color-tinted.
-
-> **How to verify the patch**: After patching, search for `_getPerColorEndpointTexture` — it must appear at LEAST twice (the definition + the call site). If it only appears once, the call site wasn't inserted.
-
-#### 6. Wire attributes in scene JSON
+#### 4. Wire attributes in scene JSON
 ```python
 import json
 from pathlib import Path
@@ -295,30 +261,33 @@ for ent in data['entities'].values():
     sc = ent.get('components', {}).get('script', {}).get('scripts', {})
     if 'gridRenderer' in sc:
         attrs = sc['gridRenderer']['attributes']
-        attrs['textureEndpointRed'] = 283500002    # fire
         attrs['textureEndpointBlue'] = 283500001   # bird
+        attrs['textureEndpointRed'] = 283500002    # fire
 p.write_text(json.dumps(data, ensure_ascii=False, separators=(',', ':')))
 ```
 
-### Verify the patch
+#### 5. Verify
 ```bash
-# 1. Check function exists AND is called (must be ≥ 2 occurrences)
-grep -o '_getPerColorEndpointTexture' __game-scripts.js | wc -l
-# Expected: 2 or more
+# Check PNG files are valid
+file files/assets/283500001/1/bird_blue.png  # must say "PNG image data"
+file files/assets/283500002/1/fire_red.png
 
-# 2. Verify texture files are real PNG (not SVG)
-file files/assets/283500001/1/*.png  # must say "PNG image data"
-file files/assets/283500002/1/*.png
-
-# 3. Verify no JS syntax errors
-node -e "eval(require('fs').readFileSync('__game-scripts.js','utf8'))" 2>&1 | head -5
+# Check scene JSON is valid
+node -e "JSON.parse(require('fs').readFileSync('2453710.json','utf8')); console.log('ok')"
 ```
 
-### Fallback: One symbol for all endpoints
-If per-color is too complex, replace the single `textureEndpointCircle` asset with one symbol that applies to all endpoints. Use white-on-transparent so the runtime color tinting works.
+### Color → Attribute Mapping
+| Color key | Hex (from PATH_COLOR_HEX) | Attribute name |
+|---|---|---|
+| red | #E24B4A | `textureEndpointRed` |
+| blue | #378ADD | `textureEndpointBlue` |
+| green | #639922 | `textureEndpointGreen` |
+| yellow | #BA7517 | `textureEndpointYellow` |
+| purple | #7F77DD | `textureEndpointPurple` |
+| teal | #17A589 | `textureEndpointTeal` |
 
-### Also supporting per-color block obstacles
-If the user wants per-color textures on **block/obstacle** cells (not endpoints), use the same approach but target `textureBlock` and the `block` frame type.
+### Fallback: One symbol for all endpoints
+If the user just wants one symbol on all endpoints, replace the `textureEndpointCircle` asset directly instead of using per-color attributes.
 
 ---
 
