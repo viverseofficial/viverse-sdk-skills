@@ -11,12 +11,20 @@ tags: [playcanvas, texture, image, asset, art, symbol, overlay, sprite]
 
 **If the user wants different symbols/images on different colored endpoints:**
 
-**Step 1: For each color, decide the source:**
+### Intent interpretation
+- If the user says "change color blocks to have symbols" (broad request), that means **ALL 6 colors** need symbols.
+- Phrases like "such as", "for example", "e.g." indicate **examples**, not an exhaustive list.
+- For explicitly named colors → use the user's specified symbol.
+- For colors NOT mentioned → pick a distinct symbol from the library so each color is unique.
+- The 6 colors are: **red, blue, green, yellow, purple, teal**.
+
+**Step 1: For each of the 6 colors, decide the source:**
 - Check `ls files/assets/symbol_library/` for pre-made PNGs:
   bird, flame, star, heart, diamond, cross, moon, lightning, circle_ring, triangle
 - If the user's requested symbol **IS** in the library → use `cp`
 - If the user's requested symbol **IS NOT** in the library → **GENERATE it with PIL** (Step 2b)
 - **NEVER substitute a different symbol.** If user says "tree" and there's no tree.png, you MUST generate a tree.
+- **NEVER leave a color with a placeholder.** After you're done, ALL 6 endpoint PNGs must be >850 bytes.
 
 **Step 2a: Copy from library** (for symbols that exist):
 ```bash
