@@ -11,17 +11,38 @@ tags: [playcanvas, texture, image, asset, art, symbol, overlay, sprite]
 
 **If the user wants different symbols/images on different colored endpoints:**
 
-**Step 1: Pick symbols** — `ls files/assets/symbol_library/` to see available PNGs:
-bird, flame, star, heart, diamond, cross, moon, lightning, circle_ring, triangle
+**Step 1: For each color, decide the source:**
+- Check `ls files/assets/symbol_library/` for pre-made PNGs:
+  bird, flame, star, heart, diamond, cross, moon, lightning, circle_ring, triangle
+- If the user's requested symbol **IS** in the library → use `cp`
+- If the user's requested symbol **IS NOT** in the library → **GENERATE it with PIL** (Step 2b)
+- **NEVER substitute a different symbol.** If user says "tree" and there's no tree.png, you MUST generate a tree.
 
-**Step 2: Copy to the pre-wired paths** — this is the ONLY thing you need to do:
+**Step 2a: Copy from library** (for symbols that exist):
 ```bash
-# Example: bird on blue, fire on red
 cp files/assets/symbol_library/bird.png files/assets/283500002/1/endpoint_blue.png
-cp files/assets/symbol_library/flame.png files/assets/283500001/1/endpoint_red.png
 cp files/assets/symbol_library/bird.png files/assets/283500012/1/block_blue.png
-cp files/assets/symbol_library/flame.png files/assets/283500011/1/block_red.png
 ```
+
+**Step 2b: Generate with PIL** (for symbols NOT in library):
+```bash
+python3 - <<'PY'
+from PIL import Image, ImageDraw
+SZ = 256
+BG = (153, 153, 153, 255)  # gray background
+FG = (255, 255, 255, 255)  # white foreground (symbol)
+img = Image.new('RGBA', (SZ, SZ), BG)
+d = ImageDraw.Draw(img)
+# Draw the requested shape — be creative and make it recognizable
+# Example: tree (trunk + triangular canopy)
+d.rectangle([118, 180, 138, 240], fill=FG)  # trunk
+d.polygon([(128, 30), (50, 180), (206, 180)], fill=FG)  # canopy
+img.save('files/assets/283500003/1/endpoint_green.png')
+img.save('files/assets/283500013/1/block_green.png')
+PY
+```
+> Use gray `(153,153,153)` background + white `(255,255,255)` foreground.
+> White areas = full color brightness, gray areas = dimmer (still colored).
 
 **Step 3: Verify** — `file files/assets/283500002/1/endpoint_blue.png` → must say "PNG image data"
 
@@ -38,20 +59,19 @@ cp files/assets/symbol_library/flame.png files/assets/283500011/1/block_red.png
 | purple | `files/assets/283500005/1/endpoint_purple.png` | `files/assets/283500015/1/block_purple.png` |
 | teal | `files/assets/283500006/1/endpoint_teal.png` | `files/assets/283500016/1/block_teal.png` |
 
-### Custom symbol not in library? Generate with PIL:
-```bash
-python3 - <<'PY'
-from PIL import Image, ImageDraw
-SZ = 256
-BG = (153, 153, 153, 255)  # gray background
-FG = (255, 255, 255, 255)  # white foreground (symbol)
-img = Image.new('RGBA', (SZ, SZ), BG)
-d = ImageDraw.Draw(img)
-# Draw your symbol shape here in white
-d.polygon([(128, 18), (90, 80), (60, 150), (100, 230), (128, 240), (156, 230), (196, 150), (166, 80)], fill=FG)
-img.save('files/assets/283500001/1/endpoint_red.png')
-PY
-```
+### PIL generation tips for common shapes:
+| Symbol | Drawing approach |
+|---|---|
+| tree | Rectangle trunk + triangle polygon canopy |
+| fish | Ellipse body + triangle tail polygon |
+| cat | Circle head + triangle ears + dot eyes |
+| house | Rectangle base + triangle roof polygon |
+| car | Rectangle body + two circle wheels |
+| crown | Rectangle base + three triangle points |
+| flower | Central circle + ellipse petals around it |
+| shield | Wide top arc + pointed bottom polygon |
+
+Always save to BOTH the endpoint AND block path for each color.
 
 ---
 
@@ -62,6 +82,7 @@ PY
 3. **NEVER patch `__game-scripts.js`** for per-color — it's already patched with `_getPerColorEndpointTexture()`.
 4. **NEVER save SVG content as a `.png` file** — PlayCanvas requires real raster PNG data.
 5. **NEVER modify `2453710.json` attribute values** for per-color work — they're pre-wired.
+6. **NEVER substitute a different symbol** when the user's requested one is not in the library — generate it with PIL instead.
 
 ## Game Terminology (flow-line-v1)
 
