@@ -139,6 +139,44 @@ Every cell is painted with a **frame type** that determines its texture:
 | `pipe_straight` | Path segments | `texturePipeStraight` | Connected path cells |
 | `pipe_corner` | Path corners | `texturePipeCorner` | Path turns |
 
+### ⚠️ Pipe Asset Orientation Convention (CRITICAL)
+
+The game engine rotates `pipe_corner` by 0°/90°/180°/270° to produce all four turn directions.
+The **base sprite (0° rotation)** must connect **RIGHT and DOWN**:
+
+```
+┌────────────┐
+│            │
+│   ╔═══════─┤  → exits RIGHT
+│   ║        │
+│   ║        │
+└───╨────────┘
+    ↓ exits DOWN
+```
+
+- At 0°: connects **right + down**
+- At 90°: connects **left + down**
+- At 180°: connects **left + up**
+- At 270°: connects **right + up**
+
+When generating `pipe_corner.png` with PIL, draw the arc/curve from the **right edge to the bottom edge** of the image. If you draw it connecting up+right or any other pairing at 0°, all rotated variants will be wrong.
+
+```python
+# Correct corner pipe generation (right→down at 0°):
+from PIL import Image, ImageDraw
+SZ = 256
+PIPE_W = 80  # pipe width
+img = Image.new('RGBA', (SZ, SZ), (0, 0, 0, 0))
+d = ImageDraw.Draw(img)
+# Horizontal bar: center-Y to right edge
+d.rectangle([SZ//2 - PIPE_W//2, SZ//2 - PIPE_W//2, SZ, SZ//2 + PIPE_W//2], fill=(255,255,255,255))
+# Vertical bar: center-X to bottom edge
+d.rectangle([SZ//2 - PIPE_W//2, SZ//2 - PIPE_W//2, SZ//2 + PIPE_W//2, SZ], fill=(255,255,255,255))
+img.save('pipe_corner.png')
+```
+
+`pipe_straight` base sprite (0° rotation) must be a **horizontal** bar (left↔right). The engine rotates it 90° for vertical segments.
+
 ### Color System
 - Each endpoint has a color key (`red`, `blue`, `green`, etc.) mapped to a hex via `GridRenderer.PATH_COLOR_HEX`
 - `_paintCellFrame(row, col, frameType, parsedColor, rotation)` applies the frame texture + color tint
