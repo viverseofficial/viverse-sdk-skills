@@ -159,21 +159,23 @@ The **base sprite (0° rotation)** must connect **RIGHT and DOWN**:
 - At 180°: connects **left + up**
 - At 270°: connects **right + up**
 
-When generating `pipe_corner.png` with PIL, draw the arc/curve from the **right edge to the bottom edge** of the image. If you draw it connecting up+right or any other pairing at 0°, all rotated variants will be wrong.
+**⚠️ PIL vs PlayCanvas UV flip:** PlayCanvas loads textures with UV origin at bottom-left, but PIL draws with origin at top-left. This means the image appears **rotated 180°** in-game relative to how it looks in an image viewer. To produce a sprite that connects RIGHT+DOWN **in-game**, you must draw it connecting **LEFT+UP in PIL coordinates** (i.e., exits at x=0 and y=0).
 
 ```python
-# Correct corner pipe generation (right→down at 0°):
+# Correct corner pipe generation — appears as right→down IN-GAME:
 from PIL import Image, ImageDraw
 SZ = 256
 PIPE_W = 80  # pipe width
 img = Image.new('RGBA', (SZ, SZ), (0, 0, 0, 0))
 d = ImageDraw.Draw(img)
-# Horizontal bar: center-Y to right edge
-d.rectangle([SZ//2 - PIPE_W//2, SZ//2 - PIPE_W//2, SZ, SZ//2 + PIPE_W//2], fill=(255,255,255,255))
-# Vertical bar: center-X to bottom edge
-d.rectangle([SZ//2 - PIPE_W//2, SZ//2 - PIPE_W//2, SZ//2 + PIPE_W//2, SZ], fill=(255,255,255,255))
+# Horizontal bar: center-Y to LEFT edge (appears as right exit in-game)
+d.rectangle([0, SZ//2 - PIPE_W//2, SZ//2 + PIPE_W//2, SZ//2 + PIPE_W//2], fill=(255,255,255,255))
+# Vertical bar: center-X to TOP edge (appears as down exit in-game)
+d.rectangle([SZ//2 - PIPE_W//2, 0, SZ//2 + PIPE_W//2, SZ//2 + PIPE_W//2], fill=(255,255,255,255))
 img.save('pipe_corner.png')
 ```
+
+**Verification:** Open the saved PNG in an image viewer — the elbow should be in the **upper-left** quadrant with openings pointing LEFT and UP. In-game (after PlayCanvas UV flip) it will display as RIGHT+DOWN.
 
 `pipe_straight` base sprite (0° rotation) must be a **horizontal** bar (left↔right). The engine rotates it 90° for vertical segments.
 
