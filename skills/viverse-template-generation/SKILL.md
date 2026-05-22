@@ -74,6 +74,99 @@ Use this skill when implementing or evolving the internal template system (regis
     there is no need to manually patch it with `sed` unless the build output still contains the
     `YOUR_APP_ID` placeholder.
 
+16. **Art Modularization Assessment is REQUIRED during template extraction.** Before freezing a game
+    into a template, scan the source to determine its "theme-swap readiness" level. If the source
+    scores below Level 2, perform minimal modularization surgery before packaging.
+
+## Art Modularization Assessment
+
+When extracting a new template, run this assessment on the source code to determine how easy it
+will be for agents to swap themes/assets at generation time.
+
+### Scan Process
+
+1. **Grep for a centralized theme/config file** — look for `ThemeConfig`, `Constants`, `THEME`,
+   `palette`, or a top-level config object that collects colors/paths in one place.
+2. **Grep for hardcoded hex colors** — `0x[0-9a-f]{6}`, `#[0-9a-f]{3,6}`, `hsl(`, `rgb(` in
+   scene/rendering files. Count how many unique locations define visual constants.
+3. **Check model loading** — are model paths collected in one array/registry, or scattered across
+   multiple files? Is there a shared colormap atlas?
+4. **Check procedural texture functions** — are they standalone (easy to swap params) or inlined
+   inside class methods with game logic mixed in?
+5. **Check VFX/particle colors** — centralized or hardcoded per-effect?
+6. **Check light/fog/atmosphere** — grouped in one setup block or scattered?
+
+### Readiness Levels
+
+| Level | Name | Criteria | Agent theme-swap cost |
+|---|---|---|---|
+| **3** | Fully modularized | Centralized `ThemeConfig.js` or equivalent; all colors, model paths, and atmosphere values reference it. One-file change = full retheme. | 1 file edit |
+| **2** | Partially modularized | Procedural textures as standalone functions; shared colormap; colors hardcoded but grouped in few files (≤3). | 3-5 edits, same file regions |
+| **1** | Scattered | Colors/paths spread across 5+ files, inline in logic, no config object. | 10+ edits across many files, error-prone |
+| **0** | Entangled | Visual constants mixed into gameplay math; changing a color could break collision/physics. | Refactor required before theming |
+
+### Minimum Bar for Template Freeze: Level 2
+
+If the source scores Level 1 or 0, apply these **minimal modularization steps** before packaging:
+
+#### Step A: Extract procedural textures to standalone functions (if inlined)
+Move any canvas/texture generation into named top-level functions with color parameters at the top:
+```javascript
+// BEFORE (entangled):
+class Scene { build() { ctx.fillStyle = '#1a2e1a'; ... } }
+
+// AFTER (modularized):
+function makeGroundTexture(baseColor = '#1a2e1a', noiseHue = 115) { ... }
+```
+
+#### Step B: Collect model paths into a single inventory comment or constant
+```javascript
+// Asset registry — swap these paths for a full model retheme
+const MODEL_PATHS = {
+  castle: '/assets/castle/',
+  enemies: '/assets/enemies/',
+  weapons: '/assets/weapons/',
+};
+```
+
+#### Step C: Group atmosphere values at the top of the scene file
+```javascript
+// ── Theme atmosphere (edit these for mood changes) ──
+const ATMOSPHERE = {
+  background: 0x0a0e1a,
+  fog: { color: 0x0a0e1a, density: 0.014 },
+  ambient: { color: 0x8899bb, intensity: 2.8 },
+  sun: { color: 0xfff5dd, intensity: 1.2 },
+};
+```
+
+#### Step D: Document the shared colormap pattern (if GLBs use texture atlases)
+Add a comment at the template level noting which colormap file recolors which model set.
+
+### Documenting the Result
+
+After assessment, record the level and swap instructions in the template's `TEMPLATE.md` under
+a `## Art Architecture` section. This tells the fast-path modification agent exactly where to
+make edits for theme swaps. Include:
+- Readiness level (1-3)
+- File locations of each art layer (textures, models, VFX, atmosphere)
+- "Fastest swap" recipe (fewest edits for maximum visual change)
+- Known limitations (e.g., "model placement is hardcoded — replacing GLBs must match scale/origin")
+
+### Assessment Examples
+
+**dashrunner-v1 → Level 3:** `js/game/ThemeManager.js` has 7 named presets controlling all visuals.
+One function call `setTheme('volcanic')` rethemes everything.
+
+**starter-kit-racing-v1 → Level 3:** `js/ThemeConfig.js` + shared colormap atlas. Change palette
+PNG or config object = full retheme.
+
+**bastion-archer-v1 → Level 2:** Procedural textures are standalone functions with grouped color
+params. Shared colormaps per model category. But no single ThemeConfig — colors are in
+SceneBuilder.js functions + atmosphere in constructor. 3-5 edit locations for full retheme.
+
+**flight-simulator-v1 → Level 3:** All visual constants in `src/core/Constants.js`.
+
 ## Template Checklist
 
 - [ ] Registry entry exists and template path is real

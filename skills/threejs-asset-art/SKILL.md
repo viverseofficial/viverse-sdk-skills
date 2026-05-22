@@ -519,6 +519,96 @@ No models to swap — change colors/dimensions directly in Constants.js.
 
 ---
 
+## Template-Specific: bastion-archer-v1
+
+### Art Architecture (3-Layer System)
+
+The template uses a **layered art system** that makes theme swaps easy:
+
+| Layer | Location | Swap technique | Impact |
+|---|---|---|---|
+| **1. Procedural textures** | `src/scene/SceneBuilder.js` (top-level functions) | Edit canvas-draw parameters | Ground, walls, paths |
+| **2. GLB model kit** | `public/assets/{castle,enemies,weapons}/` | File replacement (same name = drop-in) | 3D models |
+| **3. Shared colormap** | `public/assets/*/Textures/colormap.png` | Overwrite 1 file → recolors all models in that category | Palette |
+| **4. VFX particles** | `src/scene/VFX.js` | Edit colors/sizes in particle create calls | Trails, sparks, splashes |
+| **5. Atmosphere** | `SceneBuilder` constructor | Edit fog, lights, background color | Overall mood |
+
+### Procedural Texture Functions
+
+All defined at the top of `src/scene/SceneBuilder.js`:
+
+| Function | Produces | Key params to change for themes |
+|---|---|---|
+| `makeStoneTexture(w, h)` | Castle wall bricks | HSL base `(210,12%,28-38%)`, mortar color `#252e3c` |
+| `makeTowerStoneTexture()` | Tower surface (calls makeStoneTexture with different repeat) | Same as above |
+| `makeGroundTexture()` | Grass battlefield | Base color `#1a2e1a`, grass HSL `(115,28-46%,10-28%)` |
+| `makePathTexture()` | Enemy walk path | Base `#2a2018`, noise HSL `(35,15-27%,12-24%)` |
+
+**Theme swap pattern:** Change the HSL/hex values in these functions to recolor the entire battlefield:
+
+```javascript
+// Example: Volcanic theme
+// makeGroundTexture → base '#2e1a1a', noise hsl(0, 20-40%, 8-22%)
+// makeStoneTexture → base hsl(0, 15%, 20-30%), mortar '#1c0a0a'
+// makePathTexture  → base '#1a0e0e', noise hsl(10, 20-35%, 10-18%)
+```
+
+### GLB Model Inventory (Kenney Castle Kit)
+
+All models share a colormap atlas per category — swapping the colormap recolors all models at once.
+
+| Category | Path | Models | Shared texture |
+|---|---|---|---|
+| Castle | `public/assets/castle/` | wall, wall-corner, wall-doorway, wall-half, wall-narrow, wall-pillar, wall-stud, gate, metal-gate, tower-square-base/mid/top/roof, stairs-stone, flag-banner-long/short, flag, ground | `castle/Textures/colormap.png` |
+| Enemies | `public/assets/enemies/` | character-ghost, character-human, character-keeper, character-orc, character-skeleton, character-vampire, character-zombie | `enemies/Textures/colormap.png` |
+| Weapons | `public/assets/weapons/` | bow, shield-round, siege-ballista/catapult/trebuchet, tool-axe/pickaxe-upgraded, weapon-spear/sword | `weapons/Textures/colormap.png` |
+
+### SceneBuilder Layout (for placement reference)
+
+```
+Camera: (0, 22, 20) looking at (0, 0, -4)
+Ground: 44×74 plane at y=0, center z=-16
+Path:   5×74 strip on ground (enemy walk lane)
+Castle wall: y=0→5.6, z≈7.55 (segments from x=-14 to +14)
+Towers: at x=±7 (bastions) and x=±14 (corner towers)
+Archer platform: (0, 5.375, 8.6) — player stands here
+Mountains: background at z=-44
+Stars: random points y=20→100
+```
+
+### How to Theme This Template
+
+**Fastest (palette only):** Replace the 3 colormap.png files in `public/assets/*/Textures/`.
+Use PIL or any image editor to create a 512×512 flat-color atlas matching the original swatch layout.
+
+**Medium (colors + atmosphere):** Edit the procedural texture functions + scene fog/background/light colors.
+
+**Full (new assets):** Replace GLB files in `public/assets/` with same filenames. Models must have similar origin/scale since placement is hardcoded in `_loadCastleGLBs()`.
+
+### PIL Generation for Colormap Replacement
+
+```python
+from PIL import Image, ImageDraw
+# Generate a volcanic-themed colormap (replaces castle/Textures/colormap.png)
+SZ = 512
+img = Image.new('RGB', (SZ, SZ), (80, 30, 20))  # dark red-brown base
+d = ImageDraw.Draw(img)
+# Kenney colormaps are flat swatches — subdivide into color blocks
+# Main stone: dark volcanic rock
+d.rectangle([0, 0, SZ//2, SZ//2], fill=(60, 25, 15))
+# Accent: molten orange trim
+d.rectangle([SZ//2, 0, SZ, SZ//4], fill=(200, 80, 20))
+# Metal: dark iron
+d.rectangle([SZ//2, SZ//4, SZ, SZ//2], fill=(40, 40, 50))
+# Wood: charred
+d.rectangle([0, SZ//2, SZ, SZ], fill=(35, 20, 10))
+img.save('public/assets/castle/Textures/colormap.png')
+```
+
+⚠️ **PIL vs Three.js UV note:** Three.js `CanvasTexture` uses the HTML Canvas coordinate system (origin top-left), which matches PIL's coordinate system. So unlike PlayCanvas templates, **no 180° flip is needed** when generating textures with PIL for Three.js templates. The texture appears in-game exactly as it looks in an image viewer.
+
+---
+
 ## Capability Boundaries
 
 ### ✅ POSSIBLE — agent can do these
