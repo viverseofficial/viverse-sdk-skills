@@ -1,0 +1,137 @@
+{
+  "bundleName": "viverse-playcanvas-toolkit",
+  "outputZipFile": "viverse-playcanvas-toolkit.zip",
+  "stagingDirectory": "standalone-skill-bundle",
+  "packaging": {
+    "goal": "Create one standalone zip artifact without macOS-specific hidden files.",
+    "preferredCommand": "cd standalone-skill-bundle && COPYFILE_DISABLE=1 zip -r ../viverse-playcanvas-toolkit.zip . -x '*.DS_Store' -x '*/.DS_Store' -x '__MACOSX/*' -x '*/__MACOSX/*' -x '*/._*' -x '.Spotlight-V100/*' -x '*/.Spotlight-V100/*' -x '.Trashes/*' -x '*/.Trashes/*'",
+    "avoid": [
+      "Finder Compress, because it may introduce __MACOSX metadata.",
+      "Packaging directly from a dirty workspace root instead of a dedicated staging directory."
+    ],
+    "macOSExcludePatterns": [
+      "*.DS_Store",
+      "*/.DS_Store",
+      "__MACOSX/*",
+      "*/__MACOSX/*",
+      "*/._*",
+      ".Spotlight-V100/*",
+      "*/.Spotlight-V100/*",
+      ".Trashes/*",
+      "*/.Trashes/*"
+    ]
+  },
+  "upstreamReferencePolicy": {
+    "repository": "https://github.com/viverseofficial/viverse-playcanvas-toolkit",
+    "preferredReference": "Pin a Git tag or use a dedicated export branch.",
+    "fallbackReference": "main",
+    "doNotAssume": "A simple stable release branch named release exists.",
+    "observedRemoteBranches": [
+      "main",
+      "develop",
+      "release-please--branches--develop",
+      "release-please--branches--develop--components--viverse-playcanvas-toolkit"
+    ]
+  },
+  "exportModes": {
+    "fullStandalone": {
+      "description": "Preserve current grounded executable claims by shipping required assets together.",
+      "recommended": true
+    },
+    "thinBundle": {
+      "description": "Ship only skills and prompts, but downgrade workflows that rely on local scripts or templates.",
+      "recommended": false
+    }
+  },
+  "include": {
+    "skills": [
+      "skills/choose-viverse-workflow/SKILL.md",
+      "skills/compose-toolkit-capabilities/SKILL.md",
+      "skills/playcanvas-local-sync/SKILL.md",
+      "skills/toolkit-build-and-package/SKILL.md",
+      "skills/toolkit-publish-troubleshooting/SKILL.md",
+      "skills/viverse-cli-publish/SKILL.md",
+      "skills/viverse-default-room-multiplayer/SKILL.md",
+      "skills/viverse-leaderboard/SKILL.md"
+    ],
+    "prompts": [
+      "prompts/compose-viverse-feature.prompt.md",
+      "prompts/publish-build-output-to-viverse.prompt.md",
+      "prompts/setup-playcanvas-sync.prompt.md",
+      "prompts/sync-and-publish-viverse-project.prompt.md"
+    ],
+    "catalogs": [
+      "toolkit-capability-catalog.md",
+      "toolkit-capability-catalog.json"
+    ],
+    "workflowDocs": [
+      "viverse-default-room-multiplayer-contract.md",
+      "viverse-multiplayer-integration-contract.md",
+      "viverse-leaderboard-integration-contract.md",
+      "viverse-leaderboard-readiness-spec.md",
+      "viverse-leaderboard-ready-checklist.md",
+      "viverse-leaderboard-promotion-review.md",
+      "viverse-leaderboard-real-runtime-test.md",
+      "viverse-leaderboard-skill-review.md",
+      "viverse-skill-acceptance-checklist.md",
+      "viverse-skill-review-template.md",
+      "viverse-leaderboard-user-project-example.md",
+      "viverse-leaderboard-validator-spec.md"
+    ],
+    "scripts": [
+      "scripts/create-leaderboard-runtime-boundary.mjs",
+      "scripts/publish-build-output-to-viverse.mjs",
+      "scripts/setup-playcanvas-sync.mjs",
+      "scripts/validate-default-room-multiplayer.mjs",
+      "scripts/validate-leaderboard-integration.mjs"
+    ],
+    "templates": [
+      "scripts/templates/leaderboard/leaderboard-runtime-boundary.mjs.template"
+    ],
+    "sourceEvidence": [
+      "packages/account/guide.md",
+      "packages/account/src/index.ts",
+      "packages/extension/guide.md",
+      "packages/local-player/guide.md",
+      "packages/network/guide.md",
+      "packages/network/package.json",
+      "packages/network/src/index.ts",
+      "packages/network/src/NetworkSystem.ts",
+      "packages/network/src/modules/multiplayer/MultiplayerModule.ts",
+      "packages/quest/guide.md",
+      "packages/ui/guide.md",
+      "apps/editor-extension/src/components/PublishExtension.tsx",
+      "apps/editor-extension/src/components/PublishModeSelect.tsx",
+      "apps/preview/src/utils/link-and-billboard-scene.ts",
+      "apps/preview/src/utils/media-scene.ts",
+      "apps/preview/src/utils/pick-and-action.ts",
+      "apps/preview/src/utils/post-effects.ts",
+      "apps/preview/src/utils/seat-scene.ts"
+    ],
+    "readmes": [
+      "README.md",
+      "LICENSE.md",
+      "apps/editor-extension/README.md",
+      "docs/ASSETS_GUIDE.md",
+      "docs/CONTRIBUTING.md",
+      "docs/CONVENTIONS.md",
+      "public/images/find-create-new-world-button.png",
+      "public/images/toolkit-version-update.png"
+    ]
+  },
+  "rewriteRules": [
+    {
+      "from": "repo-relative links that stay inside the exported bundle",
+      "to": "bundle-relative links under standalone-skill-bundle/"
+    },
+    {
+      "from": "repo-relative links to assets intentionally not bundled",
+      "to": "pinned GitHub links using a tag or dedicated export branch"
+    }
+  ],
+  "blockingNotes": [
+    "viverse-leaderboard currently depends on repo-local scripts, template assets, and governance docs, so it is not truthfully standalone without those files.",
+    "viverse-default-room-multiplayer currently depends on repo-local validation and package source evidence, so it is not truthfully standalone without those files.",
+    "compose-viverse-feature depends on toolkit-capability-catalog.md and toolkit-capability-catalog.json, so both catalog files must travel with the exported bundle or be replaced with stable upstream references."
+  ]
+}

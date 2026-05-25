@@ -1,0 +1,40 @@
+{
+  "name": "@viverse/network",
+  "version": "0.1.12",
+  "description": "Networking system for the VIVERSE World Framework",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "pnpm type-check && vite build",
+    "build:docs": "vite build --mode docs",
+    "build:extension": "vite build --mode editor",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist .turbo",
+    "docs": "typedoc --out docs"
+  },
+  "dependencies": {
+    "@viverse/core": "workspace:*",
+    "@viverse/types": "workspace:*",
+    "@viverse/config": "workspace:*",
+    "eventemitter3": "^5.0.1",
+    "zustand": "^5.0.6"
+  },
+  "devDependencies": {
+    "typescript": "catalog:",
+    "vite": "catalog:"
+  },
+  "peerDependencies": {
+    "playcanvas": "catalog:"
+  }
+}

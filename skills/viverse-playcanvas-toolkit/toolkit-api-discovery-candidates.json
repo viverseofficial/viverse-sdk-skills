@@ -1,0 +1,867 @@
+{
+  "version": 1,
+  "generatedAt": "2026-05-19T16:47:45.965Z",
+  "scannedRoots": [
+    "apps",
+    "packages",
+    "scripts"
+  ],
+  "includeNodeModules": false,
+  "excludedPackages": [
+    "@viverse/types"
+  ],
+  "purpose": "Auto-discovered candidate Toolkit APIs from visible repo imports and package index exports. Review before merging into toolkit-api-discovery-index.json.",
+  "discoveryRules": [
+    "Scan visible imports from @viverse/* across apps, packages, and scripts.",
+    "Allow extra scan roots such as private Toolkit repos or installed package folders through repeated --scan-root arguments.",
+    "Infer additional candidates from package index files in source repos or node_modules when available.",
+    "Exclude noisy packages such as @viverse/types by default unless explicitly re-included.",
+    "Drop malformed or type-only import symbols before they become candidate APIs.",
+    "Treat suggestedIntentCues as heuristics that should be curated before becoming canonical routing data."
+  ],
+  "packages": [
+    {
+      "packageName": "@viverse/account",
+      "packageGuide": "packages/account/guide.md",
+      "apiCount": 2,
+      "apis": [
+        {
+          "name": "AccountSystem",
+          "kind": "system",
+          "discoverySources": [
+            "export-index"
+          ],
+          "suggestedIntentCues": [
+            "account",
+            "auth",
+            "credentials",
+            "login",
+            "profile"
+          ],
+          "sourceEvidence": [
+            "packages/account/src/index.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "AuthModule",
+          "kind": "module",
+          "discoverySources": [
+            "export-index"
+          ],
+          "suggestedIntentCues": [
+            "account",
+            "auth",
+            "credentials",
+            "login",
+            "profile"
+          ],
+          "sourceEvidence": [
+            "packages/account/src/index.ts"
+          ],
+          "evidenceCount": 1
+        }
+      ]
+    },
+    {
+      "packageName": "@viverse/config",
+      "packageGuide": null,
+      "apiCount": 2,
+      "apis": [
+        {
+          "name": "getViverseConfig",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "config",
+            "get",
+            "viverse"
+          ],
+          "sourceEvidence": [
+            "scripts/templates/engine-only-world/main.toolkit-player.js.template",
+            "scripts/templates/engine-only-world/main.toolkit-quest-ui.js.template",
+            "scripts/templates/engine-only-world/main.toolkit-runtime.js.template"
+          ],
+          "evidenceCount": 3
+        },
+        {
+          "name": "setViverseEnv",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "env",
+            "set",
+            "viverse"
+          ],
+          "sourceEvidence": [
+            "scripts/templates/engine-only-world/main.toolkit-player.js.template",
+            "scripts/templates/engine-only-world/main.toolkit-quest-ui.js.template",
+            "scripts/templates/engine-only-world/main.toolkit-runtime.js.template"
+          ],
+          "evidenceCount": 3
+        }
+      ]
+    },
+    {
+      "packageName": "@viverse/core",
+      "packageGuide": null,
+      "apiCount": 6,
+      "apis": [
+        {
+          "name": "BaseModule",
+          "kind": "module",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "base"
+          ],
+          "sourceEvidence": [
+            "packages/network/src/modules/multiplayer/MultiplayerModule.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "BaseSystem",
+          "kind": "system",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "base"
+          ],
+          "sourceEvidence": [
+            "packages/network/src/NetworkSystem.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "Debugger",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "debugger"
+          ],
+          "sourceEvidence": [
+            "packages/network/src/modules/multiplayer/MultiplayerModule.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "loadFontAsset",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "asset",
+            "font",
+            "load"
+          ],
+          "sourceEvidence": [
+            "apps/preview/src/utils/link-and-billboard-scene.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "registerModule",
+          "kind": "module",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "register"
+          ],
+          "sourceEvidence": [
+            "packages/network/src/NetworkSystem.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "ViverseApp",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "app",
+            "viverse"
+          ],
+          "sourceEvidence": [
+            "scripts/templates/engine-only-world/main.toolkit-player.js.template",
+            "scripts/templates/engine-only-world/main.toolkit-quest-ui.js.template",
+            "scripts/templates/engine-only-world/main.toolkit-runtime.js.template"
+          ],
+          "evidenceCount": 3
+        }
+      ]
+    },
+    {
+      "packageName": "@viverse/extension",
+      "packageGuide": "packages/extension/guide.md",
+      "apiCount": 21,
+      "apis": [
+        {
+          "name": "Billboard",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "event",
+            "interaction",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "apps/preview/src/utils/link-and-billboard-scene.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "BlendEffect",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "blend",
+            "effect",
+            "event",
+            "interaction",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "apps/preview/src/utils/post-effects.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "BloomEffect",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "bloom",
+            "effect",
+            "event",
+            "interaction",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "apps/preview/src/utils/post-effects.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "BrightnessContrastEffect",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "brightness",
+            "contrast",
+            "effect",
+            "event",
+            "interaction",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "apps/preview/src/utils/post-effects.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "EdgeDetectEffect",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "detect",
+            "edge",
+            "effect",
+            "event",
+            "interaction",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "apps/preview/src/utils/post-effects.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "FxaaEffect",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "effect",
+            "event",
+            "fxaa",
+            "interaction",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "apps/preview/src/utils/post-effects.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "HorizontalTiltShiftEffect",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "effect",
+            "event",
+            "horizontal",
+            "interaction",
+            "shift",
+            "tilt",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "apps/preview/src/utils/post-effects.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "HueSaturationEffect",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "effect",
+            "event",
+            "hue",
+            "interaction",
+            "saturation",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "apps/preview/src/utils/post-effects.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "InteractionExecutingTrigger",
+          "kind": "trigger",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "event",
+            "interaction",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "scripts/templates/engine-only-world/main.toolkit-quest-ui.js.template"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "OpenLinkAction",
+          "kind": "action",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "event",
+            "interaction",
+            "link",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "apps/preview/src/utils/link-and-billboard-scene.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "PickInteraction",
+          "kind": "interaction",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "event",
+            "interaction",
+            "pick",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "apps/preview/src/utils/pick-and-action.ts",
+            "scripts/templates/engine-only-world/main.toolkit-quest-ui.js.template"
+          ],
+          "evidenceCount": 2
+        },
+        {
+          "name": "QuestAction",
+          "kind": "action",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "event",
+            "interaction",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "scripts/templates/engine-only-world/main.toolkit-quest-ui.js.template"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "SitInteraction",
+          "kind": "interaction",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "event",
+            "interaction",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "apps/preview/src/utils/seat-scene.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "SoundAudioZone",
+          "kind": "media-zone",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "event",
+            "interaction",
+            "sound",
+            "trigger",
+            "zone"
+          ],
+          "sourceEvidence": [
+            "apps/preview/src/utils/media-scene.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "SoundControls",
+          "kind": "control",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "event",
+            "interaction",
+            "sound",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "apps/preview/src/utils/media-scene.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "SSAOEffect",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "event",
+            "interaction",
+            "ssaoeffect",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "apps/preview/src/utils/post-effects.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "VerticalTiltShiftEffect",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "effect",
+            "event",
+            "interaction",
+            "shift",
+            "tilt",
+            "trigger",
+            "vertical"
+          ],
+          "sourceEvidence": [
+            "apps/preview/src/utils/post-effects.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "VideoTexture",
+          "kind": "media",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "event",
+            "interaction",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "apps/preview/src/utils/media-scene.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "VideoTextureAudioZone",
+          "kind": "media-zone",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "event",
+            "interaction",
+            "trigger",
+            "zone"
+          ],
+          "sourceEvidence": [
+            "apps/preview/src/utils/media-scene.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "VideoTextureControls",
+          "kind": "control",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "event",
+            "interaction",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "apps/preview/src/utils/media-scene.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "VignetteEffect",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "effect",
+            "event",
+            "interaction",
+            "trigger",
+            "vignette"
+          ],
+          "sourceEvidence": [
+            "apps/preview/src/utils/post-effects.ts"
+          ],
+          "evidenceCount": 1
+        }
+      ]
+    },
+    {
+      "packageName": "@viverse/local-player",
+      "packageGuide": "packages/local-player/guide.md",
+      "apiCount": 8,
+      "apis": [
+        {
+          "name": "CameraModule",
+          "kind": "module",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "avatar",
+            "camera",
+            "controller",
+            "locomotion",
+            "player",
+            "xr"
+          ],
+          "sourceEvidence": [
+            "scripts/templates/engine-only-world/main.toolkit-player.js.template",
+            "scripts/templates/engine-only-world/main.toolkit-quest-ui.js.template"
+          ],
+          "evidenceCount": 2
+        },
+        {
+          "name": "DEFAULT_CAMERA_COMPONENT_SETTINGS",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "avatar",
+            "camera",
+            "component",
+            "controller",
+            "default",
+            "locomotion",
+            "player",
+            "settings",
+            "xr"
+          ],
+          "sourceEvidence": [
+            "scripts/templates/engine-only-world/main.toolkit-player.js.template",
+            "scripts/templates/engine-only-world/main.toolkit-quest-ui.js.template"
+          ],
+          "evidenceCount": 2
+        },
+        {
+          "name": "FirstPersonCamera",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "avatar",
+            "camera",
+            "controller",
+            "first",
+            "locomotion",
+            "person",
+            "player",
+            "xr"
+          ],
+          "sourceEvidence": [
+            "scripts/templates/engine-only-world/main.toolkit-player.js.template",
+            "scripts/templates/engine-only-world/main.toolkit-quest-ui.js.template"
+          ],
+          "evidenceCount": 2
+        },
+        {
+          "name": "InteractionModule",
+          "kind": "module",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "avatar",
+            "camera",
+            "controller",
+            "locomotion",
+            "player",
+            "xr"
+          ],
+          "sourceEvidence": [
+            "scripts/templates/engine-only-world/main.toolkit-player.js.template",
+            "scripts/templates/engine-only-world/main.toolkit-quest-ui.js.template"
+          ],
+          "evidenceCount": 2
+        },
+        {
+          "name": "LocalAvatarModule",
+          "kind": "module",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "avatar",
+            "camera",
+            "controller",
+            "local",
+            "locomotion",
+            "player",
+            "xr"
+          ],
+          "sourceEvidence": [
+            "scripts/templates/engine-only-world/main.toolkit-player.js.template",
+            "scripts/templates/engine-only-world/main.toolkit-quest-ui.js.template"
+          ],
+          "evidenceCount": 2
+        },
+        {
+          "name": "LocalPlayerSystem",
+          "kind": "system",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "avatar",
+            "camera",
+            "controller",
+            "local",
+            "locomotion",
+            "player",
+            "xr"
+          ],
+          "sourceEvidence": [
+            "scripts/templates/engine-only-world/main.toolkit-player.js.template",
+            "scripts/templates/engine-only-world/main.toolkit-quest-ui.js.template"
+          ],
+          "evidenceCount": 2
+        },
+        {
+          "name": "LocomotionModule",
+          "kind": "module",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "avatar",
+            "camera",
+            "controller",
+            "locomotion",
+            "player",
+            "xr"
+          ],
+          "sourceEvidence": [
+            "scripts/templates/engine-only-world/main.toolkit-player.js.template",
+            "scripts/templates/engine-only-world/main.toolkit-quest-ui.js.template"
+          ],
+          "evidenceCount": 2
+        },
+        {
+          "name": "ThirdPersonCamera",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "avatar",
+            "camera",
+            "controller",
+            "locomotion",
+            "person",
+            "player",
+            "third",
+            "xr"
+          ],
+          "sourceEvidence": [
+            "scripts/templates/engine-only-world/main.toolkit-player.js.template",
+            "scripts/templates/engine-only-world/main.toolkit-quest-ui.js.template"
+          ],
+          "evidenceCount": 2
+        }
+      ]
+    },
+    {
+      "packageName": "@viverse/network",
+      "packageGuide": "packages/network/guide.md",
+      "apiCount": 2,
+      "apis": [
+        {
+          "name": "MultiplayerModule",
+          "kind": "module",
+          "discoverySources": [
+            "export-index"
+          ],
+          "suggestedIntentCues": [
+            "multiplayer",
+            "network",
+            "room",
+            "sync"
+          ],
+          "sourceEvidence": [
+            "packages/network/src/index.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "NetworkSystem",
+          "kind": "system",
+          "discoverySources": [
+            "export-index"
+          ],
+          "suggestedIntentCues": [
+            "multiplayer",
+            "network",
+            "room",
+            "sync"
+          ],
+          "sourceEvidence": [
+            "packages/network/src/index.ts"
+          ],
+          "evidenceCount": 1
+        }
+      ]
+    },
+    {
+      "packageName": "@viverse/quest",
+      "packageGuide": "packages/quest/guide.md",
+      "apiCount": 1,
+      "apis": [
+        {
+          "name": "QuestSystem",
+          "kind": "system",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "objective",
+            "progress",
+            "quest",
+            "task"
+          ],
+          "sourceEvidence": [
+            "scripts/templates/engine-only-world/main.toolkit-quest-ui.js.template"
+          ],
+          "evidenceCount": 1
+        }
+      ]
+    },
+    {
+      "packageName": "@viverse/ui",
+      "packageGuide": "packages/ui/guide.md",
+      "apiCount": 1,
+      "apis": [
+        {
+          "name": "UiSystem",
+          "kind": "system",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "hud",
+            "interface",
+            "ui"
+          ],
+          "sourceEvidence": [
+            "scripts/templates/engine-only-world/main.toolkit-quest-ui.js.template"
+          ],
+          "evidenceCount": 1
+        }
+      ]
+    }
+  ]
+}

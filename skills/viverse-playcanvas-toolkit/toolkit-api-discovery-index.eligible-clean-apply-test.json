@@ -1,0 +1,289 @@
+{
+  "version": 1,
+  "purpose": "API-level discovery cues for agents that need to map user intent to concrete Toolkit APIs before inventing bespoke logic.",
+  "usageRule": [
+    "Use this index after behavior decomposition and before writing custom scene logic.",
+    "Prefer APIs with matching intent cues before falling back to manual polling, ad hoc state flags, or custom DOM glue.",
+    "Treat this as the API-level companion to toolkit-capability-catalog.json."
+  ],
+  "packages": [
+    {
+      "packageName": "@viverse/local-player",
+      "apis": [
+        {
+          "name": "LocalPlayerSystem",
+          "kind": "system",
+          "intentCues": [
+            "player controller",
+            "character movement",
+            "camera follow",
+            "avatar locomotion",
+            "xr player"
+          ],
+          "useWhen": [
+            "the world needs a controllable local avatar",
+            "camera and locomotion should come from Toolkit instead of custom controller glue"
+          ],
+          "sourceEvidence": [
+            "scripts/templates/engine-only-world/main.toolkit-player.js.template",
+            "scripts/templates/engine-only-world/main.toolkit-quest-ui.js.template",
+            "packages/local-player/guide.md"
+          ]
+        }
+      ]
+    },
+    {
+      "packageName": "@viverse/quest",
+      "apis": [
+        {
+          "name": "QuestSystem",
+          "kind": "system",
+          "intentCues": [
+            "quest tracking",
+            "objective progress",
+            "task completion",
+            "mission flow"
+          ],
+          "useWhen": [
+            "the request needs event-driven quest state or objective tracking",
+            "task progress should be managed by Toolkit instead of ad hoc flags"
+          ],
+          "sourceEvidence": [
+            "scripts/templates/engine-only-world/main.toolkit-quest-ui.js.template",
+            "packages/quest/guide.md"
+          ]
+        }
+      ]
+    },
+    {
+      "packageName": "@viverse/ui",
+      "apis": [
+        {
+          "name": "UiSystem",
+          "kind": "system",
+          "intentCues": ["quest ui", "chat ui", "world-facing ui", "game ui"],
+          "useWhen": [
+            "the request needs Toolkit-managed interface state",
+            "ui should react to quest or interaction events without custom UI wiring from scratch"
+          ],
+          "sourceEvidence": [
+            "scripts/templates/engine-only-world/main.toolkit-quest-ui.js.template",
+            "packages/ui/guide.md"
+          ]
+        }
+      ]
+    },
+    {
+      "packageName": "@viverse/network",
+      "apis": [
+        {
+          "name": "NetworkSystem",
+          "kind": "system",
+          "intentCues": [
+            "multiplayer",
+            "shared presence",
+            "network sync",
+            "room state"
+          ],
+          "useWhen": [
+            "the request needs synchronized player or world state",
+            "default-room multiplayer or networked interactions are in scope"
+          ],
+          "sourceEvidence": [
+            "packages/network/src/index.ts",
+            "packages/network/src/NetworkSystem.ts",
+            "packages/network/guide.md"
+          ]
+        },
+        {
+          "name": "MultiplayerModule",
+          "kind": "module",
+          "intentCues": ["multiplayer module", "network plugin", "shared room"],
+          "useWhen": [
+            "NetworkSystem should initialize a multiplayer slice through registered modules"
+          ],
+          "sourceEvidence": [
+            "packages/network/src/index.ts",
+            "packages/network/src/modules/multiplayer/MultiplayerModule.ts",
+            "viverse-default-room-multiplayer-contract.md"
+          ]
+        }
+      ]
+    },
+    {
+      "packageName": "@viverse/account",
+      "apis": [
+        {
+          "name": "AccountSystem",
+          "kind": "system",
+          "intentCues": [
+            "login",
+            "account",
+            "profile",
+            "credentials",
+            "authenticated user"
+          ],
+          "useWhen": [
+            "the request depends on signed-in identity or VIVERSE credentials",
+            "user profile or auth-aware runtime behavior is required"
+          ],
+          "sourceEvidence": [
+            "packages/account/src/index.ts",
+            "packages/account/guide.md",
+            "scripts/templates/leaderboard/leaderboard-runtime-boundary.mjs.template"
+          ]
+        }
+      ]
+    },
+    {
+      "packageName": "@viverse/extension",
+      "apis": [
+        {
+          "name": "PickInteraction",
+          "kind": "interaction",
+          "intentCues": [
+            "pick up object",
+            "grab object",
+            "hold prop",
+            "direct interaction"
+          ],
+          "useWhen": [
+            "the player should pick up or manipulate an entity through Toolkit interaction primitives"
+          ],
+          "sourceEvidence": [
+            "apps/preview/src/utils/pick-and-action.ts",
+            "scripts/templates/engine-only-world/main.toolkit-quest-ui.js.template",
+            "toolkit-capability-catalog.json"
+          ]
+        },
+        {
+          "name": "SitInteraction",
+          "kind": "interaction",
+          "intentCues": [
+            "sit down",
+            "chair interaction",
+            "seat spot",
+            "seat exit"
+          ],
+          "useWhen": [
+            "the player should sit at a defined spot with Toolkit seat behavior"
+          ],
+          "sourceEvidence": [
+            "apps/preview/src/utils/seat-scene.ts",
+            "toolkit-capability-catalog.json"
+          ]
+        },
+        {
+          "name": "InteractionExecutingTrigger",
+          "kind": "trigger",
+          "intentCues": [
+            "trigger after interaction",
+            "run action when interaction happens",
+            "interaction event chain"
+          ],
+          "useWhen": [
+            "an interaction should trigger follow-up actions without custom update-loop glue"
+          ],
+          "sourceEvidence": [
+            "scripts/templates/engine-only-world/main.toolkit-quest-ui.js.template"
+          ]
+        },
+        {
+          "name": "QuestAction",
+          "kind": "action",
+          "intentCues": [
+            "complete quest task",
+            "advance objective",
+            "mark task done"
+          ],
+          "useWhen": [
+            "an interaction or trigger should complete quest progress through Toolkit action wiring"
+          ],
+          "sourceEvidence": [
+            "scripts/templates/engine-only-world/main.toolkit-quest-ui.js.template"
+          ]
+        },
+        {
+          "name": "Billboard",
+          "kind": "ui-or-visual",
+          "intentCues": [
+            "camera-facing sign",
+            "billboard",
+            "always face player"
+          ],
+          "useWhen": [
+            "world-facing UI or signage should orient through Toolkit behavior"
+          ],
+          "sourceEvidence": [
+            "apps/preview/src/utils/link-and-billboard-scene.ts",
+            "toolkit-capability-catalog.json"
+          ]
+        },
+        {
+          "name": "OpenLinkAction",
+          "kind": "action",
+          "intentCues": [
+            "open link",
+            "external url",
+            "click button to open site"
+          ],
+          "useWhen": [
+            "a world interaction should open an external link through Toolkit action wiring"
+          ],
+          "sourceEvidence": [
+            "apps/preview/src/utils/link-and-billboard-scene.ts",
+            "toolkit-capability-catalog.json"
+          ]
+        }
+      ]
+    },
+    {
+      "packageName": "media reference capabilities",
+      "apis": [
+        {
+          "name": "VideoTexture",
+          "kind": "media",
+          "intentCues": [
+            "video surface",
+            "play video in world",
+            "flat video",
+            "360 video"
+          ],
+          "useWhen": [
+            "the scene needs Toolkit-backed video playback instead of custom media plumbing"
+          ],
+          "sourceEvidence": [
+            "apps/preview/src/utils/media-scene.ts",
+            "toolkit-capability-catalog.json"
+          ]
+        },
+        {
+          "name": "VideoTextureControls",
+          "kind": "media-control",
+          "intentCues": ["video controls", "play pause media", "media ui"],
+          "useWhen": ["video playback needs Toolkit-provided controls"],
+          "sourceEvidence": [
+            "apps/preview/src/utils/media-scene.ts",
+            "toolkit-capability-catalog.json"
+          ]
+        },
+        {
+          "name": "VideoTextureAudioZone",
+          "kind": "media-zone",
+          "intentCues": [
+            "video audio zone",
+            "positional media audio",
+            "audio area"
+          ],
+          "useWhen": [
+            "video audio should respond to the player's world position through an existing media-zone primitive"
+          ],
+          "sourceEvidence": [
+            "apps/preview/src/utils/media-scene.ts",
+            "toolkit-capability-catalog.json"
+          ]
+        }
+      ]
+    }
+  ]
+}

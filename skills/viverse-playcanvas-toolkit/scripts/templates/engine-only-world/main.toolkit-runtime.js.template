@@ -1,0 +1,79 @@
+import * as pc from 'playcanvas';
+import { ViverseApp } from '@viverse/core';
+import { getViverseConfig, setViverseEnv } from '@viverse/config';
+
+function createBaseScene(app) {
+  app.scene.ambientLight = new pc.Color(0.45, 0.48, 0.55);
+
+  const camera = new pc.Entity('camera');
+  camera.addComponent('camera', {
+    clearColor: new pc.Color(0.68, 0.84, 0.98),
+    farClip: 500,
+    toneMapping: pc.TONEMAP_ACES,
+    gammaCorrection: pc.GAMMA_SRGB,
+  });
+  camera.setLocalPosition(0, 3, 8);
+  camera.lookAt(0, 0.75, 0);
+  app.root.addChild(camera);
+
+  const light = new pc.Entity('sun');
+  light.addComponent('light', {
+    type: 'directional',
+    castShadows: true,
+    intensity: 1.2,
+    shadowBias: 0.2,
+    shadowDistance: 64,
+    normalOffsetBias: 0.05,
+  });
+  light.setLocalEulerAngles(45, 30, 0);
+  app.root.addChild(light);
+
+  const groundMaterial = new pc.StandardMaterial();
+  groundMaterial.diffuse = new pc.Color(0.62, 0.66, 0.72);
+  groundMaterial.roughness = 0.95;
+  groundMaterial.update();
+
+  const ground = new pc.Entity('ground');
+  ground.addComponent('render', {
+    type: 'plane',
+    material: groundMaterial,
+  });
+  ground.setLocalScale(12, 1, 12);
+  app.root.addChild(ground);
+}
+
+(async function bootstrapEngineOnlyWorld() {
+  const canvas = document.getElementById('application-canvas');
+  if (!canvas) {
+    throw new Error('Missing #application-canvas element.');
+  }
+
+  const app = new pc.Application(canvas, {
+    mouse: new pc.Mouse(document.body),
+    touch: new pc.TouchDevice(document.body),
+    keyboard: new pc.Keyboard(window),
+  });
+
+  app.setCanvasFillMode(pc.FILLMODE_FILL_WINDOW);
+  app.setCanvasResolution(pc.RESOLUTION_AUTO);
+
+  const resize = () => app.resizeCanvas(canvas.width, canvas.height);
+  window.addEventListener('resize', resize);
+
+  createBaseScene(app);
+  app.start();
+
+  setViverseEnv({
+    ...getViverseConfig(),
+    assetDomain: window.location.origin,
+  });
+
+  const viverseApp = new ViverseApp(app, []);
+
+  try {
+    await viverseApp.start();
+    console.info('[engine-only-world] Toolkit runtime started.');
+  } catch (error) {
+    console.error('[engine-only-world] Failed to start toolkit runtime.', error);
+  }
+})();

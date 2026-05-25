@@ -1,0 +1,132 @@
+{
+  "userFacingDirs": ["skills", "prompts"],
+  "userFacingFiles": [
+    "README.md",
+    "scripts/create-engine-only-world.mjs",
+    "scripts/run-engine-only-world-smoke.mjs",
+    "scripts/create-leaderboard-runtime-boundary.mjs",
+    "scripts/validate-default-room-multiplayer.mjs",
+    "scripts/validate-leaderboard-integration.mjs",
+    "scripts/validate-engine-only-world.mjs",
+    "scripts/publish-build-output-to-viverse.mjs",
+    "scripts/setup-playcanvas-sync.mjs"
+  ],
+  "ignorePatterns": [
+    "viverse-nontechnical-user-ux-checklist\\.md$",
+    "viverse-skill-acceptance-checklist\\.md$",
+    "toolkit-source-transition\\.md$"
+  ],
+  "allowRuleIdsByFilePattern": [
+    {
+      "filePattern": "^scripts/create-leaderboard-runtime-boundary\\.mjs$",
+      "ruleIds": []
+    }
+  ],
+  "termRules": [
+    {
+      "id": "runtime-bootstrap",
+      "pattern": "runtime bootstrap",
+      "flags": "i",
+      "message": "Prefer main world file or world code wording."
+    },
+    {
+      "id": "runtime-boundary",
+      "pattern": "runtime boundary",
+      "flags": "i",
+      "message": "Prefer plain language like leaderboard wiring or built-in world hookup."
+    },
+    {
+      "id": "runtime-entry",
+      "pattern": "runtime entry",
+      "flags": "i",
+      "message": "Prefer main world file unless the file target truly must be named."
+    },
+    {
+      "id": "integration-route",
+      "pattern": "integration route",
+      "flags": "i",
+      "message": "Prefer in-world feature or setup wording."
+    },
+    {
+      "id": "toolkit-source-profile",
+      "pattern": "toolkit source profile",
+      "flags": "i",
+      "message": "Do not expose internal source-profile choices to normal users."
+    },
+    {
+      "id": "lock-file",
+      "pattern": "lock file",
+      "flags": "i",
+      "message": "Avoid exposing lock-file mechanics in user guidance."
+    },
+    {
+      "id": "vendored-artifacts",
+      "pattern": "vendored artifacts",
+      "flags": "i",
+      "message": "Avoid maintainership terms in user-facing guidance."
+    },
+    {
+      "id": "wrapper-internals",
+      "pattern": "wrapper internals",
+      "flags": "i",
+      "message": "Prefer local sync shortcut wording."
+    },
+    {
+      "id": "artifact-classification",
+      "pattern": "artifact classification",
+      "flags": "i",
+      "message": "Prefer folder classification or direct next-step wording."
+    },
+    {
+      "id": "manifest-path",
+      "pattern": "manifest path",
+      "flags": "i",
+      "message": "Do not ask normal users about manifest-path details."
+    }
+  ],
+  "decisionLeakRules": [
+    {
+      "id": "choose-technical-route",
+      "pattern": "choose between .*?(route|profile|manifest|lock|install|wrapper|command)",
+      "flags": "i",
+      "message": "The agent should usually choose the technical route instead of asking the user."
+    },
+    {
+      "id": "taxonomy-template",
+      "pattern": "I want to: edit\\/sync\\/publish|This folder looks like: finished world files\\/working project files",
+      "flags": "i",
+      "message": "Check whether the workflow is making the user classify the folder instead of giving the path and letting the agent decide."
+    }
+  ],
+  "skipLinePatterns": [
+    {
+      "pattern": "say \".*\" instead of \".*\"",
+      "flags": "i"
+    },
+    {
+      "pattern": "^[-*] Do not ask ",
+      "flags": "i"
+    },
+    {
+      "pattern": "^Do not ask ",
+      "flags": "i"
+    },
+    {
+      "pattern": "^[-*] Prefer ",
+      "flags": "i"
+    },
+    {
+      "pattern": "^Avoid leading with ",
+      "flags": "i"
+    },
+    {
+      "pattern": "Check whether the wording",
+      "flags": "i"
+    },
+    {
+      "pattern": "wrapper internals",
+      "flags": "i"
+    }
+  ],
+  "userFacingScriptLinePattern": "(console\\.(log|error)|throw new Error|Usage:|Options:|Next action:|status:|reason:)"
+}

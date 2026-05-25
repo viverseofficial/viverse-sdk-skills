@@ -1,0 +1,1212 @@
+{
+  "version": 1,
+  "purpose": "API-level discovery cues for agents that need to map user intent to concrete Toolkit APIs before inventing bespoke logic.",
+  "usageRule": [
+    "Use this index after behavior decomposition and before writing custom scene logic.",
+    "Prefer APIs with matching intent cues before falling back to manual polling, ad hoc state flags, or custom DOM glue.",
+    "Treat this as the API-level companion to toolkit-capability-catalog.json."
+  ],
+  "hintGuide": {
+    "configFields": {
+      "useFor": [
+        "real config object fields that materially change how a trigger, action, or similar API should be wired"
+      ],
+      "avoidWhen": [
+        "the detail is only a low-value parameter or a private implementation member",
+        "the main risk is not field naming but attaching the API to the wrong source object"
+      ],
+      "examples": [
+        "EntityTriggerEnterTrigger.filterByPlayer",
+        "EntityTriggerEnterTrigger.tagsFilter",
+        "EntitySelectedTrigger.selectionExcludeTags",
+        "QuestAction.type"
+      ]
+    },
+    "constructionHints": {
+      "useFor": [
+        "APIs that are usually created from an existing Toolkit or PlayCanvas object rather than selected by one config field"
+      ],
+      "avoidWhen": [
+        "the API is already well described by configFields alone",
+        "the hint would duplicate obvious constructor arguments without changing routing"
+      ],
+      "examples": [
+        "VideoTextureControls.videoTexture",
+        "SoundControls.soundComponent",
+        "SoundControls.slotName"
+      ]
+    },
+    "capabilityHints": {
+      "useFor": [
+        "important built-in behavior that should stop the agent from rebuilding the same control surface or helper flow from scratch"
+      ],
+      "avoidWhen": [
+        "the hint only restates the API name",
+        "the behavior is too generic to change implementation choice"
+      ],
+      "examples": [
+        "VideoTextureControls.playback controls",
+        "VideoTextureControls.seek controls",
+        "SoundControls.volume controls"
+      ]
+    }
+  },
+  "packages": [
+    {
+      "packageName": "@viverse/account",
+      "apis": [
+        {
+          "name": "AccountSystem",
+          "kind": "system",
+          "intentCues": [
+            "login",
+            "account",
+            "profile",
+            "credentials",
+            "authenticated user"
+          ],
+          "useWhen": [
+            "the request depends on signed-in identity or VIVERSE credentials",
+            "user profile or auth-aware runtime behavior is required"
+          ],
+          "sourceEvidence": [
+            "packages/account/src/index.ts",
+            "packages/account/guide.md",
+            "scripts/templates/leaderboard/leaderboard-runtime-boundary.mjs.template"
+          ]
+        },
+        {
+          "name": "AuthModule",
+          "kind": "module",
+          "intentCues": [
+            "login flow",
+            "sign in",
+            "authentication",
+            "auth state",
+            "session"
+          ],
+          "useWhen": [
+            "the request depends on login or authentication state",
+            "signed-in identity behavior is needed before account-aware features can run"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/account/src/index.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/account/src/modules/auth/AuthModule.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "packageName": "@viverse/config",
+      "apis": [
+        {
+          "name": "getViverseConfig",
+          "kind": "function",
+          "intentCues": [
+            "app config",
+            "environment config",
+            "runtime config",
+            "app id config",
+            "toolkit settings"
+          ],
+          "useWhen": [
+            "the request needs toolkit runtime configuration",
+            "environment or asset-domain behavior should come from Toolkit config instead of ad hoc constants"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/config/src/index.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "packageName": "@viverse/core",
+      "apis": [
+        {
+          "name": "BaseModule",
+          "kind": "module",
+          "intentCues": [
+            "base"
+          ],
+          "useWhen": [
+            "a Toolkit system should be extended or initialized through BaseModule instead of bespoke module wiring"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/account/src/modules/auth/AuthModule.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/core/src/index.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/local-player/src/modules/avatar/AvatarModule.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/local-player/src/modules/camera/CameraModule.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/local-player/src/modules/interaction/InteractionModule.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/local-player/src/modules/locomotion/LocomotionModule.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/local-player/src/modules/xr/XrModule.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/network/src/modules/multiplayer/MultiplayerModule.ts",
+            "packages/network/src/modules/multiplayer/MultiplayerModule.ts"
+          ]
+        },
+        {
+          "name": "BaseSystem",
+          "kind": "system",
+          "intentCues": [
+            "base"
+          ],
+          "useWhen": [
+            "the request needs BaseSystem as a Toolkit-managed runtime system instead of custom orchestration"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/account/src/AccountSystem.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/core/src/index.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/local-player/src/LocalPlayerSystem.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/network/src/NetworkSystem.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/quest/src/QuestSystem.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/ui/src/UiSystem.ts",
+            "packages/network/src/NetworkSystem.ts"
+          ]
+        },
+        {
+          "name": "ConditionVerifier",
+          "kind": "shared-utility",
+          "intentCues": [
+            "condition check",
+            "verify condition",
+            "gated behavior"
+          ],
+          "useWhen": [
+            "the request needs Toolkit-managed condition verification instead of ad hoc boolean glue"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/core/src/shared/index.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/core/src/shared/ConditionVerifier.ts"
+          ]
+        },
+        {
+          "name": "getLocalPlayer",
+          "kind": "function",
+          "intentCues": [
+            "local player lookup",
+            "get current player",
+            "access local avatar"
+          ],
+          "useWhen": [
+            "follow-up logic needs the current Toolkit-managed player entity or avatar"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/core/src/index.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/core/src/helpers/player.ts"
+          ]
+        },
+        {
+          "name": "loadAsset",
+          "kind": "function",
+          "intentCues": [
+            "load asset",
+            "load model",
+            "load resource"
+          ],
+          "useWhen": [
+            "asset loading should use Toolkit helper utilities"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/core/src/index.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/core/src/utils/load-asset.ts"
+          ]
+        },
+        {
+          "name": "loadAssetFromUrl",
+          "kind": "function",
+          "intentCues": [
+            "load remote asset",
+            "load asset from url",
+            "external model url"
+          ],
+          "useWhen": [
+            "remote asset loading should use Toolkit helper utilities"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/core/src/index.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/core/src/utils/load-asset.ts"
+          ]
+        },
+        {
+          "name": "registerModule",
+          "kind": "module",
+          "intentCues": [
+            "register"
+          ],
+          "useWhen": [
+            "a Toolkit system should be extended or initialized through registerModule instead of bespoke module wiring"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/account/src/AccountSystem.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/local-player/src/LocalPlayerSystem.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/network/src/NetworkSystem.ts",
+            "packages/network/src/NetworkSystem.ts"
+          ]
+        },
+        {
+          "name": "ViverseApp",
+          "kind": "app-orchestrator",
+          "intentCues": [
+            "app orchestration",
+            "toolkit app",
+            "system lifecycle",
+            "register systems"
+          ],
+          "useWhen": [
+            "the request needs a Toolkit app orchestration root",
+            "systems or modules should be registered through the Toolkit app lifecycle"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/core/src/index.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/core/src/app/ViverseApp.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "packageName": "@viverse/extension",
+      "apis": [
+        {
+          "name": "Billboard",
+          "kind": "ui-or-visual",
+          "intentCues": [
+            "camera-facing sign",
+            "billboard",
+            "always face player"
+          ],
+          "useWhen": [
+            "world-facing UI or signage should orient through Toolkit behavior"
+          ],
+          "sourceEvidence": [
+            "apps/preview/src/utils/link-and-billboard-scene.ts",
+            "toolkit-capability-catalog.json"
+          ]
+        },
+        {
+          "name": "EntitySelectedTrigger",
+          "kind": "trigger",
+          "intentCues": [
+            "select entity trigger",
+            "click object trigger",
+            "xr select trigger"
+          ],
+          "useWhen": [
+            "a world event should fire when the player selects a specific entity through mouse or XR selection"
+          ],
+          "configFields": [
+            {
+              "name": "selectionExcludeTags",
+              "intentCues": [
+                "exclude tags from selection",
+                "ignore tagged blockers in raycast",
+                "selection filter by excluded tags"
+              ],
+              "useWhen": [
+                "selection should ignore helper geometry or other tagged entities instead of inventing a custom raycast exclusion helper"
+              ]
+            }
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/extension/src/index.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/extension/src/triggers/EntitySelectedTrigger.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/types/src/extension/types/trigger.ts"
+          ]
+        },
+        {
+          "name": "EntityTriggerEnterTrigger",
+          "kind": "trigger",
+          "intentCues": [
+            "enter zone trigger",
+            "trigger on enter",
+            "area enter event"
+          ],
+          "useWhen": [
+            "a world event should fire when something enters a trigger area"
+          ],
+          "configFields": [
+            {
+              "name": "filterByPlayer",
+              "intentCues": [
+                "only player triggers",
+                "ignore non-player collisions",
+                "player-only activation"
+              ],
+              "useWhen": [
+                "only the player should activate the trigger instead of adding custom collision filtering logic"
+              ]
+            },
+            {
+              "name": "tagsFilter",
+              "intentCues": [
+                "filter by tag",
+                "only tagged entities trigger",
+                "tag-based trigger filter"
+              ],
+              "useWhen": [
+                "only entities with specific tags should activate the trigger instead of manual tag checks in an update loop"
+              ]
+            }
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/extension/src/index.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/extension/src/triggers/collision/EntityTriggerEnterTrigger.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/types/src/extension/types/trigger.ts"
+          ]
+        },
+        {
+          "name": "InteractionExecutingTrigger",
+          "kind": "trigger",
+          "intentCues": [
+            "trigger after interaction",
+            "run action when interaction happens",
+            "interaction event chain"
+          ],
+          "useWhen": [
+            "an interaction should trigger follow-up actions without custom update-loop glue"
+          ],
+          "sourceEvidence": [
+            "scripts/templates/engine-only-world/main.toolkit-quest-ui.js.template"
+          ]
+        },
+        {
+          "name": "OpenLinkAction",
+          "kind": "action",
+          "intentCues": [
+            "open link",
+            "external url",
+            "click button to open site"
+          ],
+          "useWhen": [
+            "a world interaction should open an external link through Toolkit action wiring"
+          ],
+          "configFields": [
+            {
+              "name": "link",
+              "intentCues": [
+                "target url",
+                "destination link",
+                "which site to open"
+              ],
+              "useWhen": [
+                "the action should open a specific URL instead of custom window-open glue"
+              ]
+            },
+            {
+              "name": "openInNewTab",
+              "intentCues": [
+                "open in new tab",
+                "same tab or new tab"
+              ],
+              "useWhen": [
+                "the action should control whether the destination opens in a new browser tab"
+              ]
+            }
+          ],
+          "sourceEvidence": [
+            "apps/preview/src/utils/link-and-billboard-scene.ts",
+            "toolkit-capability-catalog.json",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/types/src/extension/types/action.ts"
+          ]
+        },
+        {
+          "name": "PickInteraction",
+          "kind": "interaction",
+          "intentCues": [
+            "pick up object",
+            "grab object",
+            "hold prop",
+            "direct interaction"
+          ],
+          "useWhen": [
+            "the player should pick up or manipulate an entity through Toolkit interaction primitives"
+          ],
+          "sourceEvidence": [
+            "apps/preview/src/utils/pick-and-action.ts",
+            "scripts/templates/engine-only-world/main.toolkit-quest-ui.js.template",
+            "toolkit-capability-catalog.json"
+          ]
+        },
+        {
+          "name": "QuestAction",
+          "kind": "action",
+          "intentCues": [
+            "complete quest task",
+            "advance objective",
+            "mark task done"
+          ],
+          "useWhen": [
+            "an interaction or trigger should complete quest progress through Toolkit action wiring"
+          ],
+          "configFields": [
+            {
+              "name": "type",
+              "intentCues": [
+                "quest action type",
+                "start or reset quest",
+                "add task progress",
+                "complete task"
+              ],
+              "useWhen": [
+                "the world should choose a built-in quest operation instead of splitting quest state changes across custom handlers"
+              ]
+            },
+            {
+              "name": "questName",
+              "intentCues": [
+                "target quest name",
+                "which quest to affect"
+              ],
+              "useWhen": [
+                "the action should target a specific Toolkit quest by name"
+              ]
+            },
+            {
+              "name": "taskName",
+              "intentCues": [
+                "target task name",
+                "which objective to update"
+              ],
+              "useWhen": [
+                "the action should target a specific Toolkit task within a quest"
+              ]
+            },
+            {
+              "name": "increment",
+              "intentCues": [
+                "progress increment",
+                "increase task progress"
+              ],
+              "useWhen": [
+                "progress should advance by a defined amount instead of hand-written counters"
+              ]
+            }
+          ],
+          "sourceEvidence": [
+            "scripts/templates/engine-only-world/main.toolkit-quest-ui.js.template",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/extension/src/actions/QuestAction.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/types/src/extension/types/action.ts"
+          ]
+        },
+        {
+          "name": "SetSpawnPointAction",
+          "kind": "action",
+          "intentCues": [
+            "set spawn point",
+            "change respawn location",
+            "update player spawn"
+          ],
+          "useWhen": [
+            "the world should update the player's spawn or respawn location through Toolkit action wiring"
+          ],
+          "configFields": [
+            {
+              "name": "spawnPoints",
+              "intentCues": [
+                "spawn point positions",
+                "respawn positions",
+                "set allowed spawn locations"
+              ],
+              "useWhen": [
+                "spawn behavior should come from authored spawn positions instead of ad hoc respawn bookkeeping"
+              ]
+            }
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/extension/src/index.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/types/src/extension/types/action.ts"
+          ]
+        },
+        {
+          "name": "ShowToastMessageAction",
+          "kind": "action",
+          "intentCues": [
+            "show toast",
+            "temporary message",
+            "popup notification"
+          ],
+          "useWhen": [
+            "a world event should show a short UI message through Toolkit action wiring"
+          ],
+          "configFields": [
+            {
+              "name": "title",
+              "intentCues": [
+                "toast title",
+                "message headline"
+              ],
+              "useWhen": [
+                "the toast needs a primary message label"
+              ]
+            },
+            {
+              "name": "description",
+              "intentCues": [
+                "toast body text",
+                "message details"
+              ],
+              "useWhen": [
+                "the toast needs optional supporting detail"
+              ]
+            },
+            {
+              "name": "duration",
+              "intentCues": [
+                "toast duration",
+                "auto close seconds"
+              ],
+              "useWhen": [
+                "the toast should auto-close after a configured number of seconds"
+              ]
+            }
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/extension/src/index.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/types/src/extension/types/action.ts"
+          ]
+        },
+        {
+          "name": "SitInteraction",
+          "kind": "interaction",
+          "intentCues": [
+            "sit down",
+            "chair interaction",
+            "seat spot",
+            "seat exit"
+          ],
+          "useWhen": [
+            "the player should sit at a defined spot with Toolkit seat behavior"
+          ],
+          "sourceEvidence": [
+            "apps/preview/src/utils/seat-scene.ts",
+            "toolkit-capability-catalog.json"
+          ]
+        },
+        {
+          "name": "SoundAudioZone",
+          "kind": "media-zone",
+          "intentCues": [
+            "action",
+            "event",
+            "interaction",
+            "sound",
+            "trigger",
+            "zone"
+          ],
+          "useWhen": [
+            "the request directly matches SoundAudioZone and the repo shows repeated runtime evidence for it"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/apps/preview/src/utils/media-scene.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/extension/src/scripts/viverse-audio-zone.ts",
+            "apps/preview/src/utils/media-scene.ts"
+          ]
+        },
+        {
+          "name": "SoundControls",
+          "kind": "control",
+          "intentCues": [
+            "action",
+            "event",
+            "interaction",
+            "sound",
+            "trigger"
+          ],
+          "useWhen": [
+            "the request directly matches SoundControls and the repo shows repeated runtime evidence for it"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/apps/preview/src/utils/media-scene.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/extension/src/scripts/viverse-media-controls.ts",
+            "apps/preview/src/utils/media-scene.ts"
+          ]
+        },
+        {
+          "name": "SubscribeNotificationTrigger",
+          "kind": "trigger",
+          "intentCues": [
+            "listen for notification",
+            "notification trigger",
+            "react to published event"
+          ],
+          "useWhen": [
+            "a world event should fire when a named Toolkit notification is published"
+          ],
+          "configFields": [
+            {
+              "name": "notificationName",
+              "intentCues": [
+                "notification channel name",
+                "which published event to listen for"
+              ],
+              "useWhen": [
+                "the trigger should subscribe to a specific named notification instead of adding bespoke event bus glue"
+              ]
+            }
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/extension/src/index.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/types/src/extension/types/trigger.ts"
+          ]
+        },
+        {
+          "name": "TeleportPlayerAction",
+          "kind": "action",
+          "intentCues": [
+            "teleport player",
+            "move player instantly",
+            "warp player"
+          ],
+          "useWhen": [
+            "the player should be teleported through Toolkit action wiring instead of bespoke movement glue"
+          ],
+          "configFields": [
+            {
+              "name": "position",
+              "intentCues": [
+                "teleport destination",
+                "target position",
+                "warp destination"
+              ],
+              "useWhen": [
+                "the action only needs a destination position instead of a custom movement script"
+              ]
+            }
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/extension/src/index.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/extension/src/actions/TeleportPlayerAction.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/types/src/extension/types/action.ts"
+          ]
+        },
+        {
+          "name": "VideoTexture",
+          "kind": "media",
+          "intentCues": [
+            "action",
+            "event",
+            "interaction",
+            "trigger"
+          ],
+          "useWhen": [
+            "the request directly matches VideoTexture and the repo shows repeated runtime evidence for it"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/apps/preview/src/utils/media-scene.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/extension/src/scripts/viverse-media-controls.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/extension/src/scripts/viverse-video-texture.ts",
+            "apps/preview/src/utils/media-scene.ts"
+          ]
+        },
+        {
+          "name": "VideoTextureAudioZone",
+          "kind": "media-zone",
+          "intentCues": [
+            "action",
+            "event",
+            "interaction",
+            "trigger",
+            "zone"
+          ],
+          "useWhen": [
+            "the request directly matches VideoTextureAudioZone and the repo shows repeated runtime evidence for it"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/apps/preview/src/utils/media-scene.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/extension/src/scripts/viverse-audio-zone.ts",
+            "apps/preview/src/utils/media-scene.ts"
+          ]
+        },
+        {
+          "name": "VideoTextureControls",
+          "kind": "control",
+          "intentCues": [
+            "action",
+            "event",
+            "interaction",
+            "trigger"
+          ],
+          "useWhen": [
+            "the request directly matches VideoTextureControls and the repo shows repeated runtime evidence for it"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/apps/preview/src/utils/media-scene.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/extension/src/scripts/viverse-media-controls.ts",
+            "apps/preview/src/utils/media-scene.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "packageName": "@viverse/local-player",
+      "apis": [
+        {
+          "name": "AvatarModule",
+          "kind": "module",
+          "intentCues": [
+            "avatar setup",
+            "avatar system",
+            "avatar behavior"
+          ],
+          "useWhen": [
+            "avatar lifecycle or avatar presentation should come from Toolkit module wiring"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/local-player/src/index.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/local-player/src/modules/avatar/AvatarModule.ts"
+          ]
+        },
+        {
+          "name": "CameraModule",
+          "kind": "module",
+          "intentCues": [
+            "avatar",
+            "camera",
+            "controller",
+            "locomotion",
+            "player",
+            "xr"
+          ],
+          "useWhen": [
+            "a Toolkit system should be extended or initialized through CameraModule instead of bespoke module wiring"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/apps/preview/src/main.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/local-player/src/index.ts",
+            "scripts/templates/engine-only-world/main.toolkit-player.js.template",
+            "scripts/templates/engine-only-world/main.toolkit-quest-ui.js.template"
+          ]
+        },
+        {
+          "name": "InteractionModule",
+          "kind": "module",
+          "intentCues": [
+            "player interaction",
+            "interaction module",
+            "interactable handling"
+          ],
+          "useWhen": [
+            "the local player should handle interactions through Toolkit modules"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/local-player/src/index.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/local-player/src/modules/interaction/InteractionModule.ts"
+          ]
+        },
+        {
+          "name": "LocalAvatarModule",
+          "kind": "module",
+          "intentCues": [
+            "avatar",
+            "camera",
+            "controller",
+            "local",
+            "locomotion",
+            "player",
+            "xr"
+          ],
+          "useWhen": [
+            "a Toolkit system should be extended or initialized through LocalAvatarModule instead of bespoke module wiring"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/apps/preview/src/main.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/local-player/src/index.ts",
+            "scripts/templates/engine-only-world/main.toolkit-player.js.template",
+            "scripts/templates/engine-only-world/main.toolkit-quest-ui.js.template"
+          ]
+        },
+        {
+          "name": "LocalPlayerSystem",
+          "kind": "system",
+          "intentCues": [
+            "player controller",
+            "character movement",
+            "camera follow",
+            "avatar locomotion",
+            "xr player"
+          ],
+          "useWhen": [
+            "the world needs a controllable local avatar",
+            "camera and locomotion should come from Toolkit instead of custom controller glue"
+          ],
+          "sourceEvidence": [
+            "scripts/templates/engine-only-world/main.toolkit-player.js.template",
+            "scripts/templates/engine-only-world/main.toolkit-quest-ui.js.template",
+            "packages/local-player/guide.md"
+          ]
+        },
+        {
+          "name": "LocomotionModule",
+          "kind": "module",
+          "intentCues": [
+            "avatar",
+            "camera",
+            "controller",
+            "locomotion",
+            "player",
+            "xr"
+          ],
+          "useWhen": [
+            "a Toolkit system should be extended or initialized through LocomotionModule instead of bespoke module wiring"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/apps/preview/src/main.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/local-player/src/index.ts",
+            "scripts/templates/engine-only-world/main.toolkit-player.js.template",
+            "scripts/templates/engine-only-world/main.toolkit-quest-ui.js.template"
+          ]
+        },
+        {
+          "name": "ThirdPersonCamera",
+          "kind": "camera",
+          "intentCues": [
+            "third person camera",
+            "follow camera",
+            "chase camera"
+          ],
+          "useWhen": [
+            "the request needs a Toolkit-managed third-person camera instead of custom follow logic"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/local-player/src/index.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/local-player/src/modules/camera/ThirdPersonCamera.ts"
+          ]
+        },
+        {
+          "name": "XrModule",
+          "kind": "module",
+          "intentCues": [
+            "xr support",
+            "vr mode",
+            "xr player"
+          ],
+          "useWhen": [
+            "the request includes XR or VR player behavior"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/local-player/src/index.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/local-player/src/modules/xr/XrModule.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "packageName": "@viverse/network",
+      "apis": [
+        {
+          "name": "MultiplayerModule",
+          "kind": "module",
+          "intentCues": [
+            "multiplayer module",
+            "network plugin",
+            "shared room"
+          ],
+          "useWhen": [
+            "NetworkSystem should initialize a multiplayer slice through registered modules"
+          ],
+          "sourceEvidence": [
+            "packages/network/src/index.ts",
+            "packages/network/src/modules/multiplayer/MultiplayerModule.ts",
+            "viverse-default-room-multiplayer-contract.md"
+          ]
+        },
+        {
+          "name": "NetworkSystem",
+          "kind": "system",
+          "intentCues": [
+            "multiplayer",
+            "shared presence",
+            "network sync",
+            "room state"
+          ],
+          "useWhen": [
+            "the request needs synchronized player or world state",
+            "default-room multiplayer or networked interactions are in scope"
+          ],
+          "sourceEvidence": [
+            "packages/network/src/index.ts",
+            "packages/network/src/NetworkSystem.ts",
+            "packages/network/guide.md"
+          ]
+        }
+      ]
+    },
+    {
+      "packageName": "@viverse/quest",
+      "apis": [
+        {
+          "name": "Quest",
+          "kind": "quest-model",
+          "intentCues": [
+            "quest definition",
+            "mission",
+            "quest structure"
+          ],
+          "useWhen": [
+            "the request is about defining or composing quest structure, not only running the system"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/quest/src/index.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/quest/src/core/Quest.ts"
+          ]
+        },
+        {
+          "name": "QuestSystem",
+          "kind": "system",
+          "intentCues": [
+            "quest tracking",
+            "objective progress",
+            "task completion",
+            "mission flow"
+          ],
+          "useWhen": [
+            "the request needs event-driven quest state or objective tracking",
+            "task progress should be managed by Toolkit instead of ad hoc flags"
+          ],
+          "sourceEvidence": [
+            "scripts/templates/engine-only-world/main.toolkit-quest-ui.js.template",
+            "packages/quest/guide.md"
+          ]
+        },
+        {
+          "name": "Task",
+          "kind": "task-model",
+          "intentCues": [
+            "task step",
+            "objective step",
+            "quest task"
+          ],
+          "useWhen": [
+            "the request is about objective units or quest step logic"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/quest/src/index.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/quest/src/core/Task.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "packageName": "@viverse/ui",
+      "apis": [
+        {
+          "name": "UiSystem",
+          "kind": "system",
+          "intentCues": [
+            "quest ui",
+            "chat ui",
+            "world-facing ui",
+            "game ui"
+          ],
+          "useWhen": [
+            "the request needs Toolkit-managed interface state",
+            "ui should react to quest or interaction events without custom UI wiring from scratch"
+          ],
+          "sourceEvidence": [
+            "scripts/templates/engine-only-world/main.toolkit-quest-ui.js.template",
+            "packages/ui/guide.md"
+          ]
+        }
+      ]
+    },
+    {
+      "packageName": "media reference capabilities",
+      "apis": [
+        {
+          "name": "SoundControls",
+          "kind": "media-control",
+          "intentCues": [
+            "audio controls",
+            "sound playback ui",
+            "sound control panel"
+          ],
+          "useWhen": [
+            "sound playback needs Toolkit-provided controls instead of a custom audio control surface"
+          ],
+          "constructionHints": [
+            {
+              "name": "soundComponent",
+              "intentCues": [
+                "attach controls to sound component",
+                "existing sound entity",
+                "reuse toolkit sound component"
+              ],
+              "useWhen": [
+                "controls should bind to an existing PlayCanvas sound component instead of a custom audio wrapper"
+              ]
+            },
+            {
+              "name": "slotName",
+              "intentCues": [
+                "which sound slot to control",
+                "target audio slot"
+              ],
+              "useWhen": [
+                "the sound component has multiple slots and the controls should target a specific one"
+              ]
+            },
+            {
+              "name": "coverTexture",
+              "intentCues": [
+                "audio cover art",
+                "custom sound cover texture"
+              ],
+              "useWhen": [
+                "the sound control surface should show custom cover artwork"
+              ]
+            },
+            {
+              "name": "coverRenderSide",
+              "intentCues": [
+                "front back double sided cover",
+                "sound controls visible on both sides"
+              ],
+              "useWhen": [
+                "the sound control surface should choose front, back, or double-sided presentation"
+              ]
+            }
+          ],
+          "capabilityHints": [
+            {
+              "name": "playback controls",
+              "intentCues": [
+                "play pause sound",
+                "audio transport ui"
+              ],
+              "useWhen": [
+                "the scene needs Toolkit-managed play and pause controls for audio"
+              ]
+            },
+            {
+              "name": "volume controls",
+              "intentCues": [
+                "sound volume ui",
+                "audio level buttons"
+              ],
+              "useWhen": [
+                "the scene needs Toolkit-managed volume changes for a sound slot"
+              ]
+            },
+            {
+              "name": "seek controls",
+              "intentCues": [
+                "seek audio",
+                "jump in track"
+              ],
+              "useWhen": [
+                "the scene needs Toolkit-managed seek buttons for audio playback"
+              ]
+            }
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/extension/src/helpers/media-controls/SoundControls.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/types/src/extension/types/media-controls.ts"
+          ]
+        },
+        {
+          "name": "VideoTexture",
+          "kind": "media",
+          "intentCues": [
+            "video surface",
+            "play video in world",
+            "flat video",
+            "360 video"
+          ],
+          "useWhen": [
+            "the scene needs Toolkit-backed video playback instead of custom media plumbing"
+          ],
+          "sourceEvidence": [
+            "apps/preview/src/utils/media-scene.ts",
+            "toolkit-capability-catalog.json"
+          ]
+        },
+        {
+          "name": "VideoTextureAudioZone",
+          "kind": "media-zone",
+          "intentCues": [
+            "video audio zone",
+            "positional media audio",
+            "audio area"
+          ],
+          "useWhen": [
+            "video audio should respond to the player's world position through an existing media-zone primitive"
+          ],
+          "sourceEvidence": [
+            "apps/preview/src/utils/media-scene.ts",
+            "toolkit-capability-catalog.json"
+          ]
+        },
+        {
+          "name": "VideoTextureControls",
+          "kind": "media-control",
+          "intentCues": [
+            "video controls",
+            "play pause media",
+            "media ui"
+          ],
+          "useWhen": [
+            "video playback needs Toolkit-provided controls"
+          ],
+          "constructionHints": [
+            {
+              "name": "videoTexture",
+              "intentCues": [
+                "existing VideoTexture instance",
+                "attach controls to video texture",
+                "reuse toolkit video surface"
+              ],
+              "useWhen": [
+                "controls should bind to an already created Toolkit VideoTexture instead of a custom HTML video wrapper"
+              ]
+            }
+          ],
+          "capabilityHints": [
+            {
+              "name": "playback controls",
+              "intentCues": [
+                "play pause video",
+                "media transport ui"
+              ],
+              "useWhen": [
+                "the scene needs Toolkit-managed play and pause controls"
+              ]
+            },
+            {
+              "name": "volume controls",
+              "intentCues": [
+                "video volume ui",
+                "mute or volume buttons"
+              ],
+              "useWhen": [
+                "the scene needs Toolkit-managed volume changes instead of custom media sliders"
+              ]
+            },
+            {
+              "name": "seek controls",
+              "intentCues": [
+                "seek video",
+                "jump backward or forward"
+              ],
+              "useWhen": [
+                "the scene needs Toolkit-managed seek buttons"
+              ]
+            },
+            {
+              "name": "flat or spherical layout",
+              "intentCues": [
+                "360 video controls",
+                "flat video controls on both sides"
+              ],
+              "useWhen": [
+                "control layout should follow the VideoTexture projection and render-side behavior"
+              ]
+            }
+          ],
+          "sourceEvidence": [
+            "apps/preview/src/utils/media-scene.ts",
+            "toolkit-capability-catalog.json",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/extension/src/helpers/media-controls/VideoTextureControls.ts"
+          ]
+        }
+      ]
+    }
+  ]
+}

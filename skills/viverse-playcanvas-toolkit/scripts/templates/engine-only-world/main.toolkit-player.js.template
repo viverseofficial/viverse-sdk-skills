@@ -1,0 +1,167 @@
+import * as pc from 'playcanvas';
+import { ViverseApp } from '@viverse/core';
+import { getViverseConfig, setViverseEnv } from '@viverse/config';
+import {
+  LocalPlayerSystem,
+  LocalAvatarModule,
+  CameraModule,
+  LocomotionModule,
+  InteractionModule,
+  ThirdPersonCamera,
+  FirstPersonCamera,
+  DEFAULT_CAMERA_COMPONENT_SETTINGS,
+} from '@viverse/local-player';
+import { SystemName, ModuleName } from '@viverse/types';
+
+function loadAmmo() {
+  if (window.Ammo) {
+    return Promise.resolve(window.Ammo);
+  }
+
+  pc.WasmModule.setConfig('Ammo', {
+    glueUrl: '/ammo/ammo.wasm.js',
+    wasmUrl: '/ammo/ammo.wasm.wasm',
+    fallbackUrl: '/ammo/ammo.js',
+  });
+
+  return new Promise((resolve) => {
+    pc.WasmModule.getInstance('Ammo', () => resolve(window.Ammo));
+  });
+}
+
+function addStaticBoxCollider(entity, size) {
+  entity.addComponent('collision', {
+    type: 'box',
+    halfExtents: new pc.Vec3(size.x * 0.5, size.y * 0.5, size.z * 0.5),
+  });
+  entity.addComponent('rigidbody', {
+    type: pc.BODYTYPE_STATIC,
+    friction: 0.8,
+    restitution: 0,
+  });
+}
+
+function createBaseScene(app) {
+  app.scene.ambientLight = new pc.Color(0.45, 0.48, 0.55);
+
+  const groundMaterial = new pc.StandardMaterial();
+  groundMaterial.diffuse = new pc.Color(0.62, 0.66, 0.72);
+  groundMaterial.roughness = 0.95;
+  groundMaterial.update();
+
+  const ground = new pc.Entity('ground');
+  ground.addComponent('render', {
+    type: 'plane',
+    material: groundMaterial,
+    castShadows: false,
+  });
+  ground.setLocalScale(18, 1, 18);
+  app.root.addChild(ground);
+
+  const light = new pc.Entity('sun');
+  light.addComponent('light', {
+    type: 'directional',
+    castShadows: true,
+    intensity: 1.2,
+    shadowBias: 0.2,
+    shadowDistance: 64,
+    normalOffsetBias: 0.05,
+  });
+  light.setLocalEulerAngles(45, 30, 0);
+  app.root.addChild(light);
+
+  return { ground };
+}
+
+function createToolkitCameraEntities() {
+  const firstCameraEntity = new pc.Entity('ToolkitFirstPersonCamera');
+  firstCameraEntity.addComponent('camera', DEFAULT_CAMERA_COMPONENT_SETTINGS);
+
+  const thirdCameraEntity = new pc.Entity('ToolkitThirdPersonCamera');
+  thirdCameraEntity.addComponent('camera', DEFAULT_CAMERA_COMPONENT_SETTINGS);
+
+  return { firstCameraEntity, thirdCameraEntity };
+}
+
+function createToolkitSystems({ firstCameraEntity, thirdCameraEntity }) {
+  return [
+    {
+      name: SystemName.LocalPlayer,
+      System: LocalPlayerSystem,
+      options: {
+        spawnPoints: [new pc.Vec3(0, 1.2, 2.8)],
+        modules: [
+          {
+            name: ModuleName.LocalAvatar,
+            Module: LocalAvatarModule,
+          },
+          {
+            name: ModuleName.Camera,
+            Module: CameraModule,
+            options: {
+              cameras: [
+                new ThirdPersonCamera({ entity: thirdCameraEntity }),
+                new FirstPersonCamera({ entity: firstCameraEntity }),
+              ],
+            },
+          },
+          {
+            name: ModuleName.Locomotion,
+            Module: LocomotionModule,
+            options: {
+              canFly: true,
+            },
+          },
+          {
+            name: ModuleName.Interaction,
+            Module: InteractionModule,
+          },
+        ],
+      },
+    },
+  ];
+}
+
+(async function bootstrapEngineOnlyWorld() {
+  const canvas = document.getElementById('application-canvas');
+  if (!canvas) {
+    throw new Error('Missing #application-canvas element.');
+  }
+
+  const app = new pc.Application(canvas, {
+    mouse: new pc.Mouse(document.body),
+    touch: new pc.TouchDevice(document.body),
+    keyboard: new pc.Keyboard(window),
+  });
+
+  app.setCanvasFillMode(pc.FILLMODE_FILL_WINDOW);
+  app.setCanvasResolution(pc.RESOLUTION_AUTO);
+
+  const resize = () => app.resizeCanvas(canvas.width, canvas.height);
+  window.addEventListener('resize', resize);
+
+  const scene = createBaseScene(app);
+
+  setViverseEnv({
+    ...getViverseConfig(),
+    assetDomain: window.location.origin,
+  });
+
+  await loadAmmo();
+
+  const cameraEntities = createToolkitCameraEntities();
+  const viverseApp = new ViverseApp(app, createToolkitSystems(cameraEntities));
+
+  app.start();
+  addStaticBoxCollider(scene.ground, new pc.Vec3(18, 0.1, 18));
+
+  try {
+    await viverseApp.start();
+    if (viverseApp.systems.localPlayer) {
+      await viverseApp.systems.localPlayer.addPlayer();
+    }
+    console.info('[engine-only-world] Toolkit player runtime started.');
+  } catch (error) {
+    console.error('[engine-only-world] Failed to start toolkit player runtime.', error);
+  }
+})();
