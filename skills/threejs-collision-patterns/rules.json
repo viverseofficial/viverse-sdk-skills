@@ -1,0 +1,40 @@
+{
+  "rules": [
+    {
+      "id": "collision-radius-constant",
+      "profiles": ["gameplay"],
+      "phases": ["gameplay", "fix"],
+      "type": "required_any",
+      "pattern": "COLLISION_RADIUS|collisionRadius|this\\.radius\\s*=",
+      "message": "Entity collision radius must be defined as a named constant or property, not a magic number.",
+      "severity": "medium"
+    },
+    {
+      "id": "collision-test-before-move",
+      "profiles": ["gameplay"],
+      "phases": ["gameplay", "fix"],
+      "type": "forbidden",
+      "pattern": "this\\.position\\.copy\\(next\\w*\\)\\s*;\\s*(?!.*collid)",
+      "message": "Movement must be guarded by collision check — test proposed position BEFORE applying it.",
+      "severity": "high"
+    },
+    {
+      "id": "no-physics-engine-unless-requested",
+      "profiles": ["gameplay"],
+      "phases": ["gameplay"],
+      "type": "forbidden",
+      "pattern": "import.*(?:cannon|rapier|ammo|oimo|havok)",
+      "message": "Do NOT add physics engine dependencies unless explicitly requested by user.",
+      "severity": "high"
+    },
+    {
+      "id": "obstacle-label-required",
+      "profiles": ["gameplay"],
+      "phases": ["gameplay", "fix"],
+      "type": "required_any",
+      "pattern": "label\\s*[=:]\\s*['\"]",
+      "message": "Collision obstacles must include a label for debug logging.",
+      "severity": "low"
+    }
+  ]
+}

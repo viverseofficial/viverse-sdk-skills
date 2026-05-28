@@ -1,0 +1,29 @@
+{
+  "id": "threejs-collision-patterns",
+  "name": "threejs-collision-patterns",
+  "version": "0.1.0",
+  "status": "active",
+  "description": "Collision detection patterns for Three.js games without physics engines",
+  "tags": [
+    "threejs",
+    "collision",
+    "physics",
+    "game",
+    "hitbox"
+  ],
+  "prerequisites": [
+    "Three.js imported",
+    "Game loop with delta time"
+  ],
+  "entrypoint": "SKILL.md",
+  "rules": "rules.json",
+  "patterns_dir": "patterns",
+  "examples_dir": "examples",
+  "read_order": [
+    "SKILL.md",
+    "patterns/aabb-box-collider.md",
+    "patterns/sphere-distance-collider.md",
+    "patterns/boundary-and-projectile.md"
+  ],
+  "dependencies": []
+}
