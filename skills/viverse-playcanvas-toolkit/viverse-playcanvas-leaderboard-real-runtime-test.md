@@ -166,4 +166,4 @@ Observed results:
 
 This browser test now supplies the real-runtime evidence that previously blocked promotion.
 
-It still should be reviewed back through [viverse-leaderboard-promotion-review.md](./viverse-leaderboard-promotion-review.md) so the support boundary remains explicit rather than expanding by implication.
+It still should be reviewed back through [viverse-playcanvas-leaderboard-promotion-review.md](./viverse-playcanvas-leaderboard-promotion-review.md) so the support boundary remains explicit rather than expanding by implication.

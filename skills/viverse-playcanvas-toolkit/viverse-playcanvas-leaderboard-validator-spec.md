@@ -113,7 +113,7 @@ Confirm that the repo-local prerequisite surfaces still exist by checking at lea
 
 - [packages/account/src/index.ts](./packages/account/src/index.ts) exists
 - [scripts/publish-build-output-to-viverse.mjs](./scripts/publish-build-output-to-viverse.mjs) exists
-- [viverse-leaderboard-integration-contract.md](./viverse-leaderboard-integration-contract.md) exists
+- [viverse-playcanvas-leaderboard-integration-contract.md](./viverse-playcanvas-leaderboard-integration-contract.md) exists
 
 Optional stronger version:
 

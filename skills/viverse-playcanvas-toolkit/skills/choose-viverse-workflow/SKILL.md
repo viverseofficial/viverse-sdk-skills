@@ -161,7 +161,7 @@ After choosing the path, hand off to the matching skill:
 - PlayCanvas sync setup: [playcanvas-local-sync](../playcanvas-local-sync/SKILL.md)
 - Engine-only world creation in a local folder: [viverse-engine-only-local-world](../viverse-engine-only-local-world/SKILL.md)
 - Build output and packaging decisions: [toolkit-build-and-package](../toolkit-build-and-package/SKILL.md)
-- One-board leaderboard integration in a local project: [viverse-leaderboard](../viverse-leaderboard/SKILL.md)
+- One-board leaderboard integration in a local project: [viverse-playcanvas-leaderboard](../viverse-playcanvas-leaderboard/SKILL.md)
 - Default-room multiplayer in a local project: [viverse-default-room-multiplayer](../viverse-default-room-multiplayer/SKILL.md)
 - VIVERSE CLI publishing: [viverse-cli-publish](../viverse-cli-publish/SKILL.md)
 - Failure analysis: [toolkit-publish-troubleshooting](../toolkit-publish-troubleshooting/SKILL.md)

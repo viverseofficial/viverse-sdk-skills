@@ -52,7 +52,7 @@
       "skills/toolkit-publish-troubleshooting/SKILL.md",
       "skills/viverse-cli-publish/SKILL.md",
       "skills/viverse-default-room-multiplayer/SKILL.md",
-      "skills/viverse-leaderboard/SKILL.md"
+      "skills/viverse-playcanvas-leaderboard/SKILL.md"
     ],
     "prompts": [
       "prompts/compose-viverse-feature.prompt.md",
@@ -67,16 +67,16 @@
     "workflowDocs": [
       "viverse-default-room-multiplayer-contract.md",
       "viverse-multiplayer-integration-contract.md",
-      "viverse-leaderboard-integration-contract.md",
-      "viverse-leaderboard-readiness-spec.md",
-      "viverse-leaderboard-ready-checklist.md",
-      "viverse-leaderboard-promotion-review.md",
-      "viverse-leaderboard-real-runtime-test.md",
-      "viverse-leaderboard-skill-review.md",
+      "viverse-playcanvas-leaderboard-integration-contract.md",
+      "viverse-playcanvas-leaderboard-readiness-spec.md",
+      "viverse-playcanvas-leaderboard-ready-checklist.md",
+      "viverse-playcanvas-leaderboard-promotion-review.md",
+      "viverse-playcanvas-leaderboard-real-runtime-test.md",
+      "viverse-playcanvas-leaderboard-skill-review.md",
       "viverse-skill-acceptance-checklist.md",
       "viverse-skill-review-template.md",
-      "viverse-leaderboard-user-project-example.md",
-      "viverse-leaderboard-validator-spec.md"
+      "viverse-playcanvas-leaderboard-user-project-example.md",
+      "viverse-playcanvas-leaderboard-validator-spec.md"
     ],
     "scripts": [
       "scripts/create-leaderboard-runtime-boundary.mjs",
@@ -130,7 +130,7 @@
     }
   ],
   "blockingNotes": [
-    "viverse-leaderboard currently depends on repo-local scripts, template assets, and governance docs, so it is not truthfully standalone without those files.",
+    "viverse-playcanvas-leaderboard currently depends on repo-local scripts, template assets, and governance docs, so it is not truthfully standalone without those files.",
     "viverse-default-room-multiplayer currently depends on repo-local validation and package source evidence, so it is not truthfully standalone without those files.",
     "compose-viverse-feature depends on toolkit-capability-catalog.md and toolkit-capability-catalog.json, so both catalog files must travel with the exported bundle or be replaced with stable upstream references."
   ]

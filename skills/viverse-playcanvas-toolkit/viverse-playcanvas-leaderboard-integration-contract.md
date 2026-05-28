@@ -35,8 +35,8 @@ The claims in this contract are grounded in these repo-local sources:
 - [packages/account/src/index.ts](./packages/account/src/index.ts)
 - [skills/viverse-cli-publish/SKILL.md](./skills/viverse-cli-publish/SKILL.md)
 - [scripts/publish-build-output-to-viverse.mjs](./scripts/publish-build-output-to-viverse.mjs)
-- [viverse-leaderboard-readiness-spec.md](./viverse-leaderboard-readiness-spec.md)
-- [viverse-leaderboard-skill-review.md](./viverse-leaderboard-skill-review.md)
+- [viverse-playcanvas-leaderboard-readiness-spec.md](./viverse-playcanvas-leaderboard-readiness-spec.md)
+- [viverse-playcanvas-leaderboard-skill-review.md](./viverse-playcanvas-leaderboard-skill-review.md)
 
 External workflow knowledge may inform a future implementation shape, but it must not be treated as local implementation proof.
 
@@ -50,10 +50,10 @@ Safe repo-local facts:
 2. [packages/account/src/index.ts](./packages/account/src/index.ts) exports account-system surfaces for auth-related integration.
 3. [skills/viverse-cli-publish/SKILL.md](./skills/viverse-cli-publish/SKILL.md) already treats stable app identity and publish targeting as real workflow concerns.
 4. [scripts/publish-build-output-to-viverse.mjs](./scripts/publish-build-output-to-viverse.mjs) provides a real repo-local publish helper that depends on app-level targeting.
-5. [viverse-leaderboard-readiness-spec.md](./viverse-leaderboard-readiness-spec.md) already defines the minimum inputs and guardrails for a leaderboard workflow in this repo.
+5. [viverse-playcanvas-leaderboard-readiness-spec.md](./viverse-playcanvas-leaderboard-readiness-spec.md) already defines the minimum inputs and guardrails for a leaderboard workflow in this repo.
 6. [scripts/create-leaderboard-runtime-boundary.mjs](./scripts/create-leaderboard-runtime-boundary.mjs) installs or refreshes the leaderboard runtime boundary into a user project.
 7. [scripts/validate-leaderboard-integration.mjs](./scripts/validate-leaderboard-integration.mjs) validates the project target, app identity, leaderboard key, and mode boundary.
-8. [viverse-leaderboard-real-runtime-test.md](./viverse-leaderboard-real-runtime-test.md) records a real-runtime pass for submit plus bounded readback.
+8. [viverse-playcanvas-leaderboard-real-runtime-test.md](./viverse-playcanvas-leaderboard-real-runtime-test.md) records a real-runtime pass for submit plus bounded readback.
 
 Do not promise behavior beyond those facts.
 
@@ -179,7 +179,7 @@ Before using this contract as grounded support, validate at least one of these f
 
 1. [packages/account/src/index.ts](./packages/account/src/index.ts) still exports account/auth surfaces.
 2. [skills/viverse-cli-publish/SKILL.md](./skills/viverse-cli-publish/SKILL.md) still requires stable app identity and publish targeting.
-3. [viverse-leaderboard-readiness-spec.md](./viverse-leaderboard-readiness-spec.md) still defines leaderboard helper or contract requirements before promotion.
+3. [viverse-playcanvas-leaderboard-readiness-spec.md](./viverse-playcanvas-leaderboard-readiness-spec.md) still defines leaderboard helper or contract requirements before promotion.
 
 When implementation begins, also validate these runtime facts when they apply:
 

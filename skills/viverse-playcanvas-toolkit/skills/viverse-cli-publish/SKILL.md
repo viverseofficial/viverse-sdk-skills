@@ -1,6 +1,6 @@
 ---
 name: viverse-cli-publish
-description: "Help a user publish the final version of their project to VIVERSE, especially when they are unsure which folder is safe to upload or what app to publish to."
+description: "Publish a PlayCanvas Toolkit local build to VIVERSE via CLI. Only for projects using viverse-playcanvas-toolkit, not for general VIVERSE world publishing."
 argument-hint: "Describe the finished folder you want to upload and whether you already have a VIVERSE world/app."
 ---
 
@@ -8,7 +8,9 @@ argument-hint: "Describe the finished folder you want to upload and whether you 
 
 ## What This Skill Does
 
-This skill covers publishing a finished local folder to VIVERSE.
+This skill covers publishing a finished local folder to VIVERSE for projects that use viverse-playcanvas-toolkit.
+
+Do not use this as a general VIVERSE world publishing workflow outside the Toolkit local-build path.
 
 Treat the user as the end user of this workflow by default. If they invoke this skill directly, do not reinterpret the request as an instruction to inspect or modify `prompts`, `skills`, memory notes, or other customization files unless they explicitly ask for customization maintenance.
 

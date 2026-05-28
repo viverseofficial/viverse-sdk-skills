@@ -1,6 +1,6 @@
 # VIVERSE Leaderboard User-Project Example
 
-This document is a real example artifact for the narrow leaderboard contract in [viverse-leaderboard-integration-contract.md](./viverse-leaderboard-integration-contract.md).
+This document is a real example artifact for the narrow leaderboard contract in [viverse-playcanvas-leaderboard-integration-contract.md](./viverse-playcanvas-leaderboard-integration-contract.md).
 
 It shows the minimum landing shape in a user-owned local project.
 
@@ -132,4 +132,4 @@ This example should be treated as a real user-project example artifact for gover
 
 It should not be treated as proof that leaderboard is ready for formal promotion by itself.
 
-Promotion still depends on the remaining checklist items in [viverse-leaderboard-ready-checklist.md](./viverse-leaderboard-ready-checklist.md), especially a real helper or validator and a stronger validation path.
+Promotion still depends on the remaining checklist items in [viverse-playcanvas-leaderboard-ready-checklist.md](./viverse-playcanvas-leaderboard-ready-checklist.md), especially a real helper or validator and a stronger validation path.

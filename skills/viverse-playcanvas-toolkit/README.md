@@ -59,7 +59,7 @@ Start with these files:
 2. engine-only world creation: `skills/viverse-engine-only-local-world/SKILL.md`
 3. feature composition: `prompts/compose-viverse-feature.prompt.md`
 4. publish workflow: `skills/viverse-cli-publish/SKILL.md`
-5. leaderboard workflow: `skills/viverse-leaderboard/SKILL.md`
+5. leaderboard workflow: `skills/viverse-playcanvas-leaderboard/SKILL.md`
 6. default-room multiplayer workflow: `skills/viverse-default-room-multiplayer/SKILL.md`
 
 Useful helper scripts for the engine-only route:

@@ -1,10 +1,10 @@
 ---
-name: viverse-leaderboard
+name: viverse-playcanvas-leaderboard
 description: "Help a user integrate a grounded VIVERSE leaderboard into a local world project with one app ID, one leaderboard Studio Meta Name, score submit, and bounded ranking readback."
 argument-hint: "Describe your project folder, your app ID, and your leaderboard Studio Meta Name if you already know it."
 ---
 
-# VIVERSE Leaderboard
+# VIVERSE PlayCanvas Leaderboard
 
 ## What This Skill Does
 
@@ -42,9 +42,9 @@ This skill is grounded in these repo-local sources:
 - [scripts/utils/resolve-runtime-entry.mjs](../../../scripts/utils/resolve-runtime-entry.mjs)
 - [scripts/templates/leaderboard/leaderboard-runtime-boundary.mjs.template](../../../scripts/templates/leaderboard/leaderboard-runtime-boundary.mjs.template)
 - [scripts/validate-leaderboard-integration.mjs](../../../scripts/validate-leaderboard-integration.mjs)
-- [viverse-leaderboard-integration-contract.md](../../../viverse-leaderboard-integration-contract.md)
-- [viverse-leaderboard-promotion-review.md](../../../viverse-leaderboard-promotion-review.md)
-- [viverse-leaderboard-real-runtime-test.md](../../../viverse-leaderboard-real-runtime-test.md)
+- [viverse-playcanvas-leaderboard-integration-contract.md](../../../viverse-playcanvas-leaderboard-integration-contract.md)
+- [viverse-playcanvas-leaderboard-promotion-review.md](../../../viverse-playcanvas-leaderboard-promotion-review.md)
+- [viverse-playcanvas-leaderboard-real-runtime-test.md](../../../viverse-playcanvas-leaderboard-real-runtime-test.md)
 
 Do not promise behavior beyond what those sources can support.
 
@@ -248,7 +248,7 @@ Before treating this path as grounded, validate at least one of these facts:
 1. [scripts/validate-leaderboard-integration.mjs](../../../scripts/validate-leaderboard-integration.mjs) still exists and checks project target, app ID, and the leaderboard Studio Meta Name used at runtime.
 2. [scripts/create-leaderboard-runtime-boundary.mjs](../../../scripts/create-leaderboard-runtime-boundary.mjs) still installs the runtime boundary into a user project and can auto-detect the engine-only main world script from `index.html`.
 3. [scripts/templates/leaderboard/leaderboard-runtime-boundary.mjs.template](../../../scripts/templates/leaderboard/leaderboard-runtime-boundary.mjs.template) still exposes submit, top-entries readback, and self-rank readback.
-4. [viverse-leaderboard-real-runtime-test.md](../../../viverse-leaderboard-real-runtime-test.md) still records a real-runtime pass for submit and bounded readback.
+4. [viverse-playcanvas-leaderboard-real-runtime-test.md](../../../viverse-playcanvas-leaderboard-real-runtime-test.md) still records a real-runtime pass for submit and bounded readback.
 
 If none of those checks can be confirmed, do not present this skill as grounded workflow support.
 

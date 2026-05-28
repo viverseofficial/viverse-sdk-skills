@@ -109,7 +109,7 @@ Do not ask the user about Node.js versions, npm, pnpm, installation steps, bundl
 6. **Start local preview the way this folder expects.** If the project has a `package.json`, read its `scripts` first and inspect `dependencies` plus `devDependencies` before running anything, so the preview command matches the project's real toolchain. Run that command explicitly in the target project directory, or use an equivalent `--prefix` or absolute-path form; do not trust the terminal's inherited working directory when multiple repos or folders have been visited. In practice, prefer command forms such as `cd /absolute/project && npm run dev` or `npm --prefix /absolute/project run dev` over a bare `npm run dev`. Treat a dev server as a long-running process, not a one-shot command. Once the terminal prints the local preview URL or another ready signal, treat startup as successful and move on to page/runtime checks instead of re-running the same command. If the output clearly belongs to another project, stop and restart from the target project directory with an explicit target-path command. Do not ask the user how to preview it. Start the correct local preview command yourself, then tell the user the exact URL to open. Do not instruct the user to double-click `index.html`; opening via `file://` will break asset fetches.
 7. **Confirm the world loads** in the browser before adding more features. A started dev command is not enough; use the real URL reported by the dev server and keep going until the first runtime error is visible if the scene does not render.
 8. **Layer in Toolkit features the user asked for**, one at a time, by handing off to the matching skill:
-   - leaderboard: [viverse-leaderboard](../viverse-leaderboard/SKILL.md)
+   - leaderboard: [viverse-playcanvas-leaderboard](../viverse-playcanvas-leaderboard/SKILL.md)
    - default-room multiplayer: [viverse-default-room-multiplayer](../viverse-default-room-multiplayer/SKILL.md)
 9. **Publish** by handing off to [viverse-cli-publish](../viverse-cli-publish/SKILL.md). Determine the correct publishable folder yourself. Only mention that folder path to the user when they need to run or verify the publish step.
 
@@ -244,7 +244,7 @@ If the user asks for a quick confidence check rather than a fully manual walkthr
 
 - Before scaffolding: [choose-viverse-workflow](../choose-viverse-workflow/SKILL.md) if the user is still deciding their workflow
 - After the world renders locally: [viverse-cli-publish](../viverse-cli-publish/SKILL.md)
-- For optional feature integrations: [viverse-leaderboard](../viverse-leaderboard/SKILL.md), [viverse-default-room-multiplayer](../viverse-default-room-multiplayer/SKILL.md)
+- For optional feature integrations: [viverse-playcanvas-leaderboard](../viverse-playcanvas-leaderboard/SKILL.md), [viverse-default-room-multiplayer](../viverse-default-room-multiplayer/SKILL.md)
 - For folder classification doubts: [toolkit-build-and-package](../toolkit-build-and-package/SKILL.md)
 - For failure analysis: [toolkit-publish-troubleshooting](../toolkit-publish-troubleshooting/SKILL.md)
 

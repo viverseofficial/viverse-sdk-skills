@@ -40,7 +40,7 @@ Without those assets, their grounded claims would weaken.
 ### Skills
 
 1. `skills/compose-toolkit-capabilities/SKILL.md`
-2. `skills/viverse-leaderboard/SKILL.md`
+2. `skills/viverse-playcanvas-leaderboard/SKILL.md`
 3. `skills/viverse-default-room-multiplayer/SKILL.md`
 4. `skills/playcanvas-local-sync/SKILL.md`
 
@@ -52,7 +52,7 @@ Without those assets, their grounded claims would weaken.
 - depends on `toolkit-capability-catalog.json`
 - its routing quality drops immediately if the catalog is absent
 
-`viverse-leaderboard`
+`viverse-playcanvas-leaderboard`
 
 - depends on `scripts/create-leaderboard-runtime-boundary.mjs`
 - depends on `scripts/validate-leaderboard-integration.mjs`

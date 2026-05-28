@@ -134,4 +134,4 @@ Assuming playcanvas-sync, Toolkit extension upload, and VIVERSE CLI are intercha
 - Build artifact issue: [toolkit-build-and-package](../toolkit-build-and-package/SKILL.md)
 - VIVERSE CLI issue: [viverse-cli-publish](../viverse-cli-publish/SKILL.md)
 
-If the user specifically wants a dedicated leaderboard implementation workflow and the request stays within one app ID plus one leaderboard Meta Name, hand off to [viverse-leaderboard](../viverse-leaderboard/SKILL.md). If the request exceeds that boundary, keep the answer inside prerequisite troubleshooting and current governance boundaries.
+If the user specifically wants a dedicated leaderboard implementation workflow and the request stays within one app ID plus one leaderboard Meta Name, hand off to [viverse-playcanvas-leaderboard](../viverse-playcanvas-leaderboard/SKILL.md). If the request exceeds that boundary, keep the answer inside prerequisite troubleshooting and current governance boundaries.

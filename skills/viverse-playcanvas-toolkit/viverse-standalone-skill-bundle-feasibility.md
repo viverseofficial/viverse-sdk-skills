@@ -25,7 +25,7 @@ The current customizations depend on three kinds of references.
 
 These are references such as:
 
-- `../viverse-leaderboard/SKILL.md`
+- `../viverse-playcanvas-leaderboard/SKILL.md`
 - `../viverse-cli-publish/SKILL.md`
 - `../playcanvas-local-sync/SKILL.md`
 
@@ -37,7 +37,7 @@ These are references such as:
 
 - `../../../README.md`
 - `../../../toolkit-capability-catalog.md`
-- `../../../viverse-leaderboard-integration-contract.md`
+- `../../../viverse-playcanvas-leaderboard-integration-contract.md`
 
 These can be made portable by rewriting them to public GitHub links.
 
@@ -116,7 +116,7 @@ These are mostly routing, diagnostics, and workflow explanation layers.
 ### Exportable But Asset-Sensitive
 
 - `compose-toolkit-capabilities`
-- `viverse-leaderboard`
+- `viverse-playcanvas-leaderboard`
 - `viverse-default-room-multiplayer`
 
 These depend more heavily on catalogs, contracts, validators, helper scripts, or runtime templates.
@@ -145,7 +145,7 @@ Start with this bounded export set first:
 
 1. `choose-viverse-workflow`
 2. `compose-toolkit-capabilities`
-3. `viverse-leaderboard`
+3. `viverse-playcanvas-leaderboard`
 4. `viverse-default-room-multiplayer`
 5. `toolkit-build-and-package`
 6. `toolkit-publish-troubleshooting`

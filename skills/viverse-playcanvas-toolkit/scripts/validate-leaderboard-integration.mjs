@@ -182,7 +182,7 @@ function validateMode(mode) {
 function validateRepoCapability() {
   const accountEntryPath = path.join(REPO_ROOT, 'packages', 'account', 'src', 'index.ts');
   const publishScriptPath = path.join(REPO_ROOT, 'scripts', 'publish-build-output-to-viverse.mjs');
-  const contractPath = path.join(REPO_ROOT, 'viverse-leaderboard-integration-contract.md');
+  const contractPath = path.join(REPO_ROOT, 'viverse-playcanvas-leaderboard-integration-contract.md');
 
   if (!existsSync(accountEntryPath) || !existsSync(publishScriptPath) || !existsSync(contractPath)) {
     return {

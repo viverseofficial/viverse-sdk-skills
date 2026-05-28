@@ -45,7 +45,7 @@ Choose the narrowest workflow that directly matches the user's goal.
 4. If the user wants to keep a local project folder and PlayCanvas in sync, use [playcanvas-local-sync](./skills/playcanvas-local-sync/SKILL.md).
 5. If the user needs to determine whether a folder is for editing, sync, or final upload, use [toolkit-build-and-package](./skills/toolkit-build-and-package/SKILL.md).
 6. If the user wants to publish a final build to VIVERSE, use [viverse-cli-publish](./skills/viverse-cli-publish/SKILL.md).
-7. If the user wants a bounded leaderboard integration in one app, use [viverse-leaderboard](./skills/viverse-leaderboard/SKILL.md).
+7. If the user wants a bounded leaderboard integration in one app, use [viverse-playcanvas-leaderboard](./skills/viverse-playcanvas-leaderboard/SKILL.md).
 8. If the user wants bounded default-room multiplayer in one local world, use [viverse-default-room-multiplayer](./skills/viverse-default-room-multiplayer/SKILL.md).
 9. If the user is already blocked by sync, packaging, upload, or publish failures, use [toolkit-publish-troubleshooting](./skills/toolkit-publish-troubleshooting/SKILL.md).
 
@@ -76,7 +76,7 @@ Avoid broad repo archaeology from this file unless the user explicitly asks abou
 6. [toolkit-publish-troubleshooting](./skills/toolkit-publish-troubleshooting/SKILL.md)
 7. [viverse-cli-publish](./skills/viverse-cli-publish/SKILL.md)
 8. [viverse-default-room-multiplayer](./skills/viverse-default-room-multiplayer/SKILL.md)
-9. [viverse-leaderboard](./skills/viverse-leaderboard/SKILL.md)
+9. [viverse-playcanvas-leaderboard](./skills/viverse-playcanvas-leaderboard/SKILL.md)
 
 ## Bundle Boundaries
 

@@ -1,7 +1,7 @@
 ---
 name: viverse-default-room-multiplayer
-description: 'Help a user integrate low-risk default-room multiplayer into a local VIVERSE world project without implying generic multiplayer support.'
-argument-hint: 'Describe your local project folder and whether you only need default-room shared presence or synchronized interactions.'
+description: "Help a user integrate low-risk default-room multiplayer into a local VIVERSE world project without implying generic multiplayer support. Not for matchmaking, named rooms, or host-authoritative gameplay; use viverse-multiplayer for those."
+argument-hint: "Describe your local project folder and whether you only need default-room shared presence or synchronized interactions."
 ---
 
 # VIVERSE Default-Room Multiplayer

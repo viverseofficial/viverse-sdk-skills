@@ -265,9 +265,9 @@ Then choose the route and the capabilities.
 
 For interaction-heavy requests, explain the intended interaction flow first in plain language, then map that flow onto Toolkit support.
 
-When a leaderboard or ranking request clearly stays within one app ID, one leaderboard Studio Meta Name, score submit, and bounded top-entries or self-rank readback, prefer handing off to [viverse-leaderboard](../viverse-leaderboard/SKILL.md) instead of treating it as open-ended backend design.
+When a leaderboard or ranking request clearly stays within one app ID, one leaderboard Studio Meta Name, score submit, and bounded top-entries or self-rank readback, prefer handing off to [viverse-playcanvas-leaderboard](../viverse-playcanvas-leaderboard/SKILL.md) instead of treating it as open-ended backend design.
 
-If that leaderboard request is otherwise in scope but the user does not yet know the app ID or leaderboard Studio Meta Name, keep the route pointed at [viverse-leaderboard](../viverse-leaderboard/SKILL.md) and let that workflow give the bounded prerequisite recovery steps; when app identity is the only blocker and no target world exists yet, let that workflow ask whether the user wants to create or publish the target world now through the preferred CLI publish path.
+If that leaderboard request is otherwise in scope but the user does not yet know the app ID or leaderboard Studio Meta Name, keep the route pointed at [viverse-playcanvas-leaderboard](../viverse-playcanvas-leaderboard/SKILL.md) and let that workflow give the bounded prerequisite recovery steps; when app identity is the only blocker and no target world exists yet, let that workflow ask whether the user wants to create or publish the target world now through the preferred CLI publish path.
 
 When a multiplayer or networking request clearly stays within default-room shared presence or default-room synchronized interactions, prefer handing off to [viverse-default-room-multiplayer](../viverse-default-room-multiplayer/SKILL.md) instead of treating it as open-ended multiplayer architecture.
 

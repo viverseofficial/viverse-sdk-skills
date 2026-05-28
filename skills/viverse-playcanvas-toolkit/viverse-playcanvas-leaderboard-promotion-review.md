@@ -1,6 +1,6 @@
 # VIVERSE Leaderboard Promotion Review
 
-Reference checklist: [viverse-leaderboard-ready-checklist.md](./viverse-leaderboard-ready-checklist.md)
+Reference checklist: [viverse-playcanvas-leaderboard-ready-checklist.md](./viverse-playcanvas-leaderboard-ready-checklist.md)
 
 ## Review Summary
 
@@ -78,7 +78,7 @@ Assessment: pass.
 
 Assessment: pass.
 
-Reason: the repo now includes both a real user-project example artifact in [viverse-leaderboard-user-project-example.md](./viverse-leaderboard-user-project-example.md) and a real executable validator in [scripts/validate-leaderboard-integration.mjs](./scripts/validate-leaderboard-integration.mjs).
+Reason: the repo now includes both a real user-project example artifact in [viverse-playcanvas-leaderboard-user-project-example.md](./viverse-playcanvas-leaderboard-user-project-example.md) and a real executable validator in [scripts/validate-leaderboard-integration.mjs](./scripts/validate-leaderboard-integration.mjs).
 
 ## Section H: User-Facing Language
 
@@ -95,12 +95,12 @@ Ready To Promote.
 
 The leaderboard line is now much better bounded than before because the repo has:
 
-- a skill review in [viverse-leaderboard-skill-review.md](./viverse-leaderboard-skill-review.md)
-- a readiness bar in [viverse-leaderboard-readiness-spec.md](./viverse-leaderboard-readiness-spec.md)
-- a candidate downstream contract in [viverse-leaderboard-integration-contract.md](./viverse-leaderboard-integration-contract.md)
+- a skill review in [viverse-playcanvas-leaderboard-skill-review.md](./viverse-playcanvas-leaderboard-skill-review.md)
+- a readiness bar in [viverse-playcanvas-leaderboard-readiness-spec.md](./viverse-playcanvas-leaderboard-readiness-spec.md)
+- a candidate downstream contract in [viverse-playcanvas-leaderboard-integration-contract.md](./viverse-playcanvas-leaderboard-integration-contract.md)
 - a real executable validator in [scripts/validate-leaderboard-integration.mjs](./scripts/validate-leaderboard-integration.mjs)
-- a validator behavior spec in [viverse-leaderboard-validator-spec.md](./viverse-leaderboard-validator-spec.md)
-- a real user-project example artifact in [viverse-leaderboard-user-project-example.md](./viverse-leaderboard-user-project-example.md)
+- a validator behavior spec in [viverse-playcanvas-leaderboard-validator-spec.md](./viverse-playcanvas-leaderboard-validator-spec.md)
+- a real user-project example artifact in [viverse-playcanvas-leaderboard-user-project-example.md](./viverse-playcanvas-leaderboard-user-project-example.md)
 - a real executable integration artifact installer in [scripts/create-leaderboard-runtime-boundary.mjs](./scripts/create-leaderboard-runtime-boundary.mjs)
 - a real runtime boundary template in [scripts/templates/leaderboard/leaderboard-runtime-boundary.mjs.template](./scripts/templates/leaderboard/leaderboard-runtime-boundary.mjs.template)
 - a corrected runtime injection path that refreshes the installed block into async `onReady()` instead of leaving `await` inside `createQuest()`

@@ -174,8 +174,8 @@ Fill this when reviewing promotion.
 
 ## Related Documents
 
-- [viverse-leaderboard-skill-review.md](./viverse-leaderboard-skill-review.md)
-- [viverse-leaderboard-readiness-spec.md](./viverse-leaderboard-readiness-spec.md)
-- [viverse-leaderboard-integration-contract.md](./viverse-leaderboard-integration-contract.md)
-- [viverse-leaderboard-validator-spec.md](./viverse-leaderboard-validator-spec.md)
+- [viverse-playcanvas-leaderboard-skill-review.md](./viverse-playcanvas-leaderboard-skill-review.md)
+- [viverse-playcanvas-leaderboard-readiness-spec.md](./viverse-playcanvas-leaderboard-readiness-spec.md)
+- [viverse-playcanvas-leaderboard-integration-contract.md](./viverse-playcanvas-leaderboard-integration-contract.md)
+- [viverse-playcanvas-leaderboard-validator-spec.md](./viverse-playcanvas-leaderboard-validator-spec.md)
 - [viverse-skill-acceptance-checklist.md](./viverse-skill-acceptance-checklist.md)

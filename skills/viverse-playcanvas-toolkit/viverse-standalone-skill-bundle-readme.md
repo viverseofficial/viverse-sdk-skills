@@ -22,7 +22,7 @@ If you are browsing the bundle directly, start here:
 1. workflow chooser: `skills/choose-viverse-workflow/SKILL.md`
 2. feature composition: `prompts/compose-viverse-feature.prompt.md`
 3. publish workflow: `skills/viverse-cli-publish/SKILL.md`
-4. leaderboard workflow: `skills/viverse-leaderboard/SKILL.md`
+4. leaderboard workflow: `skills/viverse-playcanvas-leaderboard/SKILL.md`
 5. default-room multiplayer workflow: `skills/viverse-default-room-multiplayer/SKILL.md`
 
 ## Link Strategy
