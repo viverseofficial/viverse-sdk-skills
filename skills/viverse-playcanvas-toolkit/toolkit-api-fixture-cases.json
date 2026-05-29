@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "id": "snapshot-parity-test",
+      "indexPath": "toolkit-api-discovery-index.snapshot-parity-test.json",
+      "candidatePath": "toolkit-api-discovery-candidates.snapshot-parity-test.json",
+      "expectedProposalPath": "toolkit-api-discovery-index.snapshot-parity-test.proposed.json",
+      "expectedAddedApis": 0,
+      "expectedRemovedApis": 0,
+      "expectedApplyIfCleanEligible": false,
+      "notes": [
+        "Snapshot parity case for curate output.",
+        "This fixture models a no-op proposal and is named for parity instead of apply semantics."
+      ]
+    },
+    {
+      "id": "noop-clean-apply-test",
+      "indexPath": "toolkit-api-discovery-index.noop-clean-apply-test.json",
+      "candidatePath": "toolkit-api-discovery-candidates.noop-clean-apply-test.json",
+      "expectedProposalPath": "toolkit-api-discovery-index.noop-clean-apply-test.proposed.json",
+      "expectedAddedApis": 0,
+      "expectedRemovedApis": 0,
+      "expectedApplyIfCleanEligible": false,
+      "notes": [
+        "This fixture is a no-op clean-apply boundary case.",
+        "Under current curate and apply-if-clean rules this case remains ineligible because it adds no APIs."
+      ]
+    },
+    {
+      "id": "eligible-clean-apply-test",
+      "indexPath": "toolkit-api-discovery-index.eligible-clean-apply-test.json",
+      "candidatePath": "toolkit-api-discovery-candidates.eligible-clean-apply-test.json",
+      "expectedProposalPath": "toolkit-api-discovery-index.eligible-clean-apply-test.proposed.json",
+      "expectedAddedApis": 12,
+      "expectedRemovedApis": 0,
+      "expectedApplyIfCleanEligible": true,
+      "notes": [
+        "This fixture is additive and clean under the current apply-if-clean rules.",
+        "It stays eligible as long as the default max apply threshold remains above the added API count."
+      ]
+    }
+  ]
+}

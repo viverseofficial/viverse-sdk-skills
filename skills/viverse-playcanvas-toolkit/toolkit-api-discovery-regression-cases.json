@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "purpose": "Regression cases for high-value Toolkit API discovery hints that should not silently disappear or drift to invented names.",
+  "cases": [
+    {
+      "id": "entity-selected-trigger-selection-exclude-tags",
+      "userIntent": "ignore helper geometry during click or XR selection instead of inventing a custom raycast exclusion helper",
+      "packageName": "@viverse/extension",
+      "apiName": "EntitySelectedTrigger",
+      "requiredConfigFields": ["selectionExcludeTags"],
+      "forbiddenFieldNames": ["filterByTag"]
+    },
+    {
+      "id": "entity-trigger-enter-player-or-tag-filter",
+      "userIntent": "fire a zone trigger only for the player or for entities with specific tags without bespoke polling or collision glue",
+      "packageName": "@viverse/extension",
+      "apiName": "EntityTriggerEnterTrigger",
+      "requiredConfigFields": ["filterByPlayer", "tagsFilter"],
+      "forbiddenFieldNames": ["filterByTag"]
+    },
+    {
+      "id": "quest-action-target-and-progress",
+      "userIntent": "target a named quest and task and advance built-in progress instead of splitting quest state across custom handlers",
+      "packageName": "@viverse/extension",
+      "apiName": "QuestAction",
+      "requiredConfigFields": ["type", "questName", "taskName", "increment"]
+    },
+    {
+      "id": "video-texture-controls-surface",
+      "userIntent": "attach Toolkit media controls to an existing video surface instead of rebuilding play pause volume and seek UI",
+      "packageName": "media reference capabilities",
+      "apiName": "VideoTextureControls",
+      "requiredConstructionHints": ["videoTexture"],
+      "requiredCapabilityHints": [
+        "playback controls",
+        "volume controls",
+        "seek controls"
+      ]
+    },
+    {
+      "id": "sound-controls-surface",
+      "userIntent": "attach Toolkit audio controls to an existing sound component and target the correct slot instead of custom audio UI",
+      "packageName": "media reference capabilities",
+      "apiName": "SoundControls",
+      "requiredConstructionHints": ["soundComponent", "slotName"],
+      "requiredCapabilityHints": [
+        "playback controls",
+        "volume controls",
+        "seek controls"
+      ]
+    }
+  ]
+}

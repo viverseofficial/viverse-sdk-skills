@@ -1,0 +1,390 @@
+{
+  "version": 1,
+  "routingPolicy": {
+    "apiDiscoveryIndex": "toolkit-api-discovery-index.json",
+    "preferBehaviorDecomposition": true,
+    "decompositionOrder": [
+      "player-action",
+      "world-response",
+      "state-change",
+      "success-condition"
+    ],
+    "matchCapabilitiesBy": "behavior-slice",
+    "implementationTarget": "user-local-project",
+    "preferredRuntimeEntry": "scripts/index.mjs",
+    "askForLocalProjectFolderIfMissing": true,
+    "avoidAuthoringRepoTargets": [
+      "apps/editor-extension/src/assets/custom-script-index.js"
+    ],
+    "avoidPrimaryStrategy": [
+      "prior-scene-name",
+      "prototype-name",
+      "single-example-name-match"
+    ],
+    "workflowDisambiguation": {
+      "worldPublish": [
+        "publish world",
+        "deploy world",
+        "update world",
+        "republish world"
+      ]
+    },
+    "workflowSkillTargets": {
+      "worldPublish": {
+        "skillName": "viverse-cli-publish",
+        "skillPath": "skills/viverse-cli-publish/SKILL.md"
+      }
+    },
+    "preflightHints": {
+      "avatarOrPhysics": [
+        "confirm controllable avatar requirements",
+        "choose collider strategy before behavior glue",
+        "include safe physics cleanup and ownership cleanup",
+        "treat follow-camera reset as core behavior when relevant"
+      ],
+      "persistence": [
+        "treat persistence as a separate behavior slice",
+        "distinguish guest-local fallback from signed-in cloud save",
+        "mention auth and app identity prerequisites when cloud save is implied",
+        "prefer a merge strategy when guest progress must survive first login"
+      ],
+      "publishing": [
+        "distinguish world publish from asset upload first",
+        "require stable app identity for world publish",
+        "require built-output verification before publish readiness",
+        "route model replacement requests to asset upload rather than world publish"
+      ],
+      "defaultRoomMultiplayer": [
+        "confirm the request stays within default-room shared presence or synchronized interactions",
+        "ask for the local project folder and runtime entry before implementation guidance",
+        "prefer the dedicated default-room multiplayer skill over open-ended multiplayer architecture",
+        "stop if the request expands into named rooms, matchmaking, room discovery, or custom authority rules",
+        "do not rewrite a working world to add multiplayer; prefer one small insertion point",
+        "keep the existing local path working until the multiplayer path is proven ready",
+        "gate app identity, auth, and other multiplayer prerequisites before enabling the new path",
+        "require one preserved local behavior check in addition to the new multiplayer check"
+      ],
+      "apiDiscovery": [
+        "consult toolkit-api-discovery-index.json after behavior decomposition and before bespoke scene logic",
+        "if intent cues match an indexed API, prefer that API path before manual polling or ad hoc state management",
+        "use the API index as the API-level companion to capability routing, not as a replacement for output-route selection",
+        "prefer Toolkit core utilities for app orchestration, asset loading, and local-player lookup before bespoke bootstrap or fetch helpers",
+        "when the request is about quest structure or objective units, prefer quest model APIs in addition to QuestSystem",
+        "when the request names a camera mode, avatar slice, interaction slice, or XR mode, prefer the matching local-player module family before generic controller glue",
+        "when the request sounds like zone enter, teleport, spawn point, toast, or entity toggling, prefer named extension trigger or action families before custom event plumbing"
+      ]
+    },
+    "responseTemplates": {
+      "worldPublish": {
+        "opening": "This is mainly a world publishing task. We should verify the finished folder and publish target before deployment.",
+        "ask": "Finished folder: /absolute/path Existing world/app: yes/no App ID: ... or not sure"
+      },
+      "defaultRoomMultiplayer": {
+        "opening": "This is mainly a default-room multiplayer request. We should confirm your project folder and runtime entry before planning integration.",
+        "ask": "Project folder: /absolute/path Runtime entry: scripts/index.mjs or other Multiplayer goal: default-room shared presence / default-room synchronized interactions"
+      }
+    }
+  },
+  "capabilities": [
+    {
+      "id": "default-room-multiplayer-skill",
+      "displayName": "Default-Room Multiplayer Skill",
+      "internalOnly": false,
+      "experimental": false,
+      "userFacing": true,
+      "category": ["multiplayer-or-networking"],
+      "sourcePath": "skills/viverse-default-room-multiplayer/SKILL.md",
+      "sourceKind": "workflow-skill",
+      "outputRoute": "runtime-integration",
+      "runtimeReadiness": "workflow-ready",
+      "integrationRecommendation": "direct-reference",
+      "canModifySource": false,
+      "useWhen": [
+        "default-room shared presence",
+        "default-room synchronized interactions",
+        "low-risk multiplayer guidance for a user-owned local project"
+      ],
+      "strengths": [
+        "bounded default-room scope",
+        "explicit stop conditions",
+        "validator-backed project target check",
+        "preservation-first multiplayer guidance"
+      ],
+      "why": "This skill gives a grounded path for simple multiplayer requests without implying support for named rooms, matchmaking, or generic multiplayer architecture, and it keeps already working local behavior as the baseline during integration."
+    },
+    {
+      "id": "core-runtime-utility-family",
+      "displayName": "Core Runtime Utility Family",
+      "internalOnly": false,
+      "experimental": false,
+      "userFacing": false,
+      "category": ["guidance", "runtime-foundation"],
+      "sourcePath": "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/core/src/index.ts",
+      "sourceKind": "package-family",
+      "outputRoute": "runtime-integration",
+      "runtimeReadiness": "runtime-ready",
+      "integrationRecommendation": "direct-reference",
+      "canModifySource": false,
+      "useWhen": [
+        "Toolkit app orchestration is needed",
+        "asset loading should use Toolkit helpers",
+        "logic needs Toolkit-managed local player lookup"
+      ],
+      "strengths": [
+        "BaseModule",
+        "BaseSystem",
+        "registerModule",
+        "ViverseApp",
+        "loadAsset",
+        "loadAssetFromUrl",
+        "getLocalPlayer",
+        "ConditionVerifier"
+      ],
+      "why": "This family covers the core runtime utilities and composition primitives that often replace bespoke bootstrap, module wiring, asset loading, and player lookup glue."
+    },
+    {
+      "id": "config-runtime-surface",
+      "displayName": "Config Runtime Surface",
+      "internalOnly": false,
+      "experimental": false,
+      "userFacing": false,
+      "category": ["workflow", "runtime-foundation"],
+      "sourcePath": "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/config/src/index.ts",
+      "sourceKind": "package-family",
+      "outputRoute": "runtime-integration",
+      "runtimeReadiness": "runtime-ready",
+      "integrationRecommendation": "direct-reference",
+      "canModifySource": false,
+      "useWhen": [
+        "runtime configuration should come from Toolkit config instead of ad hoc constants",
+        "the request depends on Toolkit environment or app-level configuration"
+      ],
+      "strengths": ["getViverseConfig"],
+      "why": "This family gives the agent a stable configuration route when the request is about Toolkit runtime settings or app-level environment behavior."
+    },
+    {
+      "id": "local-player-module-family",
+      "displayName": "Local Player Module Family",
+      "internalOnly": false,
+      "experimental": false,
+      "userFacing": false,
+      "category": ["avatar-or-physics", "interaction", "seating-or-traversal"],
+      "sourcePath": "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/local-player/src/index.ts",
+      "sourceKind": "package-family",
+      "outputRoute": "runtime-integration",
+      "runtimeReadiness": "runtime-ready",
+      "integrationRecommendation": "direct-reference",
+      "canModifySource": false,
+      "useWhen": [
+        "the request names a camera mode, avatar slice, interaction slice, or XR mode",
+        "a local-player feature should be composed from Toolkit modules instead of one large custom controller"
+      ],
+      "strengths": [
+        "LocalPlayerSystem",
+        "ThirdPersonCamera",
+        "CameraModule",
+        "InteractionModule",
+        "AvatarModule",
+        "LocalAvatarModule",
+        "LocomotionModule",
+        "XrModule"
+      ],
+      "why": "This family helps the agent route player-controller requests toward named camera, locomotion, avatar, interaction, and XR modules rather than stopping at the broad LocalPlayerSystem label."
+    },
+    {
+      "id": "quest-model-family",
+      "displayName": "Quest Model Family",
+      "internalOnly": false,
+      "experimental": false,
+      "userFacing": false,
+      "category": ["quest-progression"],
+      "sourcePath": "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/quest/src/index.ts",
+      "sourceKind": "package-family",
+      "outputRoute": "runtime-integration",
+      "runtimeReadiness": "runtime-ready",
+      "integrationRecommendation": "direct-reference",
+      "canModifySource": false,
+      "useWhen": [
+        "the request is about quest structure or objective units rather than only system initialization",
+        "quest progression should be modeled through Toolkit quest and task types"
+      ],
+      "strengths": ["QuestSystem", "Quest", "Task"],
+      "why": "This family captures that Toolkit quest support is not only a system-level route; it also includes named quest and task model surfaces."
+    },
+    {
+      "id": "extension-trigger-action-family",
+      "displayName": "Extension Trigger And Action Family",
+      "internalOnly": false,
+      "experimental": false,
+      "userFacing": false,
+      "category": ["interaction", "ui-or-links", "media-playback"],
+      "sourcePath": "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13/packages/extension/src/index.ts",
+      "sourceKind": "package-family",
+      "outputRoute": "runtime-integration",
+      "runtimeReadiness": "runtime-ready",
+      "integrationRecommendation": "direct-reference",
+      "canModifySource": false,
+      "useWhen": [
+        "the world should react through named Toolkit triggers or actions",
+        "the request sounds like zone enter, teleport, spawn point, toast, toggle, or media control behavior"
+      ],
+      "strengths": [
+        "EntityTriggerEnterTrigger",
+        "TeleportPlayerAction",
+        "TriggerDispatcher",
+        "SoundControls",
+        "SoundAudioZone",
+        "VideoTextureControls",
+        "VideoTextureAudioZone"
+      ],
+      "why": "This family helps the agent prefer existing trigger, action, and media-control primitives over custom event plumbing for common world reactions."
+    },
+    {
+      "id": "proximity-hint-generator",
+      "displayName": "Proximity Hint Recipe Template",
+      "internalOnly": false,
+      "experimental": false,
+      "userFacing": true,
+      "category": ["guidance"],
+      "sourcePath": "scripts/generate-scene-content.mjs",
+      "sourceKind": "generator-template",
+      "outputRoute": "generated-scene-content",
+      "runtimeReadiness": "generator-ready",
+      "integrationRecommendation": "direct-reference",
+      "canModifySource": false,
+      "useWhen": [
+        "location-based hinting",
+        "repeatable hint content",
+        "generated content packs"
+      ],
+      "strengths": [
+        "recipe generation",
+        "generated script output",
+        "manifest generation",
+        "bootstrap option"
+      ],
+      "why": "This route already has a stable generation pipeline."
+    },
+    {
+      "id": "pickable-interaction-reference",
+      "displayName": "Pickable Object Interaction Reference",
+      "internalOnly": false,
+      "experimental": false,
+      "userFacing": true,
+      "category": ["interaction", "pickup-or-hand-interaction"],
+      "sourcePath": "apps/preview/src/utils/pick-and-action.ts",
+      "sourceKind": "reference-example",
+      "outputRoute": "runtime-integration",
+      "runtimeReadiness": "reference-only",
+      "integrationRecommendation": "thin-integration-layer",
+      "canModifySource": false,
+      "useWhen": ["grabbable props", "held objects", "hand interaction"],
+      "strengths": [
+        "PickInteraction",
+        "grip point setup",
+        "container asset loading"
+      ],
+      "sourceConstraints": [
+        "hardcoded demo asset URLs",
+        "sample grip offsets tuned per model",
+        "debug grip visualization mixed into the helper scene"
+      ],
+      "preferredFormalization": "Create a thin integration layer that accepts asset path, placement, scale, and grip configuration without modifying the source file.",
+      "why": "The core interaction exists, but the current file is still sample-shaped because it hardcodes demo assets, per-model grip examples, and optional debug grip visualization."
+    },
+    {
+      "id": "seat-interaction-reference",
+      "displayName": "Seat Interaction Reference",
+      "internalOnly": false,
+      "experimental": false,
+      "userFacing": true,
+      "category": ["seating-or-traversal"],
+      "sourcePath": "apps/preview/src/utils/seat-scene.ts",
+      "sourceKind": "reference-example",
+      "outputRoute": "runtime-integration",
+      "runtimeReadiness": "reference-only",
+      "integrationRecommendation": "thin-integration-layer",
+      "canModifySource": false,
+      "useWhen": ["sit spots", "moving seats", "seat exit behavior"],
+      "strengths": [
+        "SitInteraction",
+        "seat entity setup",
+        "dynamic exit positions"
+      ],
+      "sourceConstraints": [
+        "visual seat indicators mixed into the seat helper",
+        "roller coaster movement mixed into the sample scene",
+        "multiple sample chair and sofa layouts in one scene entry point"
+      ],
+      "preferredFormalization": "Create a thin integration layer that accepts seat definitions, exit positions, and optional movement policies while keeping the source file read-only.",
+      "why": "The capability is useful, but the current file is still sample-shaped because it mixes visualization helpers, coaster motion, and multiple sample seat layouts into one scene entry point."
+    },
+    {
+      "id": "media-playback-reference",
+      "displayName": "Media Playback Reference",
+      "internalOnly": false,
+      "experimental": false,
+      "userFacing": true,
+      "category": ["media-playback"],
+      "sourcePath": "apps/preview/src/utils/media-scene.ts",
+      "sourceKind": "reference-example",
+      "outputRoute": "runtime-integration",
+      "runtimeReadiness": "reference-only",
+      "integrationRecommendation": "thin-integration-layer",
+      "canModifySource": false,
+      "useWhen": [
+        "flat video",
+        "spherical video",
+        "positional audio",
+        "media controls"
+      ],
+      "strengths": [
+        "VideoTexture",
+        "VideoTextureControls",
+        "VideoTextureAudioZone",
+        "SoundControls",
+        "SoundAudioZone"
+      ],
+      "why": "The core media capability already exists, but the current file hardcodes sample assets, placement, and multiple demo entities in one helper."
+    },
+    {
+      "id": "link-and-billboard-reference",
+      "displayName": "Link And Billboard Reference",
+      "internalOnly": false,
+      "experimental": false,
+      "userFacing": true,
+      "category": ["ui-or-links", "visual-polish"],
+      "sourcePath": "apps/preview/src/utils/link-and-billboard-scene.ts",
+      "sourceKind": "reference-example",
+      "outputRoute": "runtime-integration",
+      "runtimeReadiness": "reference-only",
+      "integrationRecommendation": "thin-integration-layer",
+      "canModifySource": false,
+      "useWhen": ["world-facing UI", "camera-facing signage", "external links"],
+      "strengths": [
+        "Billboard",
+        "OpenLinkAction",
+        "world-space buttons",
+        "font-backed labels"
+      ],
+      "why": "The core billboard and link capability exists, but the current file still mixes demo-specific rotating targets, hardcoded links, and sample button layout."
+    },
+    {
+      "id": "post-effects-reference",
+      "displayName": "Post Effects Reference",
+      "internalOnly": false,
+      "experimental": false,
+      "userFacing": true,
+      "category": ["visual-polish"],
+      "sourcePath": "apps/preview/src/utils/post-effects.ts",
+      "sourceKind": "reference-example",
+      "outputRoute": "runtime-integration",
+      "runtimeReadiness": "reference-only",
+      "integrationRecommendation": "thin-integration-layer",
+      "canModifySource": false,
+      "useWhen": ["scene presentation tuning", "visual polish"],
+      "strengths": ["post-processing setup"],
+      "why": "This is a useful visual capability source, but it still needs a target-world integration surface."
+    }
+  ]
+}

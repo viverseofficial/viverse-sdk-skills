@@ -1,0 +1,558 @@
+const DEFAULT_LEADERBOARD_CONFIG = {
+  appId: '__APP_ID__',
+  leaderboardKey: '__LEADERBOARD_KEY__',
+  readbackView: '__READBACK_VIEW__',
+  submitEventName: '__SUBMIT_EVENT_NAME__',
+  topLimit: 10,
+  installGlobalHelpers: false,
+  dashboardBaseUrl: 'https://www.viveport.com/',
+  dashboardCommunityBaseUrl: 'https://www.viverse.com/',
+};
+
+function createMissingConfigError(message) {
+  return new Error(`[Leaderboard] ${message}`);
+}
+
+function assertLeaderboardPrerequisites(config) {
+  if (!config.appId || !String(config.appId).trim()) {
+    throw createMissingConfigError('Missing app identity for leaderboard runtime boundary.');
+  }
+
+  if (!config.leaderboardKey || !String(config.leaderboardKey).trim()) {
+    throw createMissingConfigError('Missing leaderboard key for leaderboard runtime boundary.');
+  }
+}
+
+function normalizeScore(score) {
+  const normalizedScore = Number(score);
+  if (!Number.isFinite(normalizedScore)) {
+    throw new Error('[Leaderboard] Score must be a finite number.');
+  }
+
+  return normalizedScore;
+}
+
+function resolveViverseSdk() {
+  if (typeof globalThis.window !== 'undefined' && globalThis.window?.viverse) {
+    return globalThis.window.viverse;
+  }
+
+  return globalThis.viverse ?? null;
+}
+
+function resolveDashboardSdkNamespace() {
+  if (typeof globalThis.window !== 'undefined') {
+    return globalThis.window?.vSdk ?? globalThis.window?.viverse ?? globalThis.window?.VIVERSE_SDK ?? null;
+  }
+
+  return globalThis.vSdk ?? globalThis.viverse ?? globalThis.VIVERSE_SDK ?? null;
+}
+
+function resolveRuntimeViverseApp() {
+  if (typeof globalThis.window !== 'undefined' && globalThis.window?.viverseApp) {
+    return globalThis.window.viverseApp;
+  }
+
+  return globalThis.viverseApp ?? null;
+}
+
+function resolveAccountSystem(viverseApp) {
+  return viverseApp?.systems?.account ?? viverseApp?.systems?.Account ?? null;
+}
+
+function resolveAccountCredentials(accountSystem) {
+  const credentials = accountSystem?.store?.getState?.()?.credentials;
+  if (credentials?.accessToken) {
+    return credentials;
+  }
+
+  return null;
+}
+
+async function resolveRuntimeAccessToken(viverseApp) {
+  const accountSystem = resolveAccountSystem(viverseApp);
+  const credentials = resolveAccountCredentials(accountSystem);
+  if (credentials?.accessToken) {
+    return credentials.accessToken;
+  }
+
+  const authModule = accountSystem?.modules?.auth;
+  if (typeof authModule?.client?.getToken === 'function') {
+    const tokenResult = await authModule.client.getToken();
+    if (typeof tokenResult === 'string' && tokenResult.trim()) {
+      return tokenResult;
+    }
+
+    if (tokenResult?.access_token) {
+      return tokenResult.access_token;
+    }
+  }
+
+  if (typeof authModule?.checkAuth === 'function') {
+    const authResult = await authModule.checkAuth();
+    if (authResult?.accessToken) {
+      return authResult.accessToken;
+    }
+  }
+
+  return null;
+}
+
+async function resolveRuntimeGameDashboardClient(config) {
+  const viverseApp = resolveRuntimeViverseApp();
+  const sdkCore = viverseApp?.sdk?.core ?? null;
+  const sdkNamespace = resolveDashboardSdkNamespace();
+  const dashboardConstructorCandidates = [
+    sdkNamespace?.GameDashboard,
+    sdkNamespace?.gameDashboard,
+    sdkCore?.GameDashboard,
+    sdkCore?.gameDashboard,
+  ];
+  const DashboardClass =
+    dashboardConstructorCandidates.find((candidate) => typeof candidate === 'function') ?? null;
+
+  if (!DashboardClass) {
+    return null;
+  }
+
+  const accessToken = await resolveRuntimeAccessToken(viverseApp);
+  if (!accessToken) {
+    return null;
+  }
+
+  return new DashboardClass({
+    token: accessToken,
+    clientId: config.appId,
+    baseURL: config.dashboardBaseUrl,
+    communityBaseURL: config.dashboardCommunityBaseUrl,
+  });
+}
+
+function buildGameDashboardCandidates(sdk, runtimeGameDashboard) {
+  const candidates = [];
+
+  if (sdk?.gameDashboard) {
+    candidates.push(sdk.gameDashboard);
+  }
+
+  if (runtimeGameDashboard && runtimeGameDashboard !== sdk?.gameDashboard) {
+    candidates.push(runtimeGameDashboard);
+  }
+
+  return candidates;
+}
+
+async function resolveUploadScore(config, sdk) {
+  if (typeof config.transport?.uploadScore === 'function') {
+    return (score) =>
+      config.transport.uploadScore({
+        appId: config.appId,
+        leaderboardKey: config.leaderboardKey,
+        score,
+      });
+  }
+
+  const uploadLeaderboardScore = sdk?.gameDashboard?.uploadLeaderboardScore;
+  if (typeof uploadLeaderboardScore === 'function') {
+    return (score) =>
+      uploadLeaderboardScore.call(sdk.gameDashboard, config.appId, [
+        {
+          name: config.leaderboardKey,
+          value: score,
+        },
+      ]);
+  }
+
+  const runtimeGameDashboard = await resolveRuntimeGameDashboardClient(config);
+  if (typeof runtimeGameDashboard?.uploadLeaderboardScore === 'function') {
+    return (score) =>
+      runtimeGameDashboard.uploadLeaderboardScore(config.appId, [
+        {
+          name: config.leaderboardKey,
+          value: score,
+        },
+      ]);
+  }
+
+  return null;
+}
+
+function buildTopEntriesReadbackArgs(readMethod, config) {
+  const methodArity = typeof readMethod === 'function' ? readMethod.length : 0;
+
+  if (methodArity >= 3) {
+    return [config.appId, config.leaderboardKey, config.topLimit];
+  }
+
+  if (methodArity === 2) {
+    return [
+      config.appId,
+      {
+        leaderboardKey: config.leaderboardKey,
+        limit: config.topLimit,
+      },
+    ];
+  }
+
+  return [
+    {
+      appId: config.appId,
+      leaderboardKey: config.leaderboardKey,
+      limit: config.topLimit,
+    },
+  ];
+}
+
+function buildLeaderboardQuery(config, overrides = {}) {
+  return {
+    name: config.leaderboardKey,
+    range_start: 0,
+    range_end: Math.max(0, Number(config.topLimit) - 1),
+    region: 'global',
+    time_range: 'alltime',
+    around_user: false,
+    ...overrides,
+  };
+}
+
+function extractLeaderboardRankings(response) {
+  const extracted =
+    response?.rankings ??
+    response?.ranking ??
+    response?.leaderboard_rankings ??
+    response?.data?.rankings ??
+    response?.data?.ranking ??
+    response?.leaderboard?.rankings ??
+    response?.leaderboard?.ranking ??
+    [];
+
+  return Array.isArray(extracted) ? extracted : [];
+}
+
+async function readLeaderboardViaConfigs(methodName, readMethod, gameDashboard, config, queryConfigs) {
+  for (const queryConfig of queryConfigs) {
+    const response = await readMethod.call(gameDashboard, config.appId, queryConfig);
+    const rankings = extractLeaderboardRankings(response);
+
+    if (rankings.length > 0) {
+      return {
+        clientMethod: methodName,
+        queryConfig,
+        rankings,
+        response,
+      };
+    }
+  }
+
+  return null;
+}
+
+function buildTopEntriesQueries(config) {
+  return [
+    buildLeaderboardQuery(config, {
+      around_user: false,
+      region: 'global',
+    }),
+    buildLeaderboardQuery(config, {
+      around_user: true,
+      region: 'global',
+    }),
+    buildLeaderboardQuery(config, {
+      around_user: false,
+      region: 'local',
+    }),
+  ];
+}
+
+function buildSelfRankQueries(config) {
+  return [
+    buildLeaderboardQuery(config, {
+      around_user: true,
+      region: 'global',
+    }),
+    buildLeaderboardQuery(config, {
+      around_user: true,
+      region: 'local',
+    }),
+  ];
+}
+
+async function resolveReadTopEntries(config) {
+  if (typeof config.transport?.readTopEntries === 'function') {
+    return () =>
+      config.transport.readTopEntries({
+        appId: config.appId,
+        leaderboardKey: config.leaderboardKey,
+        limit: config.topLimit,
+      });
+  }
+
+  const sdk = resolveViverseSdk();
+  const runtimeGameDashboard = await resolveRuntimeGameDashboardClient(config);
+  const gameDashboardCandidates = buildGameDashboardCandidates(sdk, runtimeGameDashboard);
+  const leaderboardQueries = buildTopEntriesQueries(config);
+
+  for (const gameDashboard of gameDashboardCandidates) {
+    const dashboardMethodEntries = [
+      ['getLeaderboard', gameDashboard?.getLeaderboard],
+      ['getGuestLeaderboard', gameDashboard?.getGuestLeaderboard],
+    ];
+
+    for (const [methodName, readMethod] of dashboardMethodEntries) {
+      if (typeof readMethod !== 'function') {
+        continue;
+      }
+
+      return async () => {
+        const readback = await readLeaderboardViaConfigs(
+          methodName,
+          readMethod,
+          gameDashboard,
+          config,
+          leaderboardQueries,
+        );
+
+        if (!readback) {
+          return {
+            clientMethod: methodName,
+            queryConfigs: leaderboardQueries,
+            rankings: [],
+            response: null,
+          };
+        }
+
+        return readback;
+      };
+    }
+
+    const methodEntries = [
+      ['getLeaderboardRanking', gameDashboard?.getLeaderboardRanking],
+      ['getGuestLeaderboardRanking', gameDashboard?.getGuestLeaderboardRanking],
+    ];
+
+    for (const [methodName, readMethod] of methodEntries) {
+      if (typeof readMethod !== 'function') {
+        continue;
+      }
+
+      return async () => {
+        const args = buildTopEntriesReadbackArgs(readMethod, config);
+        const result = await readMethod.call(gameDashboard, ...args);
+
+        return {
+          clientMethod: methodName,
+          result,
+        };
+      };
+    }
+  }
+
+  return null;
+}
+
+async function resolveReadSelfRank(config) {
+  if (typeof config.transport?.readSelfRank === 'function') {
+    return () =>
+      config.transport.readSelfRank({
+        appId: config.appId,
+        leaderboardKey: config.leaderboardKey,
+      });
+  }
+
+  const sdk = resolveViverseSdk();
+  const runtimeGameDashboard = await resolveRuntimeGameDashboardClient(config);
+  const gameDashboardCandidates = buildGameDashboardCandidates(sdk, runtimeGameDashboard);
+  const leaderboardQueries = buildSelfRankQueries(config);
+
+  for (const gameDashboard of gameDashboardCandidates) {
+    const dashboardMethodEntries = [
+      ['getLeaderboard', gameDashboard?.getLeaderboard],
+      ['getGuestLeaderboard', gameDashboard?.getGuestLeaderboard],
+    ];
+
+    for (const [methodName, readMethod] of dashboardMethodEntries) {
+      if (typeof readMethod !== 'function') {
+        continue;
+      }
+
+      return async () => {
+        const readback = await readLeaderboardViaConfigs(
+          methodName,
+          readMethod,
+          gameDashboard,
+          config,
+          leaderboardQueries,
+        );
+
+        if (!readback) {
+          return {
+            clientMethod: methodName,
+            queryConfigs: leaderboardQueries,
+            rankings: [],
+            response: null,
+          };
+        }
+
+        return readback;
+      };
+    }
+  }
+
+  return null;
+}
+
+export function createLeaderboardRuntimeBoundary(userConfig = {}) {
+  const config = {
+    ...DEFAULT_LEADERBOARD_CONFIG,
+    ...userConfig,
+  };
+
+  let initialized = false;
+  let submitEventHandler = null;
+
+  const getConfig = () => ({
+    appId: config.appId,
+    leaderboardKey: config.leaderboardKey,
+    readbackView: config.readbackView,
+    submitEventName: config.submitEventName,
+    topLimit: config.topLimit,
+  });
+
+  async function submitScore(score) {
+    assertLeaderboardPrerequisites(config);
+
+    const normalizedScore = normalizeScore(score);
+    const sdk = resolveViverseSdk();
+    const uploadScore = await resolveUploadScore(config, sdk);
+
+    if (!uploadScore) {
+      throw new Error(
+        '[Leaderboard] Score submit client is not available. Provide config.transport.uploadScore or a compatible VIVERSE SDK gameDashboard.uploadLeaderboardScore surface.',
+      );
+    }
+
+    const result = await uploadScore(normalizedScore);
+
+    return {
+      status: 'submitted',
+      appId: config.appId,
+      leaderboardKey: config.leaderboardKey,
+      score: normalizedScore,
+      result,
+    };
+  }
+
+  async function readTopEntries() {
+    assertLeaderboardPrerequisites(config);
+
+    const readTopEntriesImpl = await resolveReadTopEntries(config);
+    if (!readTopEntriesImpl) {
+      throw new Error(
+        '[Leaderboard] Top-entries readback client is not available. Provide config.transport.readTopEntries, a compatible VIVERSE SDK gameDashboard surface, or a runtime with ViverseApp auth plus GameDashboard support.',
+      );
+    }
+
+    const result = await readTopEntriesImpl();
+
+    return {
+      status: 'readback',
+      readbackView: 'top-entries',
+      appId: config.appId,
+      leaderboardKey: config.leaderboardKey,
+      result,
+    };
+  }
+
+  async function readSelfRank() {
+    assertLeaderboardPrerequisites(config);
+
+    const readSelfRankImpl = await resolveReadSelfRank(config);
+    if (!readSelfRankImpl) {
+      throw new Error(
+        '[Leaderboard] Self-rank readback client is not available. Provide config.transport.readSelfRank, a compatible VIVERSE SDK gameDashboard surface, or a runtime with ViverseApp auth plus GameDashboard support.',
+      );
+    }
+
+    const result = await readSelfRankImpl();
+
+    return {
+      status: 'readback',
+      readbackView: 'self-rank',
+      appId: config.appId,
+      leaderboardKey: config.leaderboardKey,
+      result,
+    };
+  }
+
+  async function initialize() {
+    assertLeaderboardPrerequisites(config);
+
+    if (initialized) {
+      return {
+        status: 'already-ready',
+        ...getConfig(),
+      };
+    }
+
+    if (config.submitEventName && typeof globalThis.addEventListener === 'function') {
+      submitEventHandler = async (event) => {
+        try {
+          const score = event?.detail?.score;
+          const result = await submitScore(score);
+          console.log('[Leaderboard] score submitted via runtime boundary', result);
+        } catch (error) {
+          console.error('[Leaderboard] score submit failed', error);
+        }
+      };
+
+      globalThis.addEventListener(config.submitEventName, submitEventHandler);
+    }
+
+    initialized = true;
+
+    return {
+      status: 'ready',
+      ...getConfig(),
+    };
+  }
+
+  async function runSmokeTest(score = 1) {
+    const ready = await initialize();
+    const submit = await submitScore(score);
+    const topEntries = await readTopEntries();
+    const selfRank = await readSelfRank();
+
+    return {
+      ready,
+      submit,
+      topEntries,
+      selfRank,
+    };
+  }
+
+  function dispose() {
+    if (submitEventHandler && typeof globalThis.removeEventListener === 'function') {
+      globalThis.removeEventListener(config.submitEventName, submitEventHandler);
+    }
+
+    submitEventHandler = null;
+    initialized = false;
+  }
+
+  return {
+    initialize,
+    submitScore,
+    readTopEntries,
+    readSelfRank,
+    runSmokeTest,
+    getConfig,
+    dispose,
+  };
+}
+
+// First-version boundary notes:
+// - submitScore is wired to a real boundary and can use a compatible SDK upload surface
+// - readTopEntries and readSelfRank can use compatible SDK getLeaderboard/getGuestLeaderboard
+//   surfaces through this repo-local adapter
+// - legacy ranking method names remain as compatibility fallbacks where present
+// - do not widen this module into multi-board, storage, or multiplayer orchestration here

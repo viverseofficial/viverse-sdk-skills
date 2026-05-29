@@ -1,0 +1,97 @@
+{
+  "manifestVersion": 1,
+  "defaultProfile": "vendored-artifacts",
+  "profiles": {
+    "local-private-repo": {
+      "type": "local-repo",
+      "description": "Use the private local Toolkit repo during the transition period.",
+      "repoPath": "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.13",
+      "packageMode": "local-tarballs",
+      "packageOutputDir": ".local-packages",
+      "runtimeAssets": {
+        "mode": "vendored-public-dir",
+        "sourceDir": "vendor/toolkit-runtime-assets/0.1.13"
+      },
+      "packages": {
+        "@viverse/config": "viverse-config-0.1.13.tgz",
+        "@viverse/types": "viverse-types-0.1.13.tgz",
+        "@viverse/core": "viverse-core-0.1.13.tgz",
+        "@viverse/extension": "viverse-extension-0.1.13.tgz",
+        "@viverse/local-player": "viverse-local-player-0.1.13.tgz",
+        "@viverse/network": "viverse-network-0.1.13.tgz",
+        "@viverse/quest": "viverse-quest-0.1.13.tgz",
+        "@viverse/ui": "viverse-ui-0.1.13.tgz"
+      },
+      "notes": [
+        "Best current development profile while the upstream Toolkit repo is still private.",
+        "Requires the private Toolkit repo to exist on the local machine."
+      ]
+    },
+    "vendored-artifacts": {
+      "type": "vendored-artifacts",
+      "description": "Use tarballs committed inside this repo so the workflow no longer depends on an external local folder.",
+      "artifactBaseDir": "vendor/toolkit/0.1.13",
+      "runtimeAssets": {
+        "mode": "vendored-public-dir",
+        "sourceDir": "vendor/toolkit-runtime-assets/0.1.13"
+      },
+      "packages": {
+        "@viverse/config": "viverse-config-0.1.13.tgz",
+        "@viverse/types": "viverse-types-0.1.13.tgz",
+        "@viverse/core": "viverse-core-0.1.13.tgz",
+        "@viverse/extension": "viverse-extension-0.1.13.tgz",
+        "@viverse/local-player": "viverse-local-player-0.1.13.tgz",
+        "@viverse/network": "viverse-network-0.1.13.tgz",
+        "@viverse/quest": "viverse-quest-0.1.13.tgz",
+        "@viverse/ui": "viverse-ui-0.1.13.tgz"
+      },
+      "notes": [
+        "Recommended short-term fallback when external local paths must be avoided.",
+        "Populate vendor/toolkit/0.1.13 before switching the default profile."
+      ]
+    },
+    "public-registry": {
+      "type": "registry",
+      "description": "Install Toolkit packages from a remote package registry once public publishing is ready.",
+      "version": "0.1.13",
+      "runtimeAssets": {
+        "mode": "vendored-public-dir",
+        "sourceDir": "vendor/toolkit-runtime-assets/0.1.13"
+      },
+      "packages": {
+        "@viverse/config": "0.1.13",
+        "@viverse/types": "0.1.13",
+        "@viverse/core": "0.1.13",
+        "@viverse/extension": "0.1.13",
+        "@viverse/local-player": "0.1.13",
+        "@viverse/network": "0.1.13",
+        "@viverse/quest": "0.1.13",
+        "@viverse/ui": "0.1.13"
+      },
+      "notes": [
+        "Use this once the Toolkit packages are published to a stable remote registry.",
+        "Best fit when the JS modules should be installed remotely rather than vendored."
+      ]
+    },
+    "public-cdn-hybrid": {
+      "type": "cdn-hybrid",
+      "description": "Install Toolkit packages from a registry while loading Toolkit runtime assets from a remote CDN.",
+      "version": "0.1.13",
+      "packages": {
+        "@viverse/config": "0.1.13",
+        "@viverse/types": "0.1.13",
+        "@viverse/core": "0.1.13",
+        "@viverse/extension": "0.1.13",
+        "@viverse/local-player": "0.1.13",
+        "@viverse/network": "0.1.13",
+        "@viverse/quest": "0.1.13",
+        "@viverse/ui": "0.1.13"
+      },
+      "assetBaseUrl": "https://cdn.example.com/viverse-playcanvas-toolkit/0.1.13/",
+      "notes": [
+        "Target end state when JS packages and runtime assets should both resolve remotely.",
+        "Replace the placeholder CDN URL before using this profile in a real consumer scene."
+      ]
+    }
+  }
+}

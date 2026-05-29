@@ -1,0 +1,3074 @@
+{
+  "version": 1,
+  "generatedAt": "2026-05-19T16:43:32.387Z",
+  "scannedRoots": [
+    "apps",
+    "packages",
+    "scripts",
+    "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12"
+  ],
+  "includeNodeModules": false,
+  "excludedPackages": [
+    "@viverse/types"
+  ],
+  "purpose": "Auto-discovered candidate Toolkit APIs from visible repo imports and package index exports. Review before merging into toolkit-api-discovery-index.json.",
+  "discoveryRules": [
+    "Scan visible imports from @viverse/* across apps, packages, and scripts.",
+    "Allow extra scan roots such as private Toolkit repos or installed package folders through repeated --scan-root arguments.",
+    "Infer additional candidates from package index files in source repos or node_modules when available.",
+    "Exclude noisy packages such as @viverse/types by default unless explicitly re-included.",
+    "Drop malformed or type-only import symbols before they become candidate APIs.",
+    "Treat suggestedIntentCues as heuristics that should be curated before becoming canonical routing data."
+  ],
+  "packages": [
+    {
+      "packageName": "@viverse/account",
+      "packageGuide": "packages/account/guide.md",
+      "apiCount": 2,
+      "apis": [
+        {
+          "name": "AccountSystem",
+          "kind": "system",
+          "discoverySources": [
+            "export-index",
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "account",
+            "auth",
+            "credentials",
+            "login",
+            "profile"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/apps/preview/src/main.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/account/src/index.ts",
+            "packages/account/src/index.ts"
+          ],
+          "evidenceCount": 3
+        },
+        {
+          "name": "AuthModule",
+          "kind": "module",
+          "discoverySources": [
+            "export-index",
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "account",
+            "auth",
+            "credentials",
+            "login",
+            "profile"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/apps/preview/src/main.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/account/src/index.ts",
+            "packages/account/src/index.ts"
+          ],
+          "evidenceCount": 3
+        }
+      ]
+    },
+    {
+      "packageName": "@viverse/config",
+      "packageGuide": null,
+      "apiCount": 3,
+      "apis": [
+        {
+          "name": "getViverseConfig",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "config",
+            "get",
+            "viverse"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/account/src/modules/auth/AuthModule.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/core/src/helpers/avatar.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/core/src/helpers/http.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/core/src/sdk/ViverseSdkService.ts",
+            "scripts/templates/engine-only-world/main.toolkit-player.js.template",
+            "scripts/templates/engine-only-world/main.toolkit-quest-ui.js.template",
+            "scripts/templates/engine-only-world/main.toolkit-runtime.js.template"
+          ],
+          "evidenceCount": 7
+        },
+        {
+          "name": "resolveAssetPath",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "asset",
+            "path",
+            "resolve"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/core/src/utils/load-asset.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/avatar/avatars/DefaultAvatar.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/avatar/utils/preload-animations.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/ui/src/components/features/my-profile/MyProfileDialog.tsx",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/ui/src/helpers/style.tsx"
+          ],
+          "evidenceCount": 5
+        },
+        {
+          "name": "setViverseEnv",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "env",
+            "set",
+            "viverse"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/apps/preview/src/main.ts",
+            "scripts/templates/engine-only-world/main.toolkit-player.js.template",
+            "scripts/templates/engine-only-world/main.toolkit-quest-ui.js.template",
+            "scripts/templates/engine-only-world/main.toolkit-runtime.js.template"
+          ],
+          "evidenceCount": 4
+        }
+      ]
+    },
+    {
+      "packageName": "@viverse/core",
+      "packageGuide": null,
+      "apiCount": 34,
+      "apis": [
+        {
+          "name": "AudioProcessor",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "processor"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/LocalPlayerSystem.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/network/src/modules/multiplayer/components/remote-players/remote-player/RemotePlayer.ts"
+          ],
+          "evidenceCount": 2
+        },
+        {
+          "name": "AvatarOpacityRenderer",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "avatar",
+            "opacity",
+            "renderer"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/avatar/handlers/LocalAvatarOpacityHandler.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/network/src/modules/multiplayer/components/remote-players/remote-player/handlers/RemoteAvatarOpacityHandler.ts"
+          ],
+          "evidenceCount": 2
+        },
+        {
+          "name": "BaseModule",
+          "kind": "module",
+          "discoverySources": [
+            "export-index",
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "base"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/account/src/modules/auth/AuthModule.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/core/src/index.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/avatar/AvatarModule.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/camera/CameraModule.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/interaction/InteractionModule.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/locomotion/LocomotionModule.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/xr/XrModule.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/network/src/modules/multiplayer/MultiplayerModule.ts",
+            "packages/network/src/modules/multiplayer/MultiplayerModule.ts"
+          ],
+          "evidenceCount": 9
+        },
+        {
+          "name": "BaseSystem",
+          "kind": "system",
+          "discoverySources": [
+            "export-index",
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "base"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/account/src/AccountSystem.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/core/src/index.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/LocalPlayerSystem.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/network/src/NetworkSystem.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/quest/src/QuestSystem.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/ui/src/UiSystem.ts",
+            "packages/network/src/NetworkSystem.ts"
+          ],
+          "evidenceCount": 7
+        },
+        {
+          "name": "Billboard",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/helpers/Billboard.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/interaction/pick/PickTriggerButton.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/interaction/sit/helpers/SeatHintButton.ts"
+          ],
+          "evidenceCount": 3
+        },
+        {
+          "name": "calculateAvatarCapsule",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "avatar",
+            "calculate",
+            "capsule"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/avatar/AvatarModule.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/interaction/sit/helpers/PlayerSitAction.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/network/src/modules/multiplayer/components/remote-players/handlers/AvatarsOverlapHandler.ts"
+          ],
+          "evidenceCount": 3
+        },
+        {
+          "name": "ConditionVerifier",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "condition",
+            "verifier"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/avatar/handlers/VisibilityHandler.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "createAvatarCollision",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "avatar",
+            "collision",
+            "create"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/LocalPlayerSystem.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "createFallbackGripBone",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "bone",
+            "create",
+            "fallback",
+            "grip"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/interaction/pick/PickInteractionHandler.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/network/src/modules/multiplayer/components/remote-players/remote-player/RemotePlayer.ts"
+          ],
+          "evidenceCount": 2
+        },
+        {
+          "name": "createLayer",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "create",
+            "layer"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/helpers/media-controls/core/MediaControlUi.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/camera/debug/PhysicsDrawer.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/camera/outline/OutlineChannel.ts"
+          ],
+          "evidenceCount": 3
+        },
+        {
+          "name": "Debugger",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "debugger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/account/src/AccountSystem.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/account/src/helpers/guest.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/account/src/modules/auth/AuthModule.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/actions/Action.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/actions/FireEntityEventAction.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/actions/PlayEntityAnimationAction.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/actions/PlayEntityParticleSystemAction.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/actions/PushEntityWithPhysicsAction.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/actions/QuestAction.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/actions/SetSpawnPointAction.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/actions/TeleportPlayerAction.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/helpers/Billboard.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/helpers/audio-zone/AudioZone.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/interactions/Interaction.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/render/GpuInstancingRender.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/render/video/VideoAudio.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/render/video/VideoTexture.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-action.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-audio-zone.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-billboard.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-condition.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-gpu-instancing.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-media-controls.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-pick.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-sit.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-trigger.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-video-texture.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/triggers/EntitySelectedTrigger.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/triggers/InteractionExecutingTrigger.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/triggers/animation/EntityAnimTrigger.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/triggers/collision/EntityCollisionTrigger.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/LocalPlayerSystem.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/avatar/AvatarModule.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/avatar/LocalAvatarModule.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/avatar/avatars/VrmAvatar.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/avatar/avatars/helpers/VrmAnimator.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/avatar/avatars/helpers/VrmBodyMeasurer.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/camera/CameraModule.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/camera/debug/AmmoDebugDrawer.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/camera/outline/OutlineHandler.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/interaction/sit/SitInteractionHandler.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/locomotion/LocomotionModule.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/locomotion/locomotion-state/DeadState.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/locomotion/locomotion-state/LocomotionState.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/xr/XrModule.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/network/src/modules/multiplayer/MultiplayerModule.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/network/src/modules/multiplayer/adapters/PlaySdkMultiplayerAdapter.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/network/src/modules/multiplayer/components/audio/AudioManager.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/network/src/modules/multiplayer/components/remote-players/remote-player/processors/AvatarDataProcessor.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/network/src/modules/multiplayer/components/remote-players/remote-player/processors/ProfileDataProcessor.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/quest/src/QuestSystem.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/quest/src/core/ProgressTask.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/quest/src/core/Quest.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/quest/src/core/Task.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/ui/src/helpers/style.tsx",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/ui/src/hooks/network/useMultiplayerAudio.ts",
+            "packages/network/src/modules/multiplayer/MultiplayerModule.ts"
+          ],
+          "evidenceCount": 57
+        },
+        {
+          "name": "EntityStateEmitter",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "emitter",
+            "entity",
+            "state"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/interaction/InteractableItem.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "getBoundingBox",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "bounding",
+            "box",
+            "get"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/avatar/avatars/VrmAvatar.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/interaction/sit/helpers/PlayerSitAction.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/network/src/modules/multiplayer/components/remote-players/remote-player/processors/ProfileDataProcessor.ts"
+          ],
+          "evidenceCount": 3
+        },
+        {
+          "name": "getLocalPlayer",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "get",
+            "local",
+            "player"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/camera/Camera.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/interaction/pick/PickInteractionHandler.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/interaction/pick/PickableItem.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/interaction/sit/helpers/PlayerSitAction.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/interaction/sit/helpers/SeatRangeDetector.ts"
+          ],
+          "evidenceCount": 5
+        },
+        {
+          "name": "getRandomAvatar",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "avatar",
+            "get",
+            "random"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/account/src/helpers/guest.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "getRandomName",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "get",
+            "name",
+            "random"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/account/src/helpers/guest.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "helpers",
+          "kind": "candidate",
+          "discoverySources": [
+            "export-index"
+          ],
+          "suggestedIntentCues": [
+            "helpers"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/core/src/index.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "IAudioProcessorTarget",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "iaudio",
+            "processor",
+            "target"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/network/src/modules/multiplayer/components/remote-players/remote-player/RemotePlayer.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "loadAsset",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "asset",
+            "load"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/helpers/media-controls/SoundControls.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/helpers/media-controls/core/MediaControlUi.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/core/input/input/touch-input/TouchUi.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/avatar/avatars/helpers/VrmAnimResourceLoader.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/interaction/pick/PickTriggerButton.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/interaction/pick/actions/SwingActions.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/interaction/sit/helpers/SeatHintButton.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/xr/XrCursor.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/xr/xr-input-device/XrInputDevice.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/xr/xr-locomotion/TeleportXrLocomotion.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/xr/xr-ui/xr-ui-component/OverheadXrUi.ts"
+          ],
+          "evidenceCount": 11
+        },
+        {
+          "name": "loadAssetFromUrl",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "asset",
+            "from",
+            "load",
+            "url"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/xr/xr-input-device/ControllerXrInputDevice.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "loadFontAsset",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "asset",
+            "font",
+            "load"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/apps/preview/src/utils/link-and-billboard-scene.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/helpers/media-controls/core/MediaControlUi.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/xr/xr-ui/xr-ui-component/OverheadXrUi.ts",
+            "apps/preview/src/utils/link-and-billboard-scene.ts"
+          ],
+          "evidenceCount": 4
+        },
+        {
+          "name": "PlayerNameTag",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "name",
+            "player",
+            "tag"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/core/LocalPlayerNameTag.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/network/src/modules/multiplayer/components/remote-players/remote-player/processors/ProfileDataProcessor.ts"
+          ],
+          "evidenceCount": 2
+        },
+        {
+          "name": "qsGet",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "get",
+            "qs"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/apps/preview/src/main.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/apps/preview/src/setup.ts"
+          ],
+          "evidenceCount": 2
+        },
+        {
+          "name": "qsHas",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "has",
+            "qs"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/apps/preview/src/main.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/apps/preview/src/setup.ts"
+          ],
+          "evidenceCount": 2
+        },
+        {
+          "name": "registerModule",
+          "kind": "module",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "register"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/account/src/AccountSystem.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/LocalPlayerSystem.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/network/src/NetworkSystem.ts",
+            "packages/network/src/NetworkSystem.ts"
+          ],
+          "evidenceCount": 4
+        },
+        {
+          "name": "scripts",
+          "kind": "candidate",
+          "discoverySources": [
+            "export-index"
+          ],
+          "suggestedIntentCues": [
+            "scripts"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/core/src/index.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "setsEqual",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "equal",
+            "sets"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/camera/CameraModule.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/quest/src/QuestSystem.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/quest/src/core/Quest.ts"
+          ],
+          "evidenceCount": 3
+        },
+        {
+          "name": "shared",
+          "kind": "candidate",
+          "discoverySources": [
+            "export-index"
+          ],
+          "suggestedIntentCues": [
+            "shared"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/core/src/index.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "sortMapByOrder",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "by",
+            "map",
+            "order",
+            "sort"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/quest/src/QuestSystem.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/quest/src/core/Quest.ts"
+          ],
+          "evidenceCount": 2
+        },
+        {
+          "name": "type",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "type"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/network/src/modules/multiplayer/components/remote-players/remote-player/RemotePlayer.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "updateFallbackGripBonePosition",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "bone",
+            "fallback",
+            "grip",
+            "position",
+            "update"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/interaction/pick/PickInteractionHandler.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/network/src/modules/multiplayer/components/remote-players/remote-player/RemotePlayer.ts"
+          ],
+          "evidenceCount": 2
+        },
+        {
+          "name": "utils",
+          "kind": "candidate",
+          "discoverySources": [
+            "export-index"
+          ],
+          "suggestedIntentCues": [
+            "utils"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/core/src/index.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "UVScroll",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "uvscroll"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/avatar/avatars/DefaultAvatar.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "ViverseApp",
+          "kind": "candidate",
+          "discoverySources": [
+            "export-index",
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "app",
+            "viverse"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/apps/preview/src/main.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/core/src/index.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/helpers/media-controls/core/MediaControlUi.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-action.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-audio-zone.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-billboard.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-media-controls.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-pick.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-sit.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-trigger.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-video-texture.ts",
+            "scripts/templates/engine-only-world/main.toolkit-player.js.template",
+            "scripts/templates/engine-only-world/main.toolkit-quest-ui.js.template",
+            "scripts/templates/engine-only-world/main.toolkit-runtime.js.template"
+          ],
+          "evidenceCount": 14
+        }
+      ]
+    },
+    {
+      "packageName": "@viverse/extension",
+      "packageGuide": "packages/extension/guide.md",
+      "apiCount": 58,
+      "apis": [
+        {
+          "name": "actions",
+          "kind": "candidate",
+          "discoverySources": [
+            "export-index"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "actions",
+            "event",
+            "interaction",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/index.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "AudioZone",
+          "kind": "media-zone",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "event",
+            "interaction",
+            "trigger",
+            "zone"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-audio-zone.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "Billboard",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "event",
+            "interaction",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/apps/preview/src/utils/link-and-billboard-scene.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-billboard.ts",
+            "apps/preview/src/utils/link-and-billboard-scene.ts"
+          ],
+          "evidenceCount": 3
+        },
+        {
+          "name": "BlendEffect",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "blend",
+            "effect",
+            "event",
+            "interaction",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/apps/preview/src/utils/post-effects.ts",
+            "apps/preview/src/utils/post-effects.ts"
+          ],
+          "evidenceCount": 2
+        },
+        {
+          "name": "BloomEffect",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "bloom",
+            "effect",
+            "event",
+            "interaction",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/apps/preview/src/utils/post-effects.ts",
+            "apps/preview/src/utils/post-effects.ts"
+          ],
+          "evidenceCount": 2
+        },
+        {
+          "name": "BrightnessContrastEffect",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "brightness",
+            "contrast",
+            "effect",
+            "event",
+            "interaction",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/apps/preview/src/utils/post-effects.ts",
+            "apps/preview/src/utils/post-effects.ts"
+          ],
+          "evidenceCount": 2
+        },
+        {
+          "name": "ControlEntitySoundAction",
+          "kind": "action",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "control",
+            "entity",
+            "event",
+            "interaction",
+            "sound",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-action.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "DestroyEntityAction",
+          "kind": "action",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "destroy",
+            "entity",
+            "event",
+            "interaction",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-action.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "EdgeDetectEffect",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "detect",
+            "edge",
+            "effect",
+            "event",
+            "interaction",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/apps/preview/src/utils/post-effects.ts",
+            "apps/preview/src/utils/post-effects.ts"
+          ],
+          "evidenceCount": 2
+        },
+        {
+          "name": "EntityAnimCustomEventTrigger",
+          "kind": "trigger",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "anim",
+            "custom",
+            "entity",
+            "event",
+            "interaction",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-trigger.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "EntityAnimEndTrigger",
+          "kind": "trigger",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "anim",
+            "end",
+            "entity",
+            "event",
+            "interaction",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-trigger.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "EntityAnimStartTrigger",
+          "kind": "trigger",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "anim",
+            "entity",
+            "event",
+            "interaction",
+            "start",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-trigger.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "EntityCollisionEndTrigger",
+          "kind": "trigger",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "collision",
+            "end",
+            "entity",
+            "event",
+            "interaction",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-trigger.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "EntityCollisionStartTrigger",
+          "kind": "trigger",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "collision",
+            "entity",
+            "event",
+            "interaction",
+            "start",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-trigger.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "EntitySelectedTrigger",
+          "kind": "trigger",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "entity",
+            "event",
+            "interaction",
+            "selected",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-trigger.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "EntityTriggerEnterTrigger",
+          "kind": "trigger",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "enter",
+            "entity",
+            "event",
+            "interaction",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-trigger.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "EntityTriggerLeaveTrigger",
+          "kind": "trigger",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "entity",
+            "event",
+            "interaction",
+            "leave",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-trigger.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "FadeInEntityAction",
+          "kind": "action",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "entity",
+            "event",
+            "fade",
+            "in",
+            "interaction",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-action.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "FadeOutEntityAction",
+          "kind": "action",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "entity",
+            "event",
+            "fade",
+            "interaction",
+            "out",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-action.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "FireEntityEventAction",
+          "kind": "action",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "entity",
+            "event",
+            "fire",
+            "interaction",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-action.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "FxaaEffect",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "effect",
+            "event",
+            "fxaa",
+            "interaction",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/apps/preview/src/utils/post-effects.ts",
+            "apps/preview/src/utils/post-effects.ts"
+          ],
+          "evidenceCount": 2
+        },
+        {
+          "name": "GpuInstancingRender",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "event",
+            "gpu",
+            "instancing",
+            "interaction",
+            "render",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-gpu-instancing.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "helpers",
+          "kind": "candidate",
+          "discoverySources": [
+            "export-index"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "event",
+            "helpers",
+            "interaction",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/index.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "HorizontalTiltShiftEffect",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "effect",
+            "event",
+            "horizontal",
+            "interaction",
+            "shift",
+            "tilt",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/apps/preview/src/utils/post-effects.ts",
+            "apps/preview/src/utils/post-effects.ts"
+          ],
+          "evidenceCount": 2
+        },
+        {
+          "name": "HueSaturationEffect",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "effect",
+            "event",
+            "hue",
+            "interaction",
+            "saturation",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/apps/preview/src/utils/post-effects.ts",
+            "apps/preview/src/utils/post-effects.ts"
+          ],
+          "evidenceCount": 2
+        },
+        {
+          "name": "InteractionExecutingTrigger",
+          "kind": "trigger",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "event",
+            "interaction",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-trigger.ts",
+            "scripts/templates/engine-only-world/main.toolkit-quest-ui.js.template"
+          ],
+          "evidenceCount": 2
+        },
+        {
+          "name": "interactions",
+          "kind": "candidate",
+          "discoverySources": [
+            "export-index"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "event",
+            "interaction",
+            "interactions",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/index.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "LeaveSeatAction",
+          "kind": "action",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "event",
+            "interaction",
+            "leave",
+            "seat",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-action.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "OpenLinkAction",
+          "kind": "action",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "event",
+            "interaction",
+            "link",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/apps/preview/src/utils/link-and-billboard-scene.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-action.ts",
+            "apps/preview/src/utils/link-and-billboard-scene.ts"
+          ],
+          "evidenceCount": 3
+        },
+        {
+          "name": "PickInteraction",
+          "kind": "interaction",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "event",
+            "interaction",
+            "pick",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/apps/preview/src/utils/pick-and-action.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-pick.ts",
+            "apps/preview/src/utils/pick-and-action.ts",
+            "scripts/templates/engine-only-world/main.toolkit-quest-ui.js.template"
+          ],
+          "evidenceCount": 4
+        },
+        {
+          "name": "PlayEntityAnimationAction",
+          "kind": "action",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "animation",
+            "entity",
+            "event",
+            "interaction",
+            "play",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-action.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "PlayEntityParticleSystemAction",
+          "kind": "action",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "entity",
+            "event",
+            "interaction",
+            "particle",
+            "play",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-action.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "post-effects",
+          "kind": "candidate",
+          "discoverySources": [
+            "export-index"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "effects",
+            "event",
+            "interaction",
+            "post",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/index.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "PublishNotificationAction",
+          "kind": "action",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "event",
+            "interaction",
+            "notification",
+            "publish",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-action.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "PushEntityWithPhysicsAction",
+          "kind": "action",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "entity",
+            "event",
+            "interaction",
+            "physics",
+            "push",
+            "trigger",
+            "with"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-action.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "QuestAction",
+          "kind": "action",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "event",
+            "interaction",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-action.ts",
+            "scripts/templates/engine-only-world/main.toolkit-quest-ui.js.template"
+          ],
+          "evidenceCount": 2
+        },
+        {
+          "name": "render",
+          "kind": "candidate",
+          "discoverySources": [
+            "export-index"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "event",
+            "interaction",
+            "render",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/index.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "SeatOccupiedTrigger",
+          "kind": "trigger",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "event",
+            "interaction",
+            "occupied",
+            "seat",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-trigger.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "SeatVacatedTrigger",
+          "kind": "trigger",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "event",
+            "interaction",
+            "seat",
+            "trigger",
+            "vacated"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-trigger.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "SetSpawnPointAction",
+          "kind": "action",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "event",
+            "interaction",
+            "point",
+            "set",
+            "spawn",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-action.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "ShowToastMessageAction",
+          "kind": "action",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "event",
+            "interaction",
+            "message",
+            "show",
+            "toast",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-action.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "SitInteraction",
+          "kind": "interaction",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "event",
+            "interaction",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/apps/preview/src/utils/seat-scene.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-sit.ts",
+            "apps/preview/src/utils/seat-scene.ts"
+          ],
+          "evidenceCount": 3
+        },
+        {
+          "name": "SitOnSeatAction",
+          "kind": "action",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "event",
+            "interaction",
+            "on",
+            "seat",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-action.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "SoundAudioZone",
+          "kind": "media-zone",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "event",
+            "interaction",
+            "sound",
+            "trigger",
+            "zone"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/apps/preview/src/utils/media-scene.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-audio-zone.ts",
+            "apps/preview/src/utils/media-scene.ts"
+          ],
+          "evidenceCount": 3
+        },
+        {
+          "name": "SoundControls",
+          "kind": "control",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "event",
+            "interaction",
+            "sound",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/apps/preview/src/utils/media-scene.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-media-controls.ts",
+            "apps/preview/src/utils/media-scene.ts"
+          ],
+          "evidenceCount": 3
+        },
+        {
+          "name": "SSAOEffect",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "event",
+            "interaction",
+            "ssaoeffect",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/apps/preview/src/utils/post-effects.ts",
+            "apps/preview/src/utils/post-effects.ts"
+          ],
+          "evidenceCount": 2
+        },
+        {
+          "name": "SubscribeNotificationTrigger",
+          "kind": "trigger",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "event",
+            "interaction",
+            "notification",
+            "subscribe",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-trigger.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "TeleportPlayerAction",
+          "kind": "action",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "event",
+            "interaction",
+            "player",
+            "teleport",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-action.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "ToggleEntityAction",
+          "kind": "action",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "entity",
+            "event",
+            "interaction",
+            "toggle",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-action.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "ToggleEntityCollisionAction",
+          "kind": "action",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "collision",
+            "entity",
+            "event",
+            "interaction",
+            "toggle",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-action.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "ToggleEntityRigidbodyAction",
+          "kind": "action",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "entity",
+            "event",
+            "interaction",
+            "rigidbody",
+            "toggle",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-action.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "TriggerDispatcher",
+          "kind": "candidate",
+          "discoverySources": [
+            "export-index",
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "dispatcher",
+            "event",
+            "interaction",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/index.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-action.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-condition.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-trigger.ts"
+          ],
+          "evidenceCount": 4
+        },
+        {
+          "name": "triggers",
+          "kind": "candidate",
+          "discoverySources": [
+            "export-index"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "event",
+            "interaction",
+            "trigger",
+            "triggers"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/index.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "VerticalTiltShiftEffect",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "effect",
+            "event",
+            "interaction",
+            "shift",
+            "tilt",
+            "trigger",
+            "vertical"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/apps/preview/src/utils/post-effects.ts",
+            "apps/preview/src/utils/post-effects.ts"
+          ],
+          "evidenceCount": 2
+        },
+        {
+          "name": "VideoTexture",
+          "kind": "media",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "event",
+            "interaction",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/apps/preview/src/utils/media-scene.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-media-controls.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-video-texture.ts",
+            "apps/preview/src/utils/media-scene.ts"
+          ],
+          "evidenceCount": 4
+        },
+        {
+          "name": "VideoTextureAudioZone",
+          "kind": "media-zone",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "event",
+            "interaction",
+            "trigger",
+            "zone"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/apps/preview/src/utils/media-scene.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-audio-zone.ts",
+            "apps/preview/src/utils/media-scene.ts"
+          ],
+          "evidenceCount": 3
+        },
+        {
+          "name": "VideoTextureControls",
+          "kind": "control",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "event",
+            "interaction",
+            "trigger"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/apps/preview/src/utils/media-scene.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/extension/src/scripts/viverse-media-controls.ts",
+            "apps/preview/src/utils/media-scene.ts"
+          ],
+          "evidenceCount": 3
+        },
+        {
+          "name": "VignetteEffect",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "action",
+            "effect",
+            "event",
+            "interaction",
+            "trigger",
+            "vignette"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/apps/preview/src/utils/post-effects.ts",
+            "apps/preview/src/utils/post-effects.ts"
+          ],
+          "evidenceCount": 2
+        }
+      ]
+    },
+    {
+      "packageName": "@viverse/local-player",
+      "packageGuide": "packages/local-player/guide.md",
+      "apiCount": 37,
+      "apis": [
+        {
+          "name": "AvatarModule",
+          "kind": "module",
+          "discoverySources": [
+            "export-index"
+          ],
+          "suggestedIntentCues": [
+            "avatar",
+            "camera",
+            "controller",
+            "locomotion",
+            "player",
+            "xr"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/index.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "Camera",
+          "kind": "candidate",
+          "discoverySources": [
+            "export-index"
+          ],
+          "suggestedIntentCues": [
+            "avatar",
+            "camera",
+            "controller",
+            "locomotion",
+            "player",
+            "xr"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/index.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "CameraModule",
+          "kind": "module",
+          "discoverySources": [
+            "export-index",
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "avatar",
+            "camera",
+            "controller",
+            "locomotion",
+            "player",
+            "xr"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/apps/preview/src/main.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/index.ts",
+            "scripts/templates/engine-only-world/main.toolkit-player.js.template",
+            "scripts/templates/engine-only-world/main.toolkit-quest-ui.js.template"
+          ],
+          "evidenceCount": 4
+        },
+        {
+          "name": "ControllerXrInputDevice",
+          "kind": "candidate",
+          "discoverySources": [
+            "export-index"
+          ],
+          "suggestedIntentCues": [
+            "avatar",
+            "camera",
+            "controller",
+            "device",
+            "input",
+            "locomotion",
+            "player",
+            "xr"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/index.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "DeadState",
+          "kind": "candidate",
+          "discoverySources": [
+            "export-index"
+          ],
+          "suggestedIntentCues": [
+            "avatar",
+            "camera",
+            "controller",
+            "dead",
+            "locomotion",
+            "player",
+            "state",
+            "xr"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/index.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "DEFAULT_CAMERA_COMPONENT_SETTINGS",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "avatar",
+            "camera",
+            "component",
+            "controller",
+            "default",
+            "locomotion",
+            "player",
+            "settings",
+            "xr"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/apps/preview/src/main.ts",
+            "scripts/templates/engine-only-world/main.toolkit-player.js.template",
+            "scripts/templates/engine-only-world/main.toolkit-quest-ui.js.template"
+          ],
+          "evidenceCount": 3
+        },
+        {
+          "name": "DefaultAvatar",
+          "kind": "candidate",
+          "discoverySources": [
+            "export-index",
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "avatar",
+            "camera",
+            "controller",
+            "default",
+            "locomotion",
+            "player",
+            "xr"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/apps/preview/src/main.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/index.ts"
+          ],
+          "evidenceCount": 2
+        },
+        {
+          "name": "FallingState",
+          "kind": "candidate",
+          "discoverySources": [
+            "export-index"
+          ],
+          "suggestedIntentCues": [
+            "avatar",
+            "camera",
+            "controller",
+            "falling",
+            "locomotion",
+            "player",
+            "state",
+            "xr"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/index.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "FirstPersonCamera",
+          "kind": "candidate",
+          "discoverySources": [
+            "export-index",
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "avatar",
+            "camera",
+            "controller",
+            "first",
+            "locomotion",
+            "person",
+            "player",
+            "xr"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/apps/preview/src/main.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/index.ts",
+            "scripts/templates/engine-only-world/main.toolkit-player.js.template",
+            "scripts/templates/engine-only-world/main.toolkit-quest-ui.js.template"
+          ],
+          "evidenceCount": 4
+        },
+        {
+          "name": "FlyingState",
+          "kind": "candidate",
+          "discoverySources": [
+            "export-index"
+          ],
+          "suggestedIntentCues": [
+            "avatar",
+            "camera",
+            "controller",
+            "flying",
+            "locomotion",
+            "player",
+            "state",
+            "xr"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/index.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "GroundedState",
+          "kind": "candidate",
+          "discoverySources": [
+            "export-index"
+          ],
+          "suggestedIntentCues": [
+            "avatar",
+            "camera",
+            "controller",
+            "grounded",
+            "locomotion",
+            "player",
+            "state",
+            "xr"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/index.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "HandXrInputDevice",
+          "kind": "candidate",
+          "discoverySources": [
+            "export-index"
+          ],
+          "suggestedIntentCues": [
+            "avatar",
+            "camera",
+            "controller",
+            "device",
+            "hand",
+            "input",
+            "locomotion",
+            "player",
+            "xr"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/index.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "HeadXrUiAnchor",
+          "kind": "candidate",
+          "discoverySources": [
+            "export-index"
+          ],
+          "suggestedIntentCues": [
+            "anchor",
+            "avatar",
+            "camera",
+            "controller",
+            "head",
+            "locomotion",
+            "player",
+            "xr"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/index.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "InputHandler",
+          "kind": "candidate",
+          "discoverySources": [
+            "export-index"
+          ],
+          "suggestedIntentCues": [
+            "avatar",
+            "camera",
+            "controller",
+            "handler",
+            "input",
+            "locomotion",
+            "player",
+            "xr"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/index.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "InteractionModule",
+          "kind": "module",
+          "discoverySources": [
+            "export-index",
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "avatar",
+            "camera",
+            "controller",
+            "locomotion",
+            "player",
+            "xr"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/apps/preview/src/main.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/index.ts",
+            "scripts/templates/engine-only-world/main.toolkit-player.js.template",
+            "scripts/templates/engine-only-world/main.toolkit-quest-ui.js.template"
+          ],
+          "evidenceCount": 4
+        },
+        {
+          "name": "JumpingState",
+          "kind": "candidate",
+          "discoverySources": [
+            "export-index"
+          ],
+          "suggestedIntentCues": [
+            "avatar",
+            "camera",
+            "controller",
+            "jumping",
+            "locomotion",
+            "player",
+            "state",
+            "xr"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/index.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "KeyboardInput",
+          "kind": "candidate",
+          "discoverySources": [
+            "export-index"
+          ],
+          "suggestedIntentCues": [
+            "avatar",
+            "camera",
+            "controller",
+            "input",
+            "keyboard",
+            "locomotion",
+            "player",
+            "xr"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/index.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "LocalAvatarModule",
+          "kind": "module",
+          "discoverySources": [
+            "export-index",
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "avatar",
+            "camera",
+            "controller",
+            "local",
+            "locomotion",
+            "player",
+            "xr"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/apps/preview/src/main.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/index.ts",
+            "scripts/templates/engine-only-world/main.toolkit-player.js.template",
+            "scripts/templates/engine-only-world/main.toolkit-quest-ui.js.template"
+          ],
+          "evidenceCount": 4
+        },
+        {
+          "name": "LocalPlayerSystem",
+          "kind": "system",
+          "discoverySources": [
+            "export-index",
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "avatar",
+            "camera",
+            "controller",
+            "local",
+            "locomotion",
+            "player",
+            "xr"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/apps/preview/src/main.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/index.ts",
+            "scripts/templates/engine-only-world/main.toolkit-player.js.template",
+            "scripts/templates/engine-only-world/main.toolkit-quest-ui.js.template"
+          ],
+          "evidenceCount": 4
+        },
+        {
+          "name": "LocomotionModule",
+          "kind": "module",
+          "discoverySources": [
+            "export-index",
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "avatar",
+            "camera",
+            "controller",
+            "locomotion",
+            "player",
+            "xr"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/apps/preview/src/main.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/index.ts",
+            "scripts/templates/engine-only-world/main.toolkit-player.js.template",
+            "scripts/templates/engine-only-world/main.toolkit-quest-ui.js.template"
+          ],
+          "evidenceCount": 4
+        },
+        {
+          "name": "LocomotionState",
+          "kind": "candidate",
+          "discoverySources": [
+            "export-index"
+          ],
+          "suggestedIntentCues": [
+            "avatar",
+            "camera",
+            "controller",
+            "locomotion",
+            "player",
+            "state",
+            "xr"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/index.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "MouseInput",
+          "kind": "candidate",
+          "discoverySources": [
+            "export-index"
+          ],
+          "suggestedIntentCues": [
+            "avatar",
+            "camera",
+            "controller",
+            "input",
+            "locomotion",
+            "mouse",
+            "player",
+            "xr"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/index.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "OverheadXrUi",
+          "kind": "candidate",
+          "discoverySources": [
+            "export-index"
+          ],
+          "suggestedIntentCues": [
+            "avatar",
+            "camera",
+            "controller",
+            "locomotion",
+            "overhead",
+            "player",
+            "xr"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/index.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "setting",
+          "kind": "candidate",
+          "discoverySources": [
+            "export-index"
+          ],
+          "suggestedIntentCues": [
+            "avatar",
+            "camera",
+            "controller",
+            "locomotion",
+            "player",
+            "setting",
+            "xr"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/index.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "SmoothXrLocomotion",
+          "kind": "candidate",
+          "discoverySources": [
+            "export-index"
+          ],
+          "suggestedIntentCues": [
+            "avatar",
+            "camera",
+            "controller",
+            "locomotion",
+            "player",
+            "smooth",
+            "xr"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/index.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "TeleportXrLocomotion",
+          "kind": "candidate",
+          "discoverySources": [
+            "export-index"
+          ],
+          "suggestedIntentCues": [
+            "avatar",
+            "camera",
+            "controller",
+            "locomotion",
+            "player",
+            "teleport",
+            "xr"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/index.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "ThirdPersonCamera",
+          "kind": "candidate",
+          "discoverySources": [
+            "export-index",
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "avatar",
+            "camera",
+            "controller",
+            "locomotion",
+            "person",
+            "player",
+            "third",
+            "xr"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/apps/preview/src/main.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/index.ts",
+            "scripts/templates/engine-only-world/main.toolkit-player.js.template",
+            "scripts/templates/engine-only-world/main.toolkit-quest-ui.js.template"
+          ],
+          "evidenceCount": 4
+        },
+        {
+          "name": "TouchInput",
+          "kind": "candidate",
+          "discoverySources": [
+            "export-index"
+          ],
+          "suggestedIntentCues": [
+            "avatar",
+            "camera",
+            "controller",
+            "input",
+            "locomotion",
+            "player",
+            "touch",
+            "xr"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/index.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "ViverseAvatar",
+          "kind": "candidate",
+          "discoverySources": [
+            "export-index"
+          ],
+          "suggestedIntentCues": [
+            "avatar",
+            "camera",
+            "controller",
+            "locomotion",
+            "player",
+            "viverse",
+            "xr"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/index.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "VrmAvatar",
+          "kind": "candidate",
+          "discoverySources": [
+            "export-index",
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "avatar",
+            "camera",
+            "controller",
+            "locomotion",
+            "player",
+            "vrm",
+            "xr"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/apps/preview/src/main.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/index.ts"
+          ],
+          "evidenceCount": 2
+        },
+        {
+          "name": "XrCamera",
+          "kind": "candidate",
+          "discoverySources": [
+            "export-index"
+          ],
+          "suggestedIntentCues": [
+            "avatar",
+            "camera",
+            "controller",
+            "locomotion",
+            "player",
+            "xr"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/index.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "XrCursor",
+          "kind": "candidate",
+          "discoverySources": [
+            "export-index"
+          ],
+          "suggestedIntentCues": [
+            "avatar",
+            "camera",
+            "controller",
+            "cursor",
+            "locomotion",
+            "player",
+            "xr"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/index.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "XrHandedNode",
+          "kind": "candidate",
+          "discoverySources": [
+            "export-index"
+          ],
+          "suggestedIntentCues": [
+            "avatar",
+            "camera",
+            "controller",
+            "handed",
+            "locomotion",
+            "node",
+            "player",
+            "xr"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/index.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "XrInputDevice",
+          "kind": "candidate",
+          "discoverySources": [
+            "export-index"
+          ],
+          "suggestedIntentCues": [
+            "avatar",
+            "camera",
+            "controller",
+            "device",
+            "input",
+            "locomotion",
+            "player",
+            "xr"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/index.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "XrLocomotion",
+          "kind": "candidate",
+          "discoverySources": [
+            "export-index"
+          ],
+          "suggestedIntentCues": [
+            "avatar",
+            "camera",
+            "controller",
+            "locomotion",
+            "player",
+            "xr"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/index.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "XrModule",
+          "kind": "module",
+          "discoverySources": [
+            "export-index",
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "avatar",
+            "camera",
+            "controller",
+            "locomotion",
+            "player",
+            "xr"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/apps/preview/src/main.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/index.ts"
+          ],
+          "evidenceCount": 2
+        },
+        {
+          "name": "XrUiHandler",
+          "kind": "candidate",
+          "discoverySources": [
+            "export-index"
+          ],
+          "suggestedIntentCues": [
+            "avatar",
+            "camera",
+            "controller",
+            "handler",
+            "locomotion",
+            "player",
+            "xr"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/index.ts"
+          ],
+          "evidenceCount": 1
+        }
+      ]
+    },
+    {
+      "packageName": "@viverse/network",
+      "packageGuide": "packages/network/guide.md",
+      "apiCount": 2,
+      "apis": [
+        {
+          "name": "MultiplayerModule",
+          "kind": "module",
+          "discoverySources": [
+            "export-index",
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "multiplayer",
+            "network",
+            "room",
+            "sync"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/apps/preview/src/main.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/network/src/index.ts",
+            "packages/network/src/index.ts"
+          ],
+          "evidenceCount": 3
+        },
+        {
+          "name": "NetworkSystem",
+          "kind": "system",
+          "discoverySources": [
+            "export-index",
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "multiplayer",
+            "network",
+            "room",
+            "sync"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/apps/preview/src/main.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/network/src/index.ts",
+            "packages/network/src/index.ts"
+          ],
+          "evidenceCount": 3
+        }
+      ]
+    },
+    {
+      "packageName": "@viverse/playcanvas-vrm",
+      "packageGuide": null,
+      "apiCount": 11,
+      "apis": [
+        {
+          "name": "addIndexToNodeTags",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "add",
+            "index",
+            "node",
+            "tags",
+            "to"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/avatar/avatars/VrmAvatar.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "createFormattedVRMHumanoid",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "create",
+            "formatted",
+            "vrmhumanoid"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/avatar/avatars/helpers/VrmPluginHelper.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "IAnimationAsset",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "asset",
+            "ianimation"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/avatar/utils/preload-animations.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "type",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "type"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/avatar/utils/preload-animations.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/types/src/systems/local-player/modules/avatar/interfaces/IVrmPluginHelper.ts"
+          ],
+          "evidenceCount": 2
+        },
+        {
+          "name": "VrmAnimation",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "animation",
+            "vrm"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/avatar/avatars/helpers/VrmAnimResourceLoader.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "VrmExpression",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "expression",
+            "vrm"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/avatar/avatars/VrmAvatar.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "VRMExpressionManager",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "manager",
+            "vrmexpression"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/types/src/systems/local-player/modules/avatar/interfaces/IVrmPluginHelper.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "VRMHumanoid",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "vrmhumanoid"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/types/src/systems/local-player/modules/avatar/interfaces/IVrmPluginHelper.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "VrmMtoon",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "mtoon",
+            "vrm"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/avatar/avatars/VrmAvatar.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "VrmSpringBone",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "bone",
+            "spring",
+            "vrm"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/local-player/src/modules/avatar/avatars/VrmAvatar.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "VRMSpringBoneManager",
+          "kind": "candidate",
+          "discoverySources": [
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "bone",
+            "manager",
+            "vrmspring"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/types/src/systems/local-player/modules/avatar/interfaces/IVrmPluginHelper.ts"
+          ],
+          "evidenceCount": 1
+        }
+      ]
+    },
+    {
+      "packageName": "@viverse/quest",
+      "packageGuide": "packages/quest/guide.md",
+      "apiCount": 5,
+      "apis": [
+        {
+          "name": "ProgressTask",
+          "kind": "candidate",
+          "discoverySources": [
+            "export-index"
+          ],
+          "suggestedIntentCues": [
+            "objective",
+            "progress",
+            "quest",
+            "task"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/quest/src/index.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "Quest",
+          "kind": "candidate",
+          "discoverySources": [
+            "export-index"
+          ],
+          "suggestedIntentCues": [
+            "objective",
+            "progress",
+            "quest",
+            "task"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/quest/src/index.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "QuestSystem",
+          "kind": "system",
+          "discoverySources": [
+            "export-index",
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "objective",
+            "progress",
+            "quest",
+            "task"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/apps/preview/src/main.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/quest/src/index.ts",
+            "scripts/templates/engine-only-world/main.toolkit-quest-ui.js.template"
+          ],
+          "evidenceCount": 3
+        },
+        {
+          "name": "SimpleTask",
+          "kind": "candidate",
+          "discoverySources": [
+            "export-index"
+          ],
+          "suggestedIntentCues": [
+            "objective",
+            "progress",
+            "quest",
+            "simple",
+            "task"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/quest/src/index.ts"
+          ],
+          "evidenceCount": 1
+        },
+        {
+          "name": "Task",
+          "kind": "candidate",
+          "discoverySources": [
+            "export-index"
+          ],
+          "suggestedIntentCues": [
+            "objective",
+            "progress",
+            "quest",
+            "task"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/quest/src/index.ts"
+          ],
+          "evidenceCount": 1
+        }
+      ]
+    },
+    {
+      "packageName": "@viverse/ui",
+      "packageGuide": "packages/ui/guide.md",
+      "apiCount": 1,
+      "apis": [
+        {
+          "name": "UiSystem",
+          "kind": "system",
+          "discoverySources": [
+            "export-index",
+            "import"
+          ],
+          "suggestedIntentCues": [
+            "hud",
+            "interface",
+            "ui"
+          ],
+          "sourceEvidence": [
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/apps/preview/src/main.ts",
+            "/Users/Steven.YA_Chen/Downloads/viverse-playcanvas-toolkit-0.1.12/packages/ui/src/index.ts",
+            "scripts/templates/engine-only-world/main.toolkit-quest-ui.js.template"
+          ],
+          "evidenceCount": 3
+        }
+      ]
+    }
+  ]
+}
