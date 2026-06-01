@@ -2,6 +2,21 @@
   "routes": [
     {
       "intent": [
+        "collider",
+        "collision",
+        "hitbox",
+        "physics",
+        "rigidbody",
+        "boundary",
+        "raycaster",
+        "intersect"
+      ],
+      "skills": [
+        "threejs-collision-patterns"
+      ]
+    },
+    {
+      "intent": [
         "auth",
         "login",
         "sso",
