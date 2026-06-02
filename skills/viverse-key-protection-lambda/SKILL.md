@@ -16,7 +16,7 @@ Before starting integration, collect these three values. All are obtained from [
 | Credential | Used as | Where to get it |
 |------------|---------|-----------------|
 | **App ID** | `game_id` in `/env` and `/script` API calls; `appId` in client SDK | VIVERSE Studio → your app → **App ID** field. Same value as `VITE_VIVERSE_CLIENT_ID` in the project `.env` (set by the publish flow — see `viverse-world-publishing` skill). |
-| **Lambda Authkey** | `Authkey` request header for all admin API calls | VIVERSE Studio → your app → **Play Lambda** section → **Authkey**. This is a service credential scoped to your app — store it only in `.env.lambda.local` or CI secret manager, never in source. |
+| **Lambda Authkey** | `Authkey: <value>` request header for the **Play Lambda admin REST API** (`GET/POST/DELETE /env`, `GET/POST/DELETE /script`, `GET /jobs`). This is a **server/CI-side credential** — used in the sync script and CI automation to manage env vars and scripts. It is never used in browser code and never passed to `lambda.invoke()`. Store it only in `.env.lambda.local` or CI secret manager. |
 | **VIVERSE access token** | Third argument to `lambda.invoke()` on the client | Obtained at runtime via the VIVERSE auth flow (see `viverse-auth` skill). This is the end-user's session token, not the Authkey. |
 
 > **App ID = game_id.** The same ID used in `VITE_VIVERSE_CLIENT_ID`, `viverse-cli app publish --app-id`, and `newMultiplayerClient(roomId, appId, ...)` is the `game_id` passed to every Lambda API endpoint.

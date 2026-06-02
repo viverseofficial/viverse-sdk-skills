@@ -2,12 +2,12 @@
 
 Base URL: `/api/play-lambda-service/v1`
 
-All admin endpoints require:
+All **admin REST API** endpoints (`/env`, `/script`, `/jobs`) require:
 ```
 Authkey: <auth_key>
 Content-Type: application/json   (POST only)
 ```
-`Authkey` is a service credential for CI/admin use only. **Never ship it in client code.**
+`Authkey` is a **server/CI-side credential** used to manage env variables and scripts via the admin API. It is **not** the end-user `accessToken` used in `lambda.invoke()`. Never send `Authkey` to the browser or include it in frontend code.
 
 ---
 
