@@ -132,7 +132,6 @@
     },
     {
       "intent": [
-        "playcanvas",
         "navigation",
         "ammo",
         "character controller"
@@ -209,6 +208,75 @@
       ],
       "skills": [
         "playcanvas-asset-art"
+      ]
+    },
+    {
+      "intent": [
+        "i18n",
+        "localization",
+        "language detection",
+        "lang",
+        "translation",
+        "_htc_lang_code"
+      ],
+      "skills": [
+        "viverse-i18n"
+      ]
+    },
+    {
+      "intent": [
+        "storage",
+        "cloud save",
+        "save data",
+        "save game",
+        "persistence",
+        "cloudsaveclient"
+      ],
+      "skills": [
+        "viverse-storage"
+      ]
+    },
+    {
+      "intent": [
+        "utility app",
+        "tool app",
+        "widget",
+        "iframe tool",
+        "blank-webapp",
+        "poll",
+        "countdown",
+        "ticker"
+      ],
+      "skills": [
+        "viverse-utility-app"
+      ]
+    },
+    {
+      "intent": [
+        "weapon attach",
+        "weapon grip",
+        "hand bone",
+        "prop attach",
+        "grip pose",
+        "finger curl"
+      ],
+      "skills": [
+        "vrm-weapon-attach"
+      ]
+    },
+    {
+      "intent": [
+        "material override",
+        "model swap",
+        "procedural decoration",
+        "glb material",
+        "gltfloader",
+        "bloom",
+        "tone mapping",
+        "post-processing"
+      ],
+      "skills": [
+        "threejs-asset-art"
       ]
     }
   ]

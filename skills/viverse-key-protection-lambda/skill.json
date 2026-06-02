@@ -23,7 +23,13 @@
   "patterns_dir": "patterns",
   "examples_dir": "examples",
   "read_order": [
-    "SKILL.md"
+    "SKILL.md",
+    "patterns/lambda-api-reference.md",
+    "patterns/lambda-secret-proxy.md",
+    "patterns/storage-boundary.md",
+    "examples/voxel-landmark-migration.md",
+    "scripts/sync-lambda-config.sh",
+    "templates/.env.lambda.example"
   ],
   "dependencies": [
     "bundle:resilience"

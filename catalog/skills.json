@@ -1,7 +1,11 @@
 {
   "version": "0.1.0",
-  "generated_at": "2026-03-28T07:04:23.519Z",
+  "generated_at": "2026-06-02T09:41:05.413Z",
   "skills": [
+    {
+      "id": "playcanvas-asset-art",
+      "path": "skills/playcanvas-asset-art/skill.json"
+    },
     {
       "id": "playcanvas-avatar-navigation",
       "path": "skills/playcanvas-avatar-navigation/skill.json"
@@ -9,6 +13,14 @@
     {
       "id": "playcanvas-googlemaps-3dtiles",
       "path": "skills/playcanvas-googlemaps-3dtiles/skill.json"
+    },
+    {
+      "id": "threejs-asset-art",
+      "path": "skills/threejs-asset-art/skill.json"
+    },
+    {
+      "id": "threejs-collision-patterns",
+      "path": "skills/threejs-collision-patterns/skill.json"
     },
     {
       "id": "viverse-auth",
@@ -23,6 +35,10 @@
       "path": "skills/viverse-design-system/skill.json"
     },
     {
+      "id": "viverse-i18n",
+      "path": "skills/viverse-i18n/skill.json"
+    },
+    {
       "id": "viverse-key-protection-lambda",
       "path": "skills/viverse-key-protection-lambda/skill.json"
     },
@@ -35,12 +51,20 @@
       "path": "skills/viverse-multiplayer/skill.json"
     },
     {
+      "id": "viverse-pls-cli",
+      "path": "skills/viverse-pls-cli/skill.json"
+    },
+    {
       "id": "viverse-r3f-foundation",
       "path": "skills/viverse-r3f-foundation/skill.json"
     },
     {
       "id": "viverse-r3f-profile-ui",
       "path": "skills/viverse-r3f-profile-ui/skill.json"
+    },
+    {
+      "id": "viverse-storage",
+      "path": "skills/viverse-storage/skill.json"
     },
     {
       "id": "viverse-template-generation",
@@ -51,16 +75,20 @@
       "path": "skills/viverse-threejs-vanilla-foundation/skill.json"
     },
     {
+      "id": "viverse-utility-app",
+      "path": "skills/viverse-utility-app/skill.json"
+    },
+    {
       "id": "viverse-world-publishing",
       "path": "skills/viverse-world-publishing/skill.json"
     },
     {
-      "id": "vrma-animation-retargeting",
-      "path": "skills/vrma-animation-retargeting/skill.json"
+      "id": "vrm-weapon-attach",
+      "path": "skills/vrm-weapon-attach/skill.json"
     },
     {
-      "id": "viverse-pls-cli",
-      "path": "skills/viverse-pls-cli/skill.json"
+      "id": "vrma-animation-retargeting",
+      "path": "skills/vrma-animation-retargeting/skill.json"
     }
   ]
 }

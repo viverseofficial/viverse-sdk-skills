@@ -1,0 +1,30 @@
+{
+  "id": "threejs-asset-art",
+  "name": "threejs-asset-art",
+  "version": "0.1.0",
+  "status": "active",
+  "description": "Replace GLB models, override materials, fetch textures, and add procedural decorations in static Three.js templates.",
+  "tags": [
+    "threejs",
+    "model",
+    "material",
+    "texture",
+    "asset",
+    "art",
+    "decoration",
+    "procedural",
+    "glb",
+    "gltfloader",
+    "bloom",
+    "post-processing"
+  ],
+  "prerequisites": [
+    "Three.js static template workspace",
+    "GLTFLoader"
+  ],
+  "entrypoint": "SKILL.md",
+  "read_order": [
+    "SKILL.md"
+  ],
+  "dependencies": []
+}
