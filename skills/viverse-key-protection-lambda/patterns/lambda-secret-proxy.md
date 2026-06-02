@@ -19,10 +19,16 @@ Use this pattern for secret-bearing request/response calls where client code mus
 
 ## Client Contract
 
-1. `await multiplayerClient.init()` before invoke.
-2. `await multiplayerClient.lambda.invoke(eventName, eventData, accessToken)`.
-3. Fail closed when `status !== "succeeded"`.
-4. Parse `result` by event-specific schema (no global assumption).
+Prerequisites (must be completed before step 1):
+- VIVERSE SDK loaded (`globalThis.viverse` available)
+- Auth flow complete → `accessToken` obtained
+- `appId` known (same value used as `game_id` in `/env` and `/script`)
+
+1. Build multiplayer client: `playClient.newMultiplayerClient(roomId, appId, accessToken)` — use a stable pseudo-room ID (e.g. `"${appId}-lambda"`) if the app has no multiplayer gameplay.
+2. `await multiplayerClient.init()` before any invoke call.
+3. `await multiplayerClient.lambda.invoke(eventName, eventData, accessToken)` — `eventName` must match the `event_name` registered via `POST /script`.
+4. Fail closed when `status !== "succeeded"`.
+5. Parse `result` by event-specific schema (no global assumption).
 
 ## Failure Handling
 

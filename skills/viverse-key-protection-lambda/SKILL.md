@@ -83,16 +83,57 @@ Script requirements:
 
 ### 4) Invoke from client
 
-Use Play SDK:
+Lambda invoke goes through the VIVERSE Play SDK multiplayer client. The full setup chain is:
+
+**Step 4a — Authenticate first**
+
+Get a VIVERSE `accessToken` via the auth flow (see `viverse-auth` skill). Lambda invoke requires a valid token.
 
 ```ts
+// from viverse-auth skill — simplified
+const client = new globalThis.viverse.client();
+await client.login();
+const accessToken = client.getToken(); // or equivalent per SDK version
+```
+
+**Step 4b — Build the multiplayer client**
+
+`lambda.invoke()` is exposed on the multiplayer client. You need a `roomId` even if your app has no multiplayer gameplay — use a stable per-user or per-session room ID derived from your `appId` and user identity.
+
+```ts
+const appId = "YOUR_VIVERSE_APP_ID";  // same as game_id used in /env and /script
+const roomId = `${appId}-lambda`;      // stable pseudo-room for lambda-only usage
+const userSessionId = accessToken;     // pass the accessToken here
+
 const playClient = new globalThis.viverse.play();
 const multiplayerClient = await playClient.newMultiplayerClient(roomId, appId, userSessionId);
-await multiplayerClient.init();
-
-const res = await multiplayerClient.lambda.invoke(eventName, eventData, accessToken);
-if (res.status !== "succeeded") throw new Error(res.error || res.status);
+await multiplayerClient.init();        // must complete before invoke()
 ```
+
+**Step 4c — Invoke the lambda event**
+
+```ts
+const res = await multiplayerClient.lambda.invoke(
+  "places_search_event",   // must match event_name in POST /script
+  { query: "coffee" },     // becomes context.data inside the script
+  accessToken
+);
+
+if (res.status !== "succeeded") {
+  if (res.status === "unauthorized") { /* re-auth */ }
+  throw new Error(res.error || res.status);
+}
+// res.result schema is event-defined — never assume a universal shape
+console.log(res.result);
+```
+
+**Integration order summary:**
+1. Load VIVERSE SDK (`globalThis.viverse` available)
+2. Authenticate → get `accessToken`
+3. Create `playClient` → create `multiplayerClient(roomId, appId, accessToken)`
+4. `await multiplayerClient.init()`
+5. `await multiplayerClient.lambda.invoke(eventName, payload, accessToken)`
+6. Handle all non-`succeeded` statuses (see Verification Checklist)
 
 ### 5) Storage SDK usage
 
