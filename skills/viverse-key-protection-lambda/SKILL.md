@@ -9,6 +9,20 @@ tags: [viverse, lambda, storage, secrets, security, api-key]
 
 Use this skill when a browser app currently holds third-party API keys (for example Google/Gemini keys) and needs a safe architecture.
 
+## Required Credentials — What You Need and Where to Get Them
+
+Before starting integration, collect these three values. All are obtained from [VIVERSE Studio](https://studio.viverse.com/).
+
+| Credential | Used as | Where to get it |
+|------------|---------|-----------------|
+| **App ID** | `game_id` in `/env` and `/script` API calls; `appId` in client SDK | VIVERSE Studio → your app → **App ID** field. Same value as `VITE_VIVERSE_CLIENT_ID` in the project `.env` (set by the publish flow — see `viverse-world-publishing` skill). |
+| **Lambda Authkey** | `Authkey` request header for all admin API calls | VIVERSE Studio → your app → **Play Lambda** section → **Authkey**. This is a service credential scoped to your app — store it only in `.env.lambda.local` or CI secret manager, never in source. |
+| **VIVERSE access token** | Third argument to `lambda.invoke()` on the client | Obtained at runtime via the VIVERSE auth flow (see `viverse-auth` skill). This is the end-user's session token, not the Authkey. |
+
+> **App ID = game_id.** The same ID used in `VITE_VIVERSE_CLIENT_ID`, `viverse-cli app publish --app-id`, and `newMultiplayerClient(roomId, appId, ...)` is the `game_id` passed to every Lambda API endpoint.
+
+---
+
 ## When To Use This Skill
 
 Use this skill when a project needs:
