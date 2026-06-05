@@ -23,6 +23,10 @@
       "path": "skills/threejs-collision-patterns/skill.json"
     },
     {
+      "id": "threejs-racing-ai-driver",
+      "path": "skills/threejs-racing-ai-driver/skill.json"
+    },
+    {
       "id": "viverse-auth",
       "path": "skills/viverse-auth/skill.json"
     },

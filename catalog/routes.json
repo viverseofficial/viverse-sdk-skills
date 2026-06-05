@@ -17,6 +17,23 @@
     },
     {
       "intent": [
+        "racing",
+        "race car",
+        "cpu driver",
+        "waypoint",
+        "lap",
+        "vehicle ai",
+        "driving ai",
+        "track loop",
+        "recovery",
+        "hairpin"
+      ],
+      "skills": [
+        "threejs-racing-ai-driver"
+      ]
+    },
+    {
+      "intent": [
         "auth",
         "login",
         "sso",

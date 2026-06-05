@@ -1,0 +1,34 @@
+{
+  "id": "viverse-token-gateway",
+  "name": "viverse-token-gateway",
+  "version": "0.1.0",
+  "status": "active",
+  "description": "Integrate VIVERSE Token Gateway for AI chat capabilities in published apps. Covers auth header construction, non-streaming and streaming (SSE) patterns, rate-limit handling, and error recovery.",
+  "tags": [
+    "viverse",
+    "ai",
+    "token-gateway",
+    "chat",
+    "llm",
+    "openai",
+    "streaming",
+    "sse"
+  ],
+  "prerequisites": [
+    "viverse-auth (checkAuth → accessToken)",
+    "VIVERSE Studio App ID (X-App-Id)",
+    "App registered with Token Gateway in Studio"
+  ],
+  "entrypoint": "SKILL.md",
+  "rules": "rules.json",
+  "patterns_dir": "patterns",
+  "read_order": [
+    "SKILL.md",
+    "patterns/chat-request.md",
+    "patterns/streaming-chat.md"
+  ],
+  "dependencies": [
+    "skill:viverse-auth",
+    "bundle:resilience"
+  ]
+}

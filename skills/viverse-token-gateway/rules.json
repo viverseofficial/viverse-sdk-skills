@@ -1,0 +1,85 @@
+{
+    "rules": [
+        {
+            "id": "gateway-access-token-casing",
+            "profiles": ["token-gateway"],
+            "phases": ["integration", "gameplay", "fix"],
+            "type": "required_any",
+            "pattern": "['\"]AccessToken['\"]\\s*:|setRequestHeader\\s*\\(\\s*['\"]AccessToken['\"]",
+            "message": "Token Gateway requests MUST use 'AccessToken' (exact casing). 'accesstoken' (lowercase) is blocked by production CORS preflight.",
+            "severity": "high"
+        },
+        {
+            "id": "gateway-no-lowercase-accesstoken",
+            "profiles": ["token-gateway"],
+            "phases": ["integration", "gameplay", "fix"],
+            "type": "forbidden_any",
+            "pattern": "['\"]accesstoken['\"]\\s*:|setRequestHeader\\s*\\(\\s*['\"]accesstoken['\"]",
+            "message": "Forbidden header 'accesstoken' (lowercase) detected. Use 'AccessToken' (capital A, capital T).",
+            "severity": "high"
+        },
+        {
+            "id": "gateway-x-app-id-header",
+            "profiles": ["token-gateway"],
+            "phases": ["integration", "gameplay", "fix"],
+            "type": "required_any",
+            "pattern": "['\"]X-App-Id['\"]\\s*:",
+            "message": "Token Gateway requests MUST include 'X-App-Id' header for OR key resolution and rate limiting.",
+            "severity": "high"
+        },
+        {
+            "id": "gateway-no-direct-openrouter",
+            "profiles": ["token-gateway"],
+            "phases": ["integration", "gameplay", "fix"],
+            "type": "forbidden_any",
+            "pattern": "openrouter\\.ai|sk-or-v1-",
+            "message": "MUST NOT call OpenRouter directly from browser code. Route through Token Gateway instead.",
+            "severity": "high"
+        },
+        {
+            "id": "gateway-429-retry-after",
+            "profiles": ["token-gateway"],
+            "phases": ["integration", "gameplay", "fix"],
+            "type": "required_any",
+            "pattern": "Retry-After|retryAfter|retry_after",
+            "message": "Rate limit (429) handler MUST read 'Retry-After' header before retrying.",
+            "severity": "medium"
+        },
+        {
+            "id": "gateway-401-reauth",
+            "profiles": ["token-gateway"],
+            "phases": ["integration", "gameplay", "fix"],
+            "type": "required_any",
+            "pattern": "401|GatewayAuthError|checkAuth\\s*\\(",
+            "message": "MUST handle 401 responses by re-running checkAuth() and retrying once.",
+            "severity": "medium"
+        },
+        {
+            "id": "gateway-version-constant",
+            "profiles": ["token-gateway"],
+            "phases": ["integration", "fix"],
+            "type": "required_any",
+            "pattern": "VERSION_NAME\\s*=",
+            "message": "MANDATORY: Token Gateway integration code must include a VERSION_NAME constant logged on startup.",
+            "severity": "medium"
+        },
+        {
+            "id": "gateway-no-hardcoded-token",
+            "profiles": ["token-gateway"],
+            "phases": ["integration", "gameplay", "fix"],
+            "type": "forbidden_any",
+            "pattern": "AccessToken\\s*:\\s*['\"][A-Za-z0-9._\\-]{20,}['\"]",
+            "message": "MUST NOT hardcode AccessToken value. Obtain dynamically via checkAuth().",
+            "severity": "high"
+        },
+        {
+            "id": "gateway-streaming-morph-not-direct",
+            "profiles": ["token-gateway"],
+            "phases": ["integration", "gameplay", "fix"],
+            "type": "forbidden_any",
+            "pattern": "token-gateway\\.viverse\\.com/v1/chat/stream",
+            "message": "Published apps MUST use Viverse Morph relay for streaming, not Token Gateway /v1/chat/stream directly.",
+            "severity": "medium"
+        }
+    ]
+}

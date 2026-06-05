@@ -303,6 +303,28 @@ function App() {
 - **Token expiry**: `expires_in` is in seconds. Refresh the session before it expires for long-running experiences.
 - **Flat namespace**: Some SDK versions don't have a `client` constructor — the namespace itself has methods directly. Handle both cases.
 - **checkAuth ≠ profile**: `checkAuth()` only returns auth tokens, NOT user profile data. Use the full fallback chain, not `checkAuth()` fields alone.
+- **Empty `clientId` causes silent `checkAuth` timeout**: Passing an empty string to `new sdk.client({ clientId: '', ... })` does NOT throw — it silently times out with `"Timeout waiting for parent message"`. This happens whenever `VIVERSE_APP_ID` is unset (e.g. no `?appId=` param, no localStorage entry, no hostname fallback). Always verify the App ID is resolved before constructing the client. For Worlds iframe apps the hostname regex `([a-z0-9]+)(?:-preview)?\.world\.viverse\.app` reliably extracts the App ID without any query param:
+  ```javascript
+  const _hostnameAppId = (() => {
+    const m = location.hostname.match(/^([a-z0-9]+)(?:-preview)?\.world\.viverse\.app$/);
+    return m ? m[1] : null;
+  })();
+  const appId = new URLSearchParams(location.search).get('appId')
+    || localStorage.getItem('my_app_id')
+    || _hostnameAppId
+    || '';
+  // Guard before constructing client:
+  if (!appId) { console.warn('[Auth] App ID not resolved — skipping checkAuth'); return null; }
+  ```
+- **Call `_initViverseAuth()` eagerly on page load, not lazily on first user action**: If auth is only triggered when the user first clicks an AI/social feature, there is a noticeable cold-start delay (1200ms handshake + `checkAuth` + profile fetch). Call auth bootstrap proactively on `DOMContentLoaded` or during app init — results are cached and reused. Only skip eager init for `dev` environments that use a direct bearer token instead of SSO:
+  ```javascript
+  // main.js / app entry point
+  if (GATEWAY_ENV !== 'dev') {
+    initViverseAuth().then(auth => {
+      if (auth) showToast(`✓ 已登入 · ${auth.displayName}`);
+    }).catch(() => {});
+  }
+  ```
 - **Iframe Auth Hang (`checkAuth:ack`)**: If the application hangs on VIVERSE Studio or logs `unhandled methods: VIVERSE_SDK/checkAuth:ack`, it is almost always caused by an **App ID mismatch**. The VIVERSE parent iframe security model prevents the auth handshake if `clientId` (from your `.env` file) does not exactly match the App ID the iframe was launched with. Double check copied `.env` files.
 - **Placeholder App ID trap**: If `.env` still has `VITE_VIVERSE_CLIENT_ID=YOUR_APP_ID`, auth may silently fall back to guest mode in preview even when publish uses correct `--app-id`. Build/runtime must resolve a real app id (env or iframe hostname fallback).
 - **TypeError: Cannot read properties of null (reading 'accountId')**: This occurs when `getProfile()` returns null (often due to App ID mismatch or invalid token) and the code tries to access `profile.accountId` without a check. **Safety Fix**: Always use optional chaining `profile?.accountId` or a null-guard `if (profile)`.
