@@ -22,7 +22,7 @@ Operational guide for AI agents running pls-cli to upload or replace 3D models o
 ### Check if already installed
 
 ```bash
-which pls-cli || ls ~/bin/pls-cli 2>/dev/null || ls /usr/local/bin/pls-cli 2>/dev/null
+which cli || ls ~/bin/cli 2>/dev/null || ls /usr/local/bin/cli 2>/dev/null
 ```
 
 If found, skip this section.
@@ -46,8 +46,8 @@ BINARY="pls-cli-${OS}-${ARCH}"
 URL="https://github.com/ViveportSoftware/pls-cli/releases/download/${VERSION}/${BINARY}"
 
 mkdir -p ~/bin
-curl -fsSL "$URL" -o ~/bin/pls-cli
-chmod +x ~/bin/pls-cli
+curl -fsSL "$URL" -o ~/bin/cli
+chmod +x ~/bin/cli
 ```
 
 > **Windows**: Download `pls-cli-windows-amd64.exe` from the releases page and add it to your PATH.
@@ -86,7 +86,7 @@ If `.env` doesn't exist, ask the user to set the variables in their terminal bef
 ### Check if binary exists
 
 ```bash
-ls bin/pls-cli
+ls bin/cli
 ```
 
 If it doesn't exist, build first (see Section 1).
@@ -97,14 +97,14 @@ If it doesn't exist, build first (see Section 1).
 
 ```bash
 # Standard dev build (no client ID or version burned in — use for local testing only)
-go build -o bin/pls-cli ./cmd/pls-cli
+go build -o bin/cli ./cmd/pls-cli
 
 # Production build (client ID + version required for real auth against VIVERSE API)
 source .env  # PLS_CLI_CLIENT_ID from .env (see .env.example)
 VERSION=$(git describe --tags --abbrev=0)
 LDFLAG="-X dev.azure.com/viveportengineering/POC/pls-cli/internal/auth.DefaultClientID=${PLS_CLI_CLIENT_ID} -X main.version=${VERSION}"
 mkdir -p bin
-go build -ldflags "${LDFLAG}" -o bin/pls-cli ./cmd/pls-cli
+go build -ldflags "${LDFLAG}" -o bin/cli ./cmd/pls-cli
 ```
 
 **Rule**: Always output to `bin/`. Never write binaries to the project root or any other directory.
@@ -122,12 +122,12 @@ There is **no token env var** — you must log in first with `pls-cli login`.
 
 ```bash
 # Stage
-bin/pls-cli login --stage \
+pls-cli login --stage \
   --email="$PLS_CLI_TEST_EMAIL" \
   --password="$PLS_CLI_TEST_PASSWORD"
 
 # Production
-bin/pls-cli login \
+pls-cli login \
   --email="$PLS_CLI_TEST_EMAIL" \
   --password="$PLS_CLI_TEST_PASSWORD"
 ```
@@ -135,7 +135,7 @@ bin/pls-cli login \
 ### Verify login succeeded
 
 ```bash
-bin/pls-cli status
+pls-cli status
 # Outputs: email, account ID, environment (stage/prod), token expiry
 ```
 
@@ -156,16 +156,16 @@ You do not need to manually check the environment — the CLI enforces it.
 
 ```bash
 # Minimal — --group is OPTIONAL (CLI auto-selects your first group if omitted)
-bin/pls-cli upload model.zip
+pls-cli upload model.zip
 
 # With explicit group
-bin/pls-cli upload model.zip --group=<group-uuid>
+pls-cli upload model.zip --group=<group-uuid>
 
 # Stage environment
-bin/pls-cli upload model.zip --group=<group-uuid> --stage
+pls-cli upload model.zip --group=<group-uuid> --stage
 
 # With conversion options
-bin/pls-cli upload model.glb \
+pls-cli upload model.glb \
   --group=<group-uuid> \
   --stage \
   --ai-enhance \
@@ -174,10 +174,10 @@ bin/pls-cli upload model.glb \
   --collider-scale=5
 
 # Multi-file (max 10 files)
-bin/pls-cli upload file1.zip file2.glb file3.obj --group=<group-uuid>
+pls-cli upload file1.zip file2.glb file3.obj --group=<group-uuid>
 
 # Machine-readable output (for agent parsing — recommended)
-bin/pls-cli upload model.zip --json
+pls-cli upload model.zip --json
 ```
 
 ### Upload flags reference
@@ -200,13 +200,13 @@ bin/pls-cli upload model.zip --json
 
 ```bash
 # Replace existing asset by ID
-bin/pls-cli replace <old-asset-id> new-model.zip
+pls-cli replace <old-asset-id> new-model.zip
 
 # Stage
-bin/pls-cli replace <old-asset-id> new-model.glb --stage
+pls-cli replace <old-asset-id> new-model.glb --stage
 
 # With collider + machine-readable output
-bin/pls-cli replace <old-asset-id> new-model.obj --collider --collider-scale=10 --json
+pls-cli replace <old-asset-id> new-model.obj --collider --collider-scale=10 --json
 ```
 
 Replace shares the same flags as upload except `--group` (originId is provided instead). This includes `--tags` — pass comma-separated tag names to auto-create and assign tags after conversion.
@@ -221,39 +221,39 @@ Tags are labels you can attach to assets. You can create them, list them, and as
 
 ```bash
 # Create a tag in a group
-bin/pls-cli tag create --group=<group-uuid> "my-tag"
+pls-cli tag create --group=<group-uuid> "my-tag"
 
 # Stage environment
-bin/pls-cli tag create --group=<group-uuid> --stage "my-tag"
+pls-cli tag create --group=<group-uuid> --stage "my-tag"
 
 # Machine-readable output
-bin/pls-cli tag create --group=<group-uuid> --json "my-tag"
+pls-cli tag create --group=<group-uuid> --json "my-tag"
 ```
 
 ### tag list
 
 ```bash
 # List all tags in a group
-bin/pls-cli tag list --group=<group-uuid>
+pls-cli tag list --group=<group-uuid>
 
 # Stage environment
-bin/pls-cli tag list --group=<group-uuid> --stage
+pls-cli tag list --group=<group-uuid> --stage
 
 # Machine-readable output
-bin/pls-cli tag list --group=<group-uuid> --json
+pls-cli tag list --group=<group-uuid> --json
 ```
 
 ### tag assign
 
 ```bash
 # Assign one or more tags to an asset (positional args are tag UUIDs)
-bin/pls-cli tag assign --asset=<asset-uuid> <tag-uuid-1> <tag-uuid-2>
+pls-cli tag assign --asset=<asset-uuid> <tag-uuid-1> <tag-uuid-2>
 
 # Stage environment
-bin/pls-cli tag assign --asset=<asset-uuid> --stage <tag-uuid-1>
+pls-cli tag assign --asset=<asset-uuid> --stage <tag-uuid-1>
 
 # Machine-readable output
-bin/pls-cli tag assign --asset=<asset-uuid> --json <tag-uuid-1> <tag-uuid-2>
+pls-cli tag assign --asset=<asset-uuid> --json <tag-uuid-1> <tag-uuid-2>
 ```
 
 ### Tag flags reference
@@ -276,13 +276,13 @@ Pass `--tags` to auto-create any missing tags and assign them to the asset after
 
 ```bash
 # Upload with tags (auto-creates "foo" and "bar" if they don't exist)
-bin/pls-cli upload model.glb --group=<group-uuid> --tags=foo,bar
+pls-cli upload model.glb --group=<group-uuid> --tags=foo,bar
 
 # Replace with tags
-bin/pls-cli replace <old-asset-id> new-model.glb --tags=foo,bar
+pls-cli replace <old-asset-id> new-model.glb --tags=foo,bar
 
 # Combine with --json for machine-readable output
-bin/pls-cli upload model.glb --group=<group-uuid> --tags=foo,bar --json
+pls-cli upload model.glb --group=<group-uuid> --tags=foo,bar --json
 ```
 
 `--tags` accepts a comma-separated list of tag **names**. The CLI:
@@ -390,7 +390,7 @@ When `--tags` is used, the upload JSON output includes a `"tags"` field:
 
 ```bash
 # Check if upload succeeded
-result=$(bin/pls-cli upload model.zip --json 2>/dev/null)
+result=$(pls-cli upload model.zip --json 2>/dev/null)
 status=$(echo "$result" | python3 -c "import sys,json; print(json.load(sys.stdin)['files'][0]['status'])")
 asset_id=$(echo "$result" | python3 -c "import sys,json; print(json.load(sys.stdin)['files'][0]['assetId'])")
 ```
@@ -447,7 +447,7 @@ Tests auto-skip when `PLS_CLI_TEST_EMAIL` / `PLS_CLI_TEST_PASSWORD` are unset.
 
 | Symptom                                              | Cause                                          | Fix                                               |
 | ---------------------------------------------------- | ---------------------------------------------- | ------------------------------------------------- |
-| `401 Unauthorized`                                   | Expired token or missing cookie                | Re-run `bin/pls-cli login`                        |
+| `401 Unauthorized`                                   | Expired token or missing cookie                | Re-run `pls-cli login`                            |
 | `credentials are for prod, but --stage was provided` | Env mismatch at login vs upload                | Re-login with the matching `--stage` flag         |
 | Error code 11                                        | Wrong password or malformed auth ticket        | Check credentials                                 |
 | Error code 1105                                      | Binary built without correct client ID ldflags | Rebuild with `CLIENT_ID` ldflags (see Section 1)  |
