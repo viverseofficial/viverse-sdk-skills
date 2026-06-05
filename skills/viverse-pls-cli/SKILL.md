@@ -13,6 +13,7 @@ Operational guide for AI agents running pls-cli to upload or replace 3D models o
 - User wants to replace an existing asset by asset ID
 - Running smoke tests or integration tests against stage API
 - Debugging upload/conversion failures
+- Building or cross-compiling the pls-cli binary
 
 ---
 
@@ -82,9 +83,37 @@ source .env   # loads PLS_CLI_TEST_EMAIL, PLS_CLI_TEST_PASSWORD, PLS_CLI_TEST_GR
 
 If `.env` doesn't exist, ask the user to set the variables in their terminal before proceeding.
 
+### Check if binary exists
+
+```bash
+ls bin/pls-cli
+```
+
+If it doesn't exist, build first (see Section 1).
+
 ---
 
-## 2. Authentication
+## 2. Build from Source (optional)
+
+```bash
+# Standard dev build (no client ID or version burned in — use for local testing only)
+go build -o bin/pls-cli ./cmd/pls-cli
+
+# Production build (client ID + version required for real auth against VIVERSE API)
+source .env  # PLS_CLI_CLIENT_ID from .env (see .env.example)
+VERSION=$(git describe --tags --abbrev=0)
+LDFLAG="-X dev.azure.com/viveportengineering/POC/pls-cli/internal/auth.DefaultClientID=${PLS_CLI_CLIENT_ID} -X main.version=${VERSION}"
+mkdir -p bin
+go build -ldflags "${LDFLAG}" -o bin/pls-cli ./cmd/pls-cli
+```
+
+**Rule**: Always output to `bin/`. Never write binaries to the project root or any other directory.
+
+**Note**: A dev build (no ldflags) will fail at `login` with "missing client ID" — this is expected. Use the production build for any real API interaction.
+
+---
+
+## 3. Authentication
 
 The CLI uses cookie-based auth stored in `~/.pls-cli/credentials.json`.
 There is **no token env var** — you must log in first with `pls-cli login`.
@@ -93,12 +122,12 @@ There is **no token env var** — you must log in first with `pls-cli login`.
 
 ```bash
 # Stage
-pls-cli login --stage \
+bin/pls-cli login --stage \
   --email="$PLS_CLI_TEST_EMAIL" \
   --password="$PLS_CLI_TEST_PASSWORD"
 
 # Production
-pls-cli login \
+bin/pls-cli login \
   --email="$PLS_CLI_TEST_EMAIL" \
   --password="$PLS_CLI_TEST_PASSWORD"
 ```
@@ -106,7 +135,7 @@ pls-cli login \
 ### Verify login succeeded
 
 ```bash
-pls-cli status
+bin/pls-cli status
 # Outputs: email, account ID, environment (stage/prod), token expiry
 ```
 
@@ -123,20 +152,20 @@ You do not need to manually check the environment — the CLI enforces it.
 
 ---
 
-## 3. Upload
+## 4. Upload
 
 ```bash
 # Minimal — --group is OPTIONAL (CLI auto-selects your first group if omitted)
-pls-cli upload model.zip
+bin/pls-cli upload model.zip
 
 # With explicit group
-pls-cli upload model.zip --group=<group-uuid>
+bin/pls-cli upload model.zip --group=<group-uuid>
 
 # Stage environment
-pls-cli upload model.zip --group=<group-uuid> --stage
+bin/pls-cli upload model.zip --group=<group-uuid> --stage
 
 # With conversion options
-pls-cli upload model.glb \
+bin/pls-cli upload model.glb \
   --group=<group-uuid> \
   --stage \
   --ai-enhance \
@@ -145,10 +174,10 @@ pls-cli upload model.glb \
   --collider-scale=5
 
 # Multi-file (max 10 files)
-pls-cli upload file1.zip file2.glb file3.obj --group=<group-uuid>
+bin/pls-cli upload file1.zip file2.glb file3.obj --group=<group-uuid>
 
 # Machine-readable output (for agent parsing — recommended)
-pls-cli upload model.zip --json
+bin/pls-cli upload model.zip --json
 ```
 
 ### Upload flags reference
@@ -163,27 +192,108 @@ pls-cli upload model.zip --json
 | `--collider-scale` | 0.3/2/5/10/100                  | 2.0           | -                                                 |
 | `--secure`         | bool                            | false         | Encryption                                        |
 | `--json`           | bool                            | false         | Write JSON to stdout; human messages go to stderr |
+| `--tags`           | comma-separated names           | -             | Auto-create missing tags and assign after upload  |
 
 ---
 
-## 4. Replace
+## 5. Replace
 
 ```bash
 # Replace existing asset by ID
-pls-cli replace <old-asset-id> new-model.zip
+bin/pls-cli replace <old-asset-id> new-model.zip
 
 # Stage
-pls-cli replace <old-asset-id> new-model.glb --stage
+bin/pls-cli replace <old-asset-id> new-model.glb --stage
 
 # With collider + machine-readable output
-pls-cli replace <old-asset-id> new-model.obj --collider --collider-scale=10 --json
+bin/pls-cli replace <old-asset-id> new-model.obj --collider --collider-scale=10 --json
 ```
 
-Replace shares the same flags as upload except `--group` (originId is provided instead).
+Replace shares the same flags as upload except `--group` (originId is provided instead). This includes `--tags` — pass comma-separated tag names to auto-create and assign tags after conversion.
 
 ---
 
-## 5. Machine-Readable Output (--json)
+## 6. Tag Management
+
+Tags are labels you can attach to assets. You can create them, list them, and assign them to assets after upload.
+
+### tag create
+
+```bash
+# Create a tag in a group
+bin/pls-cli tag create --group=<group-uuid> "my-tag"
+
+# Stage environment
+bin/pls-cli tag create --group=<group-uuid> --stage "my-tag"
+
+# Machine-readable output
+bin/pls-cli tag create --group=<group-uuid> --json "my-tag"
+```
+
+### tag list
+
+```bash
+# List all tags in a group
+bin/pls-cli tag list --group=<group-uuid>
+
+# Stage environment
+bin/pls-cli tag list --group=<group-uuid> --stage
+
+# Machine-readable output
+bin/pls-cli tag list --group=<group-uuid> --json
+```
+
+### tag assign
+
+```bash
+# Assign one or more tags to an asset (positional args are tag UUIDs)
+bin/pls-cli tag assign --asset=<asset-uuid> <tag-uuid-1> <tag-uuid-2>
+
+# Stage environment
+bin/pls-cli tag assign --asset=<asset-uuid> --stage <tag-uuid-1>
+
+# Machine-readable output
+bin/pls-cli tag assign --asset=<asset-uuid> --json <tag-uuid-1> <tag-uuid-2>
+```
+
+### Tag flags reference
+
+| Command      | Flag      | Values | Notes                                             |
+| ------------ | --------- | ------ | ------------------------------------------------- |
+| `tag create` | `--group` | UUID   | Required — group to create the tag in             |
+| `tag create` | `--stage` | bool   | Use staging environment                           |
+| `tag create` | `--json`  | bool   | Write JSON to stdout; human messages go to stderr |
+| `tag list`   | `--group` | UUID   | Required — group to list tags from                |
+| `tag list`   | `--stage` | bool   | Use staging environment                           |
+| `tag list`   | `--json`  | bool   | Write JSON to stdout; human messages go to stderr |
+| `tag assign` | `--asset` | UUID   | Required — asset to assign tags to                |
+| `tag assign` | `--stage` | bool   | Use staging environment                           |
+| `tag assign` | `--json`  | bool   | Write JSON to stdout; human messages go to stderr |
+
+### --tags flag on upload and replace
+
+Pass `--tags` to auto-create any missing tags and assign them to the asset after conversion:
+
+```bash
+# Upload with tags (auto-creates "foo" and "bar" if they don't exist)
+bin/pls-cli upload model.glb --group=<group-uuid> --tags=foo,bar
+
+# Replace with tags
+bin/pls-cli replace <old-asset-id> new-model.glb --tags=foo,bar
+
+# Combine with --json for machine-readable output
+bin/pls-cli upload model.glb --group=<group-uuid> --tags=foo,bar --json
+```
+
+`--tags` accepts a comma-separated list of tag **names**. The CLI:
+
+1. Lists existing tags for the group
+2. Creates any tags that don't already exist
+3. Assigns all resolved tag UUIDs to the asset after conversion completes
+
+---
+
+## 7. Machine-Readable Output (--json)
 
 Always pass `--json` when the result needs to be parsed programmatically.
 
@@ -201,6 +311,49 @@ Always pass `--json` when the result needs to be parsed programmatically.
     }
   ]
 }
+```
+
+### Upload JSON output (with --tags)
+
+When `--tags` is used, the upload JSON output includes a `"tags"` field:
+
+```json
+{
+  "files": [
+    {
+      "file": "model.zip",
+      "assetId": "abc-123-uuid",
+      "status": "ready"
+    }
+  ],
+  "tags": [
+    { "uuid": "tag-uuid-1", "name": "foo" },
+    { "uuid": "tag-uuid-2", "name": "bar" }
+  ]
+}
+```
+
+### tag create JSON output
+
+```json
+{ "uuid": "tag-uuid-1", "name": "my-tag" }
+```
+
+### tag list JSON output
+
+```json
+{
+  "tags": [
+    { "uuid": "tag-uuid-1", "name": "foo" },
+    { "uuid": "tag-uuid-2", "name": "bar" }
+  ]
+}
+```
+
+### tag assign JSON output
+
+```json
+{ "assetId": "asset-uuid", "tagUuids": ["tag-uuid-1", "tag-uuid-2"] }
 ```
 
 ### Replace JSON output
@@ -237,14 +390,14 @@ Always pass `--json` when the result needs to be parsed programmatically.
 
 ```bash
 # Check if upload succeeded
-result=$(pls-cli upload model.zip --json 2>/dev/null)
+result=$(bin/pls-cli upload model.zip --json 2>/dev/null)
 status=$(echo "$result" | python3 -c "import sys,json; print(json.load(sys.stdin)['files'][0]['status'])")
 asset_id=$(echo "$result" | python3 -c "import sys,json; print(json.load(sys.stdin)['files'][0]['assetId'])")
 ```
 
 ---
 
-## 6. What the CLI Does Internally
+## 8. What the CLI Does Internally
 
 Understanding this helps debug failures:
 
@@ -255,13 +408,14 @@ Understanding this helps debug failures:
 4. POST /management/asset/:id/convert
 5. WebSocket wss://{domain}/management/user/ws  →  stream conversion progress
 6. Exit 0 on "ready", exit 1 on "failed"
+6.5. (optional) If --tags provided: resolve tag names → create missing tags → PUT /management/asset/:id/tags
 ```
 
 Replace uses `PUT /management/asset/:originId` instead of POST at step 2.
 
 ---
 
-## 7. Supported File Formats
+## 9. Supported File Formats
 
 | Format | Notes                         |
 | ------ | ----------------------------- |
@@ -274,19 +428,37 @@ Max file size: 500 MB per file (FREE tier limit from API).
 
 ---
 
-## 8. Common Failures and Fixes
+## 10. Running Tests
 
-| Symptom                                              | Cause                                          | Fix                                               |
-| ---------------------------------------------------- | ---------------------------------------------- | ------------------------------------------------- |
-| `401 Unauthorized`                                   | Expired token or missing cookie                | Re-run `pls-cli login`                            |
-| `credentials are for prod, but --stage was provided` | Env mismatch at login vs upload                | Re-login with the matching `--stage` flag         |
-| Error code 11                                        | Wrong password or malformed auth ticket        | Check credentials                                 |
-| Error code 1108                                      | Scope not allowed                              | Don't pass extra `--scopes`                       |
-| Conversion `status: "failed"`                        | Model file corrupted or unsupported            | Check `failedType` and `errorCode` in JSON output |
+```bash
+# Unit + integration tests (race detection)
+go test -race ./...
+
+# Stage E2E tests (requires credentials)
+source .env
+go test -v -timeout 300s -run '^TestStage' ./cmd/pls-cli/
+```
+
+Tests auto-skip when `PLS_CLI_TEST_EMAIL` / `PLS_CLI_TEST_PASSWORD` are unset.
 
 ---
 
-## 9. Environments
+## 11. Common Failures and Fixes
+
+| Symptom                                              | Cause                                          | Fix                                               |
+| ---------------------------------------------------- | ---------------------------------------------- | ------------------------------------------------- |
+| `401 Unauthorized`                                   | Expired token or missing cookie                | Re-run `bin/pls-cli login`                        |
+| `credentials are for prod, but --stage was provided` | Env mismatch at login vs upload                | Re-login with the matching `--stage` flag         |
+| Error code 11                                        | Wrong password or malformed auth ticket        | Check credentials                                 |
+| Error code 1105                                      | Binary built without correct client ID ldflags | Rebuild with `CLIENT_ID` ldflags (see Section 1)  |
+| Error code 1108                                      | Scope not allowed                              | Don't pass extra `--scopes`                       |
+| Conversion `status: "failed"`                        | Model file corrupted or unsupported            | Check `failedType` and `errorCode` in JSON output |
+| Binary not found                                     | `bin/` missing                                 | Run build step first                              |
+| Dev build fails at login                             | No client ID burned in                         | Rebuild with ldflags (see Section 1)              |
+
+---
+
+## 12. Environments
 
 | Env        | API base                           | WS base                          | Login flag |
 | ---------- | ---------------------------------- | -------------------------------- | ---------- |
