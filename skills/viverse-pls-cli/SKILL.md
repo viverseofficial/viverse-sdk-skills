@@ -13,7 +13,6 @@ Operational guide for AI agents running pls-cli to upload or replace 3D models o
 - User wants to replace an existing asset by asset ID
 - Running smoke tests or integration tests against stage API
 - Debugging upload/conversion failures
-- Building or cross-compiling the pls-cli binary
 
 ---
 
@@ -83,37 +82,9 @@ source .env   # loads PLS_CLI_TEST_EMAIL, PLS_CLI_TEST_PASSWORD, PLS_CLI_TEST_GR
 
 If `.env` doesn't exist, ask the user to set the variables in their terminal before proceeding.
 
-### Check if binary exists
-
-```bash
-ls bin/pls-cli
-```
-
-If it doesn't exist, build first (see Section 1).
-
 ---
 
-## 2. Build from Source (optional)
-
-```bash
-# Standard dev build (no client ID or version burned in — use for local testing only)
-go build -o bin/pls-cli ./cmd/pls-cli
-
-# Production build (client ID + version required for real auth against VIVERSE API)
-source .env  # PLS_CLI_CLIENT_ID from .env (see .env.example)
-VERSION=$(git describe --tags --abbrev=0)
-LDFLAG="-X dev.azure.com/viveportengineering/POC/pls-cli/internal/auth.DefaultClientID=${PLS_CLI_CLIENT_ID} -X main.version=${VERSION}"
-mkdir -p bin
-go build -ldflags "${LDFLAG}" -o bin/pls-cli ./cmd/pls-cli
-```
-
-**Rule**: Always output to `bin/`. Never write binaries to the project root or any other directory.
-
-**Note**: A dev build (no ldflags) will fail at `login` with "missing client ID" — this is expected. Use the production build for any real API interaction.
-
----
-
-## 3. Authentication
+## 2. Authentication
 
 The CLI uses cookie-based auth stored in `~/.pls-cli/credentials.json`.
 There is **no token env var** — you must log in first with `pls-cli login`.
@@ -152,7 +123,7 @@ You do not need to manually check the environment — the CLI enforces it.
 
 ---
 
-## 4. Upload
+## 3. Upload
 
 ```bash
 # Minimal — --group is OPTIONAL (CLI auto-selects your first group if omitted)
@@ -196,7 +167,7 @@ pls-cli upload model.zip --json
 
 ---
 
-## 5. Replace
+## 4. Replace
 
 ```bash
 # Replace existing asset by ID
@@ -213,7 +184,7 @@ Replace shares the same flags as upload except `--group` (originId is provided i
 
 ---
 
-## 6. Tag Management
+## 5. Tag Management
 
 Tags are labels you can attach to assets. You can create them, list them, and assign them to assets after upload.
 
@@ -293,7 +264,7 @@ pls-cli upload model.glb --group=<group-uuid> --tags=foo,bar --json
 
 ---
 
-## 7. Machine-Readable Output (--json)
+## 6. Machine-Readable Output (--json)
 
 Always pass `--json` when the result needs to be parsed programmatically.
 
@@ -397,7 +368,7 @@ asset_id=$(echo "$result" | python3 -c "import sys,json; print(json.load(sys.std
 
 ---
 
-## 8. What the CLI Does Internally
+## 7. What the CLI Does Internally
 
 Understanding this helps debug failures:
 
@@ -415,7 +386,7 @@ Replace uses `PUT /management/asset/:originId` instead of POST at step 2.
 
 ---
 
-## 9. Supported File Formats
+## 8. Supported File Formats
 
 | Format | Notes                         |
 | ------ | ----------------------------- |
@@ -428,7 +399,7 @@ Max file size: 500 MB per file (FREE tier limit from API).
 
 ---
 
-## 10. Running Tests
+## 9. Running Tests
 
 ```bash
 # Unit + integration tests (race detection)
@@ -443,22 +414,22 @@ Tests auto-skip when `PLS_CLI_TEST_EMAIL` / `PLS_CLI_TEST_PASSWORD` are unset.
 
 ---
 
-## 11. Common Failures and Fixes
+## 10. Common Failures and Fixes
 
-| Symptom                                              | Cause                                          | Fix                                               |
-| ---------------------------------------------------- | ---------------------------------------------- | ------------------------------------------------- |
-| `401 Unauthorized`                                   | Expired token or missing cookie                | Re-run `pls-cli login`                            |
-| `credentials are for prod, but --stage was provided` | Env mismatch at login vs upload                | Re-login with the matching `--stage` flag         |
-| Error code 11                                        | Wrong password or malformed auth ticket        | Check credentials                                 |
-| Error code 1105                                      | Binary built without correct client ID ldflags | Rebuild with `CLIENT_ID` ldflags (see Section 1)  |
-| Error code 1108                                      | Scope not allowed                              | Don't pass extra `--scopes`                       |
-| Conversion `status: "failed"`                        | Model file corrupted or unsupported            | Check `failedType` and `errorCode` in JSON output |
-| Binary not found                                     | `bin/` missing                                 | Run build step first                              |
-| Dev build fails at login                             | No client ID burned in                         | Rebuild with ldflags (see Section 1)              |
+| Symptom                                              | Cause                                          | Fix                                                                      |
+| ---------------------------------------------------- | ---------------------------------------------- | ------------------------------------------------------------------------ |
+| `401 Unauthorized`                                   | Expired token or missing cookie                | Re-run `pls-cli login`                                                   |
+| `credentials are for prod, but --stage was provided` | Env mismatch at login vs upload                | Re-login with the matching `--stage` flag                                |
+| Error code 11                                        | Wrong password or malformed auth ticket        | Check credentials                                                        |
+| Error code 1105                                      | Binary built without correct client ID ldflags | Install the official release binary from GitHub Releases (see Section 0) |
+| Error code 1108                                      | Scope not allowed                              | Don't pass extra `--scopes`                                              |
+| Conversion `status: "failed"`                        | Model file corrupted or unsupported            | Check `failedType` and `errorCode` in JSON output                        |
+| Binary not found                                     | pls-cli not installed                          | Install from GitHub Releases (see Section 0)                             |
+| Dev build fails at login                             | No client ID burned in                         | Install the official release binary from GitHub Releases (see Section 0) |
 
 ---
 
-## 12. Environments
+## 11. Environments
 
 | Env        | API base                           | WS base                          | Login flag |
 | ---------- | ---------------------------------- | -------------------------------- | ---------- |
