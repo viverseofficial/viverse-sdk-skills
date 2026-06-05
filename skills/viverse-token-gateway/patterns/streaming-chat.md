@@ -28,8 +28,9 @@ App ──► SG (auth) ──► Viverse Morph ──► Token Gateway ──�
 // token-gateway-stream.js
 const VERSION_NAME = 'token-gateway-stream@1.0.0';
 
-const MORPH_STREAM_URL = import.meta.env.VITE_MORPH_STREAM_URL
-  || 'https://morph.viverse.com/api/chat/stream';
+const STREAM_URL = import.meta.env.VITE_TOKEN_GATEWAY_URL
+    ? `${import.meta.env.VITE_TOKEN_GATEWAY_URL}/v1/chat/stream`
+    : 'https://token-gateway.viverse.com/v1/chat/stream';
 const APP_ID = import.meta.env.VITE_VIVERSE_CLIENT_ID;
 
 export class TokenGatewayStreamService {
@@ -58,7 +59,7 @@ export class TokenGatewayStreamService {
     const body = { messages, temperature, max_tokens, stream: true };
     if (model) body.model = model;
 
-    const response = await fetch(MORPH_STREAM_URL, {
+    const response = await fetch(STREAM_URL, {
       method: 'POST',
       headers: {
         'AccessToken': accessToken,     // exact casing
@@ -161,7 +162,6 @@ export function useStreamingChat({ auth }) {
       getAccessToken: () => auth?.access_token,
     });
   }
-
   const send = useCallback(async (messages, options = {}) => {
     abortRef.current?.abort();
     const controller = new AbortController();

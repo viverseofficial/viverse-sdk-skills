@@ -67,7 +67,7 @@ These are release blockers for any token-gateway integration task:
 6. **MUST** handle `401 Unauthorized` by re-running the auth flow (`checkAuth()`) before retrying once. Do not retry 401 more than once.
 7. **MUST** handle `403 Forbidden` as a non-retryable app registration error — surface to developer, not end user.
 8. **MUST** handle `503 Service Unavailable` (provider key resolution failed) gracefully in UI.
-9. **MUST** use the Viverse Morph SSE relay endpoint for streaming responses — Token Gateway `/v1/chat/stream` is for internal use; client apps reach streaming via Morph.
+9. **MUST** use `POST /v1/chat/stream` (via SG) for streaming — send the same `AccessToken` + `X-App-Id` headers as non-streaming.
 10. **MUST** include a `VERSION_NAME` constant in generated gateway integration code, logged on startup.
 11. **MUST NOT** fall back to a direct OpenRouter call if Token Gateway fails — surface the error instead of bypassing the gateway.
 12. **MUST** specify `Content-Type: application/json` on all POST requests.
@@ -82,10 +82,9 @@ Published App (browser)
     ▼
 Service Gateway (SG Nginx)          ← verifies accessToken via AKS
     │                                  injects X-HTC-Account-Id + X-HTC-Auth-Client
-    ├──── non-streaming ──────────► Token Gateway → OpenRouter
+    ├──── non-streaming ──────────► Token Gateway /v1/chat → OpenRouter
     │
-    └──── streaming (SSE) ────────► Viverse Morph → Token Gateway → OpenRouter
-                                       (Morph holds vvai_ internal token)
+    └──── streaming (SSE) ────────► Token Gateway /v1/chat/stream → OpenRouter
 ```
 
 Billing is charged to the **app owner** (by `appId` in Studio registry), not the end user.
@@ -97,12 +96,11 @@ Billing is charged to the **app owner** (by `appId` in Studio registry), not the
 | Endpoint | Path | Auth |
 |---|---|---|
 | Non-streaming chat | `POST /v1/chat` | `AccessToken` + `X-App-Id` (via SG) |
-| Streaming chat (SSE) | Viverse Morph relay URL | `AccessToken` + `X-App-Id` (via SG) |
+| Streaming chat (SSE) | `POST /v1/chat/stream` | `AccessToken` + `X-App-Id` (via SG) |
 | Available models | `GET /v1/models` | none |
 | Usage stats | `GET /v1/usage?appId=...` | `AccessToken` + `X-App-Id` (via SG) |
 
 **Base URL (via SG):** `https://token-gateway.viverse.com`  
-**Morph SSE relay URL:** `https://morph.viverse.com/api/chat/stream` *(confirm with platform team)*  
 **Dev URL (skip auth):** `http://localhost:4000` with `DEV_SKIP_AUTH=1`
 
 ---
@@ -184,17 +182,17 @@ const reply = data.choices[0].message.content;
 
 See [patterns/streaming-chat.md](patterns/streaming-chat.md) for the full implementation.
 
-Streaming goes through **Viverse Morph** (not Token Gateway directly). Morph holds an internal `vvai_` service token and relays SSE to the client.
+Streaming uses the same auth as non-streaming — `AccessToken` + `X-App-Id` via SG, hitting `/v1/chat/stream` directly:
 
 ```javascript
-const response = await fetch('https://morph.viverse.com/api/chat/stream', {
+const response = await fetch('https://token-gateway.viverse.com/v1/chat/stream', {
   method: 'POST',
   headers: {
     'AccessToken': accessToken,
     'X-App-Id': appId,
     'Content-Type': 'application/json',
   },
-  body: JSON.stringify({ messages, model: 'openai/gpt-4o-mini' }),
+  body: JSON.stringify({ messages, model: 'openai/gpt-4o-mini', stream: true }),
 });
 
 const reader = response.body.getReader();

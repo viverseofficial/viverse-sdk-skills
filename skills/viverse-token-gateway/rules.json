@@ -73,12 +73,12 @@
             "severity": "high"
         },
         {
-            "id": "gateway-streaming-morph-not-direct",
+            "id": "gateway-streaming-no-morph-relay",
             "profiles": ["token-gateway"],
             "phases": ["integration", "gameplay", "fix"],
             "type": "forbidden_any",
-            "pattern": "token-gateway\\.viverse\\.com/v1/chat/stream",
-            "message": "Published apps MUST use Viverse Morph relay for streaming, not Token Gateway /v1/chat/stream directly.",
+            "pattern": "morph\\.viverse\\.com/api/chat/stream",
+            "message": "MUST NOT route streaming through Viverse Morph relay. Use Token Gateway /v1/chat/stream directly via SG with AccessToken + X-App-Id.",
             "severity": "medium"
         }
     ]
