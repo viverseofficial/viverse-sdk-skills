@@ -22,7 +22,7 @@ Operational guide for AI agents running pls-cli to upload or replace 3D models o
 ### Check if already installed
 
 ```bash
-which cli || ls ~/bin/cli 2>/dev/null || ls /usr/local/bin/cli 2>/dev/null
+which pls-cli || ls ~/bin/pls-cli 2>/dev/null || ls /usr/local/bin/pls-cli 2>/dev/null
 ```
 
 If found, skip this section.
@@ -46,8 +46,8 @@ BINARY="pls-cli-${OS}-${ARCH}"
 URL="https://github.com/ViveportSoftware/pls-cli/releases/download/${VERSION}/${BINARY}"
 
 mkdir -p ~/bin
-curl -fsSL "$URL" -o ~/bin/cli
-chmod +x ~/bin/cli
+curl -fsSL "$URL" -o ~/bin/pls-cli
+chmod +x ~/bin/pls-cli
 ```
 
 > **Windows**: Download `pls-cli-windows-amd64.exe` from the releases page and add it to your PATH.
@@ -86,7 +86,7 @@ If `.env` doesn't exist, ask the user to set the variables in their terminal bef
 ### Check if binary exists
 
 ```bash
-ls bin/cli
+ls bin/pls-cli
 ```
 
 If it doesn't exist, build first (see Section 1).
@@ -97,14 +97,14 @@ If it doesn't exist, build first (see Section 1).
 
 ```bash
 # Standard dev build (no client ID or version burned in — use for local testing only)
-go build -o bin/cli ./cmd/pls-cli
+go build -o bin/pls-cli ./cmd/pls-cli
 
 # Production build (client ID + version required for real auth against VIVERSE API)
 source .env  # PLS_CLI_CLIENT_ID from .env (see .env.example)
 VERSION=$(git describe --tags --abbrev=0)
 LDFLAG="-X dev.azure.com/viveportengineering/POC/pls-cli/internal/auth.DefaultClientID=${PLS_CLI_CLIENT_ID} -X main.version=${VERSION}"
 mkdir -p bin
-go build -ldflags "${LDFLAG}" -o bin/cli ./cmd/pls-cli
+go build -ldflags "${LDFLAG}" -o bin/pls-cli ./cmd/pls-cli
 ```
 
 **Rule**: Always output to `bin/`. Never write binaries to the project root or any other directory.
