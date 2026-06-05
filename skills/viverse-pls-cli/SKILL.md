@@ -163,6 +163,7 @@ pls-cli upload model.zip --json
 | `--collider-scale` | 0.3/2/5/10/100                  | 2.0           | -                                                 |
 | `--secure`         | bool                            | false         | Encryption                                        |
 | `--json`           | bool                            | false         | Write JSON to stdout; human messages go to stderr |
+| `--tags`           | comma-separated names           | -             | Auto-create missing tags and assign after upload  |
 
 ---
 
@@ -179,11 +180,91 @@ pls-cli replace <old-asset-id> new-model.glb --stage
 pls-cli replace <old-asset-id> new-model.obj --collider --collider-scale=10 --json
 ```
 
-Replace shares the same flags as upload except `--group` (originId is provided instead).
+Replace shares the same flags as upload except `--group` (originId is provided instead). This includes `--tags` — pass comma-separated tag names to auto-create and assign tags after conversion.
 
 ---
 
-## 5. Machine-Readable Output (--json)
+## 5. Tag Management
+
+Tags are labels you can attach to assets. You can create them, list them, and assign them to assets after upload.
+
+### tag create
+
+```bash
+# Create a tag in a group
+pls-cli tag create --group=<group-uuid> "my-tag"
+
+# Stage environment
+pls-cli tag create --group=<group-uuid> --stage "my-tag"
+
+# Machine-readable output
+pls-cli tag create --group=<group-uuid> --json "my-tag"
+```
+
+### tag list
+
+```bash
+# List all tags in a group
+pls-cli tag list --group=<group-uuid>
+
+# Stage environment
+pls-cli tag list --group=<group-uuid> --stage
+
+# Machine-readable output
+pls-cli tag list --group=<group-uuid> --json
+```
+
+### tag assign
+
+```bash
+# Assign one or more tags to an asset (positional args are tag UUIDs)
+pls-cli tag assign --asset=<asset-uuid> <tag-uuid-1> <tag-uuid-2>
+
+# Stage environment
+pls-cli tag assign --asset=<asset-uuid> --stage <tag-uuid-1>
+
+# Machine-readable output
+pls-cli tag assign --asset=<asset-uuid> --json <tag-uuid-1> <tag-uuid-2>
+```
+
+### Tag flags reference
+
+| Command      | Flag      | Values | Notes                                             |
+| ------------ | --------- | ------ | ------------------------------------------------- |
+| `tag create` | `--group` | UUID   | Required — group to create the tag in             |
+| `tag create` | `--stage` | bool   | Use staging environment                           |
+| `tag create` | `--json`  | bool   | Write JSON to stdout; human messages go to stderr |
+| `tag list`   | `--group` | UUID   | Required — group to list tags from                |
+| `tag list`   | `--stage` | bool   | Use staging environment                           |
+| `tag list`   | `--json`  | bool   | Write JSON to stdout; human messages go to stderr |
+| `tag assign` | `--asset` | UUID   | Required — asset to assign tags to                |
+| `tag assign` | `--stage` | bool   | Use staging environment                           |
+| `tag assign` | `--json`  | bool   | Write JSON to stdout; human messages go to stderr |
+
+### --tags flag on upload and replace
+
+Pass `--tags` to auto-create any missing tags and assign them to the asset after conversion:
+
+```bash
+# Upload with tags (auto-creates "foo" and "bar" if they don't exist)
+pls-cli upload model.glb --group=<group-uuid> --tags=foo,bar
+
+# Replace with tags
+pls-cli replace <old-asset-id> new-model.glb --tags=foo,bar
+
+# Combine with --json for machine-readable output
+pls-cli upload model.glb --group=<group-uuid> --tags=foo,bar --json
+```
+
+`--tags` accepts a comma-separated list of tag **names**. The CLI:
+
+1. Lists existing tags for the group
+2. Creates any tags that don't already exist
+3. Assigns all resolved tag UUIDs to the asset after conversion completes
+
+---
+
+## 6. Machine-Readable Output (--json)
 
 Always pass `--json` when the result needs to be parsed programmatically.
 
@@ -201,6 +282,49 @@ Always pass `--json` when the result needs to be parsed programmatically.
     }
   ]
 }
+```
+
+### Upload JSON output (with --tags)
+
+When `--tags` is used, the upload JSON output includes a `"tags"` field:
+
+```json
+{
+  "files": [
+    {
+      "file": "model.zip",
+      "assetId": "abc-123-uuid",
+      "status": "ready"
+    }
+  ],
+  "tags": [
+    { "uuid": "tag-uuid-1", "name": "foo" },
+    { "uuid": "tag-uuid-2", "name": "bar" }
+  ]
+}
+```
+
+### tag create JSON output
+
+```json
+{ "uuid": "tag-uuid-1", "name": "my-tag" }
+```
+
+### tag list JSON output
+
+```json
+{
+  "tags": [
+    { "uuid": "tag-uuid-1", "name": "foo" },
+    { "uuid": "tag-uuid-2", "name": "bar" }
+  ]
+}
+```
+
+### tag assign JSON output
+
+```json
+{ "assetId": "asset-uuid", "tagUuids": ["tag-uuid-1", "tag-uuid-2"] }
 ```
 
 ### Replace JSON output
@@ -244,7 +368,7 @@ asset_id=$(echo "$result" | python3 -c "import sys,json; print(json.load(sys.std
 
 ---
 
-## 6. What the CLI Does Internally
+## 7. What the CLI Does Internally
 
 Understanding this helps debug failures:
 
@@ -255,13 +379,14 @@ Understanding this helps debug failures:
 4. POST /management/asset/:id/convert
 5. WebSocket wss://{domain}/management/user/ws  →  stream conversion progress
 6. Exit 0 on "ready", exit 1 on "failed"
+6.5. (optional) If --tags provided: resolve tag names → create missing tags → PUT /management/asset/:id/tags
 ```
 
 Replace uses `PUT /management/asset/:originId` instead of POST at step 2.
 
 ---
 
-## 7. Supported File Formats
+## 8. Supported File Formats
 
 | Format | Notes                         |
 | ------ | ----------------------------- |
@@ -274,19 +399,37 @@ Max file size: 500 MB per file (FREE tier limit from API).
 
 ---
 
-## 8. Common Failures and Fixes
+## 9. Running Tests
 
-| Symptom                                              | Cause                                          | Fix                                               |
-| ---------------------------------------------------- | ---------------------------------------------- | ------------------------------------------------- |
-| `401 Unauthorized`                                   | Expired token or missing cookie                | Re-run `pls-cli login`                            |
-| `credentials are for prod, but --stage was provided` | Env mismatch at login vs upload                | Re-login with the matching `--stage` flag         |
-| Error code 11                                        | Wrong password or malformed auth ticket        | Check credentials                                 |
-| Error code 1108                                      | Scope not allowed                              | Don't pass extra `--scopes`                       |
-| Conversion `status: "failed"`                        | Model file corrupted or unsupported            | Check `failedType` and `errorCode` in JSON output |
+```bash
+# Unit + integration tests (race detection)
+go test -race ./...
+
+# Stage E2E tests (requires credentials)
+source .env
+go test -v -timeout 300s -run '^TestStage' ./cmd/pls-cli/
+```
+
+Tests auto-skip when `PLS_CLI_TEST_EMAIL` / `PLS_CLI_TEST_PASSWORD` are unset.
 
 ---
 
-## 9. Environments
+## 10. Common Failures and Fixes
+
+| Symptom                                              | Cause                                          | Fix                                                                      |
+| ---------------------------------------------------- | ---------------------------------------------- | ------------------------------------------------------------------------ |
+| `401 Unauthorized`                                   | Expired token or missing cookie                | Re-run `pls-cli login`                                                   |
+| `credentials are for prod, but --stage was provided` | Env mismatch at login vs upload                | Re-login with the matching `--stage` flag                                |
+| Error code 11                                        | Wrong password or malformed auth ticket        | Check credentials                                                        |
+| Error code 1105                                      | Binary built without correct client ID ldflags | Install the official release binary from GitHub Releases (see Section 0) |
+| Error code 1108                                      | Scope not allowed                              | Don't pass extra `--scopes`                                              |
+| Conversion `status: "failed"`                        | Model file corrupted or unsupported            | Check `failedType` and `errorCode` in JSON output                        |
+| Binary not found                                     | pls-cli not installed                          | Install from GitHub Releases (see Section 0)                             |
+| Dev build fails at login                             | No client ID burned in                         | Install the official release binary from GitHub Releases (see Section 0) |
+
+---
+
+## 11. Environments
 
 | Env        | API base                           | WS base                          | Login flag |
 | ---------- | ---------------------------------- | -------------------------------- | ---------- |
