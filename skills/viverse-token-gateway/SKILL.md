@@ -111,18 +111,40 @@ Billing is charged to the **app owner** (by `appId` in Studio registry), not the
 
 ### 1) Obtain accessToken (prerequisite)
 
-You must complete `viverse-auth` before this step. The token comes from `checkAuth()`:
+You must complete `viverse-auth` before this step. The full bootstrap — including `appId` resolution and the mandatory 1200ms handshake delay — must run before any Token Gateway call:
 
 ```javascript
-// Assumes viverse-auth integration is already in place
-const authResult = await client.checkAuth();
-const accessToken = authResult?.access_token;
+// 1. Resolve App ID from URL param → localStorage → hostname regex
+//    An empty clientId causes a silent checkAuth timeout — always resolve first.
+const appId = new URLSearchParams(location.search).get('appId')
+  || localStorage.getItem('my_app_id')
+  || location.hostname.match(/^([a-z0-9]+)(?:-preview)?\.world\.viverse\.app$/)?.[1]
+  || import.meta.env.VITE_VIVERSE_CLIENT_ID
+  || '';
+
+if (!appId) throw new Error('[TokenGateway] App ID could not be resolved — set VITE_VIVERSE_CLIENT_ID');
+
+// 2. SDK detection — check all supported globals
+const sdk = window.viverse || window.VIVERSE_SDK || window.vSdk;
+
+// 3. Init client with mandatory auth domain
+const client = new sdk.client({ clientId: appId, domain: 'account.htcvive.com' });
+
+// 4. MANDATORY 1200ms iframe handshake delay before first checkAuth()
+await new Promise(r => setTimeout(r, 1200));
+
+// 5. checkAuth → { access_token, account_id }
+const auth = await client.checkAuth();
+const accessToken = auth?.access_token;
 
 if (!accessToken) {
   // Trigger login flow — do not call Token Gateway without a token
   throw new Error('User not authenticated');
 }
 ```
+
+> [!IMPORTANT]
+> Do not skip the 1200ms delay. Calling `checkAuth()` before the VIVERSE iframe bridge is ready causes a silent timeout with no token — this is the most common integration failure.
 
 ### 2) Non-streaming chat request
 
@@ -196,7 +218,27 @@ while (true) {
 
 ### 3b) Dev vs Demo/Prod Auth Routing
 
-Projects always need a local dev setup. Use an environment flag to switch between direct bearer auth (dev) and SG/SSO path (demo/prod). Do not hardcode either path:
+Projects always need a local dev setup. First, provision a dev token once using the gateway admin API:
+
+```bash
+# 1. Get GATEWAY_SERVICE_SECRET from the gateway service owner (not in source control)
+# 2. Mint a dev token (shown only once — store it securely)
+curl -X POST http://localhost:4000/v1/tokens \
+  -H "x-gateway-secret: <GATEWAY_SERVICE_SECRET>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "appId": "my-app-dev",
+    "tenantId": "your-htc-account-id",
+    "label": "local dev token",
+    "rateLimit": 60,
+    "dailyQuota": 500
+  }'
+# Response: { "token": "vvai_..." } — save this to your .env or browser localStorage
+```
+
+Alternatively, set `DEV_SKIP_AUTH=1` on the gateway to bypass all auth validation (useful for integration tests without a real token).
+
+Then use an environment flag to switch between direct bearer auth (dev) and the SG/SSO path (demo/prod). Do not hardcode either path:
 
 ```javascript
 const GATEWAY_ENV = localStorage.getItem('gw_env') || 'demo'; // 'dev' | 'demo' | 'prod'
