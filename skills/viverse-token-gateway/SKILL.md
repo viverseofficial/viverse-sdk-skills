@@ -65,7 +65,11 @@ These are release blockers for any token-gateway integration task:
 4. **MUST NOT** store or log the `accessToken` beyond the current session.
 5. **MUST** handle `429 Too Many Requests` — read `Retry-After` header (seconds) and back off before retrying.
 6. **MUST** handle `401 Unauthorized` by re-running the auth flow (`checkAuth()`) before retrying once. Do not retry 401 more than once.
-7. **MUST** handle `403 Forbidden` as a non-retryable app registration error — surface to developer, not end user.
+7. **MUST** handle `403 Forbidden` — two distinct cases, both non-retryable:
+   - `"app not registered"` — app owner needs to register the app in Studio
+   - `"app owner has not assigned an AI provider key"` — app owner needs to configure their OR API key in Studio
+   
+   Surface both as developer/config errors, not user-facing errors.
 8. **MUST** handle `503 Service Unavailable` (provider key resolution failed) gracefully in UI.
 9. **MUST** use `POST /v1/chat/stream` (via SG) for streaming — send the same `AccessToken` + `X-App-Id` headers as non-streaming.
 10. **MUST** include a `VERSION_NAME` constant in generated gateway integration code, logged on startup.
