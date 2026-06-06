@@ -72,28 +72,66 @@ Classify each call:
 - **Move to Lambda**: secret-bearing, low/medium QPS request/response workloads
 - **Keep client-side with hard restrictions**: high-frequency streaming paths that cannot use job-style invoke
 
-### 2) Create/update Lambda Env
+### 2) Upload env variables to Lambda (server-side — must do before client invoke)
 
-Store secret values with `/env`:
+> **This step must be completed before any client `invoke()` call will succeed.**
+> If env variables are missing, the script will receive empty values from `getEnv()` and likely reply with an error, or the job will return `configuration_error`.
+
+Upload secret values via `POST /env` using the admin API (requires `Authkey`):
+```bash
+curl -X POST "https://broadcasting-gateway-gaming.vrprod.viveport.com/api/play-lambda-service/v1/env" \
+  -H "Authkey: $LAMBDA_AUTHKEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "game_id": "<YOUR_APP_ID>",
+    "variables": {
+      "GEMINI_API_KEY": "your-actual-key",
+      "GEMINI_API_URL": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
+    }
+  }'
+```
+
+Or use the sync script: `bash ./scripts/sync-lambda-config.sh --approve`
+
+Variables to upload:
 - `GOOGLE_API_KEY` / `GEMINI_API_KEY`
 - endpoint URLs
-- optional service-account JSON
+- optional service-account JSON (`GOOGLE_APPLICATION_CREDENTIALS_JSON`)
 
-Never commit these values to repo.
+Never commit these values to repo. Verify upload with `GET /env?game_id=<YOUR_APP_ID>`.
 
-### 3) Create/update Lambda Script per event
+### 3) Upload Lambda script per event (server-side — must do before client invoke)
 
-Define one event per backend capability, for example:
+> **This step must also be completed before any client `invoke()` call will succeed.**
+> If the script does not exist for the `event_name` being invoked, the job returns `configuration_error` immediately.
+
+Upload one script per backend capability via `POST /script` (requires `Authkey`):
+```bash
+curl -X POST "https://broadcasting-gateway-gaming.vrprod.viveport.com/api/play-lambda-service/v1/script" \
+  -H "Authkey: $LAMBDA_AUTHKEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "game_id": "<YOUR_APP_ID>",
+    "event_name": "gemini_chat_event",
+    "code": "<your script content — see patterns/lambda-api-reference.md for examples>"
+  }'
+```
+
+Or use the sync script: `bash ./scripts/sync-lambda-config.sh --approve`
+
+Event naming examples:
 - `places_search_event`
 - `gemini_chat_event`
 - `tiles_root_bootstrap_event` (bootstrap only; not per-tile proxy)
 
 Script requirements:
-- read with `getEnv(...)`
-- validate input
-- call external API with `fetch(...)`
-- `reply({ success, ... })`
+- read secrets with `getEnv(...)`
+- validate `context.data` input fields
+- call external API with `fetch(...)` — returns `{ status, body }` (not a Promise)
+- `reply({ success, ... })` — must be called at least once
 - include `console.*` logs for jobs debugging
+
+Verify upload with `GET /script?game_id=<YOUR_APP_ID>&event_name=<event_name>`.
 
 ### 4) Invoke from client
 
@@ -142,12 +180,19 @@ console.log(res.result);
 ```
 
 **Integration order summary:**
-1. Load VIVERSE SDK (`globalThis.viverse` available)
-2. Authenticate → get `accessToken`
-3. Create `playClient` → create `multiplayerClient(roomId, appId, accessToken)`
-4. `await multiplayerClient.init()`
-5. `await multiplayerClient.lambda.invoke(eventName, payload, accessToken)`
-6. Handle all non-`succeeded` statuses (see Verification Checklist)
+
+Server-side setup (must complete first — requires `Authkey`):
+1. Upload env variables: `POST /env` with `game_id` + `variables`
+2. Upload script(s): `POST /script` with `game_id` + `event_name` + `code`
+3. Verify: `GET /env` and `GET /script` confirm both are live
+
+Client-side (only after server-side setup is confirmed):
+4. Load VIVERSE SDK (`globalThis.viverse` available)
+5. Authenticate → get `accessToken`
+6. Create `playClient` → create `multiplayerClient(roomId, appId, accessToken)`
+7. `await multiplayerClient.init()`
+8. `await multiplayerClient.lambda.invoke(eventName, payload, accessToken)`
+9. Handle all non-`succeeded` statuses (see Verification Checklist)
 
 ### 5) Storage SDK usage
 
