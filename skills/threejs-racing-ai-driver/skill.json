@@ -1,0 +1,32 @@
+{
+  "id": "threejs-racing-ai-driver",
+  "name": "threejs-racing-ai-driver",
+  "version": "0.1.0",
+  "status": "active",
+  "description": "Runnable patterns for CPU racing drivers, loop reconstruction, progress tracking, and low-overhead debugging in Three.js or VIVERSE racing games",
+  "tags": [
+    "threejs",
+    "racing",
+    "ai",
+    "waypoint",
+    "vehicle",
+    "debugging",
+    "gameplay"
+  ],
+  "prerequisites": [
+    "Track represented as runtime cells or an ordered waypoint loop",
+    "Vehicle update loop with position, velocity, and facing"
+  ],
+  "entrypoint": "SKILL.md",
+  "rules": "rules.json",
+  "patterns_dir": "patterns",
+  "examples_dir": "examples",
+  "read_order": [
+    "SKILL.md",
+    "patterns/route-graph-from-cells.md",
+    "patterns/forward-progress-and-recovery.md",
+    "patterns/low-overhead-racing-debug.md",
+    "examples/tile-racing-cpu-driver.md"
+  ],
+  "dependencies": []
+}

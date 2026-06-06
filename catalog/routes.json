@@ -295,6 +295,20 @@
       "skills": [
         "threejs-asset-art"
       ]
+    },
+    {
+      "intent": [
+        "racing ai",
+        "cpu driver",
+        "ai driver",
+        "waypoint",
+        "lap progress",
+        "race recovery",
+        "racing debug"
+      ],
+      "skills": [
+        "threejs-racing-ai-driver"
+      ]
     }
   ]
 }

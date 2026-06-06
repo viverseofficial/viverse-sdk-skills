@@ -1,0 +1,31 @@
+{
+  "rules": [
+    {
+      "id": "route-build-must-be-ordered",
+      "profiles": ["gameplay", "fix"],
+      "phases": ["gameplay", "fix"],
+      "type": "required_any",
+      "pattern": "buildLoop|routeGraph|neighbors|waypointsFromLoop|ordered loop",
+      "message": "CPU racing route generation must use an explicit ordered loop or graph traversal, not an unordered cell scan.",
+      "severity": "high"
+    },
+    {
+      "id": "recovery-needs-offpath-evidence",
+      "profiles": ["gameplay", "fix"],
+      "phases": ["gameplay", "fix"],
+      "type": "required_any",
+      "pattern": "offPath|distToNearest|crosstrack|noProgress|recoveryReason",
+      "message": "Recovery logic should require off-path or stalled evidence rather than heading error alone.",
+      "severity": "high"
+    },
+    {
+      "id": "debug-must-be-opt-in",
+      "profiles": ["gameplay", "fix"],
+      "phases": ["gameplay", "fix"],
+      "type": "required_any",
+      "pattern": "debugEnabled|params\.get\( 'debug' \)|if \( this\.debugEnabled \)|debugDraw",
+      "message": "Racing debug visuals and logs must be opt-in to avoid runtime overhead.",
+      "severity": "medium"
+    }
+  ]
+}
