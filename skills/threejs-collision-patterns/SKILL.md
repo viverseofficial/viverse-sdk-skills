@@ -13,6 +13,7 @@ Manual collision detection for Three.js games. No physics engine required — us
 
 Use this when a project needs:
 - Collidable walls, obstacles, or furniture (AABB)
+- Tapered static obstacles such as mountains, spires, or cones
 - Projectile hit detection against entities (sphere)
 - Collectible/power-up pickup zones (distance)
 - Arena boundaries that block movement
@@ -39,6 +40,7 @@ When implementing collision in a new game:
 1. **Define entity radius** in Constants.js (e.g., `PLAYER: { COLLISION_RADIUS: 1.65 }`).
 2. **Choose pattern** based on shape:
    - Box-shaped static objects → AABB (Pattern 1 or 2)
+   - Tapered static obstacles → height-aware radial collider
    - Moving entities vs walls → Box3 intersection (Pattern 2)
    - Projectiles/pickups → Sphere distance (Pattern 3)
    - Arena edges → Boundary clamp (Pattern 4)
@@ -53,6 +55,7 @@ When implementing collision in a new game:
 - Do NOT use raycasting for simple AABB collision (expensive, unnecessary).
 - Do NOT add physics engine deps (cannon.js, rapier, ammo.js) unless explicitly requested.
 - Do NOT make collision radius exactly match mesh size — add 10-20% padding for game feel.
+- Do NOT use a full-height AABB for obviously tapered obstacles like mountains if mid-air false positives matter.
 - Do NOT skip collision on decorative meshes silently — explicitly mark `collidable: false`.
 - Do NOT test collision AFTER applying movement (causes entities stuck inside walls).
 - Do NOT allocate new Vector3/Box3 objects inside the collision loop (GC pressure) — reuse temporaries.

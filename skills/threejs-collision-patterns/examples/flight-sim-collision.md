@@ -40,57 +40,55 @@ export class LevelBuilder {
     this.buildFurniture();
   }
 
-  addBox({ position, scale, material, label, collidable = true }) {
-    const mesh = new THREE.Mesh(
-      new THREE.BoxGeometry(scale.x, scale.y, scale.z), material
-    );
-    mesh.position.copy(position);
-    this.scene.add(mesh);
-    if (collidable) {
+  buildMountains() {
+    for (let i = 0; i < 40; i++) {
+      const radius = 8 + Math.random() * 17;
+      const height = 15 + Math.random() * 45;
+      const group = new THREE.Group();
+
+      const body = new THREE.Mesh(
+        new THREE.ConeGeometry(radius, height, 8),
+        new THREE.MeshLambertMaterial({ color: 0x7a6b5a })
+      );
+      body.position.y = height / 2;
+      group.add(body);
+
+      group.position.set(
+        (Math.random() - 0.5) * 800,
+        0,
+        (Math.random() - 0.5) * 800
+      );
+      this.scene.add(group);
+
       this.obstacles.push({
-        center: position.clone(),
-        halfSize: new THREE.Vector3(scale.x / 2, scale.y / 2, scale.z / 2),
-        label
+        type: 'cone',
+        center: new THREE.Vector3(group.position.x, 0, group.position.z),
+        radius: radius * 1.08,
+        height,
+        label: `mountain-${i + 1}`
       });
     }
-    return mesh;
-  }
-
-  buildWalls() {
-    const wallMat = new THREE.MeshLambertMaterial({ color: 0x8899aa });
-    const halfW = LEVEL.OFFICE_WIDTH / 2;
-    // Collidable walls
-    this.addBox({ position: new THREE.Vector3(-halfW, 30, 0),
-      scale: new THREE.Vector3(3, 60, LEVEL.OFFICE_LENGTH),
-      material: wallMat, label: 'left wall' });
-    this.addBox({ position: new THREE.Vector3(halfW, 30, 0),
-      scale: new THREE.Vector3(3, 60, LEVEL.OFFICE_LENGTH),
-      material: wallMat, label: 'right wall' });
-    // Non-collidable decoration
-    const glassMat = new THREE.MeshBasicMaterial({ color: 0x9fc7d4, transparent: true, opacity: 0.4 });
-    this.addBox({ position: new THREE.Vector3(-halfW + 1.8, 35, 0),
-      scale: new THREE.Vector3(0.6, 18, 34),
-      material: glassMat, label: 'window', collidable: false });
-  }
-
-  buildFurniture() {
-    const deskMat = new THREE.MeshLambertMaterial({ color: 0x665544 });
-    this.addBox({ position: new THREE.Vector3(10, 5, -50),
-      scale: new THREE.Vector3(28, 6, 18),
-      material: deskMat, label: 'desk' });
   }
 
   checkCollision(point, radius = 1.5) {
-    // Boundary check first
-    if (point.z < -LEVEL.OFFICE_LENGTH / 2 || point.z > LEVEL.OFFICE_LENGTH / 2) {
-      return { label: 'office boundary' };
-    }
-    // AABB check
     for (const obs of this.obstacles) {
-      const dx = Math.max(Math.abs(point.x - obs.center.x) - obs.halfSize.x, 0);
-      const dy = Math.max(Math.abs(point.y - obs.center.y) - obs.halfSize.y, 0);
-      const dz = Math.max(Math.abs(point.z - obs.center.z) - obs.halfSize.z, 0);
-      if (dx * dx + dy * dy + dz * dz <= radius * radius) {
+      if (obs.type !== 'cone') continue;
+
+      const minY = obs.center.y - radius;
+      const maxY = obs.center.y + obs.height + radius;
+      if (point.y < minY || point.y > maxY) continue;
+
+      const relativeHeight = THREE.MathUtils.clamp(
+        (point.y - obs.center.y) / obs.height,
+        0,
+        1
+      );
+      const coneRadiusAtY = obs.radius * (1 - relativeHeight);
+      const allowedRadius = coneRadiusAtY + radius;
+      const dx = point.x - obs.center.x;
+      const dz = point.z - obs.center.z;
+
+      if (dx * dx + dz * dz <= allowedRadius * allowedRadius) {
         return obs;
       }
     }
@@ -109,9 +107,9 @@ animate() {
   if (gameState.started && !gameState.gameOver && this.player) {
     this.player.update(delta, this.input);
 
-    // Collision check AFTER player moves (flight game = death on hit)
     const collision = this.level.checkCollision(
-      this.player.getPosition(), PLAYER.COLLISION_RADIUS
+      this.player.getPosition(),
+      PLAYER.COLLISION_RADIUS
     );
     if (collision) {
       console.warn('[Game] Collision with', collision.label);

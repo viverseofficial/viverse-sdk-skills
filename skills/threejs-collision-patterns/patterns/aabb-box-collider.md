@@ -64,6 +64,64 @@ if (hit) {
 
 ---
 
+## Pattern A2: Tapered Mountain / Cone Collider
+
+Best for: mountains, rock spires, stylized cones, or other obstacles that narrow with height.
+
+When a full AABB causes crashes while the player is visibly flying beside the obstacle, switch to a height-aware radial collider instead of making the whole collision volume a box.
+
+```js
+// Register tapered obstacle during level generation
+this.obstacles.push({
+  type: 'cone',
+  center: new THREE.Vector3(group.position.x, 0, group.position.z),
+  radius: radius * 1.08,
+  height,
+  label: `mountain-${i + 1}`,
+});
+
+// Per-frame collision test: shrink allowed radius as height increases
+checkCollision(point, radius = 1.5) {
+  for (const obstacle of this.obstacles) {
+    if (obstacle.type !== 'cone') continue;
+
+    const minY = obstacle.center.y - radius;
+    const maxY = obstacle.center.y + obstacle.height + radius;
+    if (point.y < minY || point.y > maxY) continue;
+
+    const relativeHeight = THREE.MathUtils.clamp(
+      (point.y - obstacle.center.y) / obstacle.height,
+      0,
+      1
+    );
+    const coneRadiusAtY = obstacle.radius * (1 - relativeHeight);
+    const allowedRadius = coneRadiusAtY + radius;
+    const dx = point.x - obstacle.center.x;
+    const dz = point.z - obstacle.center.z;
+
+    if (dx * dx + dz * dz <= allowedRadius * allowedRadius) {
+      return obstacle;
+    }
+  }
+  return null;
+}
+```
+
+### When To Prefer This Over AABB
+
+- The visual obstacle is much narrower near the top than the base.
+- The player can fly at multiple altitudes around the obstacle.
+- A full-height box causes obvious false crashes in open air.
+
+### Key Rules
+
+- Keep the collider simple: one cone approximation is usually enough for stylized mountains.
+- Store `center`, `radius`, and `height` once at build time.
+- Add only modest padding such as `1.02` to `1.10`; large padding recreates the same false positives.
+- Still return a labeled obstacle descriptor for debug output.
+
+---
+
 ## Pattern B: Box3 Intersection (Dynamic Entities vs Static Walls)
 
 Store walls as `THREE.Box3` objects. Create a temporary Box3 around the moving entity for intersection testing.
