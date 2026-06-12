@@ -69,7 +69,7 @@
     "vite-plugin-svgr": "^4.5.0"
   },
   "dependencies": {
-    "@viverse/cli": "0.9.5-beta.10",
+    "@viverse/cli": "0.9.6-alpha.4",
     "playcanvas": "catalog:"
   }
 }
