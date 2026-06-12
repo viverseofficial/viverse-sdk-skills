@@ -42,6 +42,8 @@ Do not use this skill for direct `.glb` loading without Polygon Streaming or for
 7. **MUST NOT** treat the user-passed `onModelLoaded` callback as the primary app-level success source.
 8. **MUST** preserve a visible fallback if the streamed model fails.
 9. **MUST** decide explicitly whether the streamed asset replaces the whole actor or only one part of it.
+10. **MUST NOT** hide the fallback visual before `EVENT_MODEL_LOAD` or equivalent wrapper success is observed.
+11. **MUST** separate gameplay transform from streamed-content fitting by using an outer anchor plus an inner content root.
 
 ## Verified SDK Behavior For `2.9.0-beta.2`
 
@@ -69,6 +71,8 @@ Copy these into your final app output:
 - `public/assets/viverse-symbol-anim.glb` -> `/assets/viverse-symbol-anim.glb`
 
 For Vite apps, place `viverse-symbol-anim.glb` under `public/assets/` so the build emits `dist/assets/viverse-symbol-anim.glb` without any runtime override.
+
+If the app already has a custom root service worker, keep that registration and import the Polygon Streaming worker inside it with `importScripts('./service-worker.js')` rather than trying to register two competing root workers.
 
 ### Step 3: Construct the controller
 
@@ -146,6 +150,8 @@ streamController.addEventListener(EVENT_MODEL_LOAD_ERROR, (event) => {
 
 Treat `EVENT_MODEL_LOAD` as the app-level success signal.
 
+Hide fallback visuals and apply post-load fitting from this wrapper event path, not only from the user-supplied `onModelLoaded` callback.
+
 If the package exposes the exported constants, prefer them over raw strings. If not, the current wrapper event names are `model-load` and `model-load-error`.
 
 ### Step 7: Fit the streamed model to gameplay scale
@@ -205,6 +211,9 @@ Do not leave this implicit. If only part of the fallback is hidden, the final ac
 6. If the streamed model loads but looks absent, check post-load fitting before blaming the URL.
 7. Keep a fallback mesh or procedural object during integration.
 8. A parented anchor is safer than a floating world-space mount that is manually re-synced every frame.
+9. On non-bundled pages that use the UMD build, the PS runtime can fail at startup if it runs before a global `THREE` exists. Load a classic Three.js global first, or inject the PS runtime from module code after `window.THREE = THREE` is set.
+10. If the app already registers its own root service worker, merge the PS worker into that file instead of letting the SDK compete for root-worker ownership.
+11. Bounding-box fitting and user tuning are separate steps. Fit first from `event.boundingBox`, then optionally apply a config multiplier such as `0.5` for art direction.
 
 ## Debugging Playbook
 
@@ -232,6 +241,16 @@ Check fallback policy:
 1. Which fallback nodes are hidden on success?
 2. Is `keepTurretOverlay` or equivalent intentionally preserving part of the actor?
 3. Does the desired asset represent a full replacement or only a body replacement?
+4. Are fallback visuals being hidden too early, before wrapper success is confirmed?
+
+### Symptom: the SDK appears healthy but the fallback never swaps
+
+Check these next:
+
+1. Is fallback visibility tied to `EVENT_MODEL_LOAD` or only to `onModelLoaded`?
+2. Does the streamed content root actually gain children after load?
+3. Is the app fitting the model under a separate inner content root rather than moving the gameplay anchor itself?
+4. Is the fallback still visible only because post-load fit/offset leaves the streamed model inside it or under the floor?
 
 ### Symptom: you still suspect the SDK never loaded
 
@@ -257,5 +276,7 @@ If those counters advance, the problem has likely moved from transport into inte
 - [ ] `/lib/basis_transcoder.js` and `/lib/basis_transcoder.wasm` are reachable
 - [ ] `/assets/viverse-symbol-anim.glb` is reachable from the app root
 - [ ] Streamed content is centered/scaled using the emitted bounding box
+- [ ] Fallback is hidden only after wrapper success confirms the streamed model is usable
+- [ ] Any custom root service worker imports the PS worker instead of competing with it
 - [ ] Fallback policy matches the intended replacement mode
 - [ ] Fallback stays visible if load fails

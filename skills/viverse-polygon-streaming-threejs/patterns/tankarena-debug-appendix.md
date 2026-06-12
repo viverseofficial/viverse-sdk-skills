@@ -47,6 +47,27 @@ For multi-part actors, decide whether the streamed model replaces:
 
 If only one fallback node is hidden, the result can look half-replaced even though streaming succeeded.
 
+### 5. Do not hide the fallback before wrapper success
+
+If the app removes or hides the fallback actor before `model-load`, the user can see an empty slot and assume PS failed even while the SDK is still progressing.
+
+Keep the fallback visible until wrapper success confirms the streamed content is present and fitted.
+
+### 6. Fit under an inner content root, not the gameplay anchor
+
+Using a single mount group for both gameplay transforms and post-load fitting makes debugging harder and can cause offset/scale confusion.
+
+Use:
+
+- outer anchor: gameplay motion, rotation, authored placement
+- inner content root: bounding-box centering, minY ground alignment, final fit scale
+
+### 7. A failed loading mascot is a separate prerequisite issue
+
+`/assets/viverse-symbol-anim.glb` can fail independently of the XRG stream.
+
+Ship the file, but do not treat mascot failure alone as proof that the streamed model failed.
+
 ## Cheap Discriminators
 
 Before changing broad integration code, check these:
@@ -57,6 +78,7 @@ Before changing broad integration code, check these:
 4. wrapper success/error event name correctness
 5. post-load bounding-box fitting
 6. fallback hide/show policy
+7. whether the streamed content root actually gains children after success
 
 ## Internal Engine Clues
 
