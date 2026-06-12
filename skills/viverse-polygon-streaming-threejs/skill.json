@@ -1,0 +1,29 @@
+{
+  "id": "viverse-polygon-streaming-threejs",
+  "name": "viverse-polygon-streaming-threejs",
+  "version": "1.0.0",
+  "status": "active",
+  "description": "Runtime Polygon Streaming .xrg integration for browser-based Three.js apps, including StreamController wiring, wrapper event handling, model fitting, and fallback replacement policy.",
+  "tags": [
+    "viverse",
+    "threejs",
+    "polygon-streaming",
+    "xrg",
+    "streamcontroller",
+    "runtime-streaming"
+  ],
+  "prerequisites": [
+    "Three.js project",
+    "@polygon-streaming/web-player-threejs@2.9.0-beta.2",
+    "Ability to publish files at the app web root"
+  ],
+  "entrypoint": "SKILL.md",
+  "patterns_dir": "patterns",
+  "read_order": [
+    "SKILL.md",
+    "patterns/tankarena-debug-appendix.md"
+  ],
+  "dependencies": [
+    "bundle:resilience"
+  ]
+}

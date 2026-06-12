@@ -190,6 +190,23 @@
     },
     {
       "intent": [
+        "polygon streaming runtime",
+        "streamcontroller",
+        "xrg loading",
+        "model-load",
+        "model-load-error",
+        "basis transcoder",
+        "service-worker.js",
+        "threejs polygon streaming",
+        "runtime streaming",
+        "streamed model invisible"
+      ],
+      "skills": [
+        "viverse-polygon-streaming-threejs"
+      ]
+    },
+    {
+      "intent": [
         "polygon streaming",
         "pls-cli",
         "glb convert",

@@ -55,6 +55,10 @@
       "path": "skills/viverse-multiplayer/skill.json"
     },
     {
+      "id": "viverse-polygon-streaming-threejs",
+      "path": "skills/viverse-polygon-streaming-threejs/skill.json"
+    },
+    {
       "id": "viverse-pls-cli",
       "path": "skills/viverse-pls-cli/skill.json"
     },
