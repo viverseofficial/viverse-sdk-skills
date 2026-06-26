@@ -25,6 +25,7 @@ Do not use this skill for direct `.glb` loading without Polygon Streaming or for
 - [ ] `npm install -S three`
 - [ ] The app has a live `camera`, `renderer`, `scene`, and `cameraTarget`
 - [ ] `/service-worker.js` is published at the web root
+- [ ] The app registers the Polygon Streaming service worker at runtime before constructing/loading streams
 - [ ] `/lib/basis_transcoder.js` is published at the web root
 - [ ] `/lib/basis_transcoder.wasm` is published at the web root
 - [ ] `/assets/viverse-symbol-anim.glb` is published at the web root
@@ -34,16 +35,18 @@ Do not use this skill for direct `.glb` loading without Polygon Streaming or for
 
 1. **MUST** use `StreamController` from `@polygon-streaming/web-player-threejs`.
 2. **MUST** publish the service worker and Basis transcoder files at the expected root paths.
-3. **MUST** call `streamController.update()` every frame after `renderer.render(...)`.
-4. **MUST** use the exported beta wrapper signature for `2.9.0-beta.2`:
+3. **MUST** register the Polygon Streaming service worker at runtime; copying it into `dist` is not enough.
+4. **MUST** log before any service-worker await so bootstrap stalls are visible in console.
+5. **MUST** call `streamController.update()` every frame after `renderer.render(...)`.
+6. **MUST** use the exported beta wrapper signature for `2.9.0-beta.2`:
    `streamController.addModel(url, sceneGroup, options)`
-5. **MUST NOT** call the internal object-form API directly through the exported wrapper.
-6. **MUST** wire success and failure through the wrapper event layer on `StreamController`.
-7. **MUST NOT** treat the user-passed `onModelLoaded` callback as the primary app-level success source.
-8. **MUST** preserve a visible fallback if the streamed model fails.
-9. **MUST** decide explicitly whether the streamed asset replaces the whole actor or only one part of it.
-10. **MUST NOT** hide the fallback visual before `EVENT_MODEL_LOAD` or equivalent wrapper success is observed.
-11. **MUST** separate gameplay transform from streamed-content fitting by using an outer anchor plus an inner content root.
+7. **MUST NOT** call the internal object-form API directly through the exported wrapper.
+8. **MUST** wire success and failure through the wrapper event layer on `StreamController`.
+9. **MUST NOT** treat the user-passed `onModelLoaded` callback as the primary app-level success source.
+10. **MUST** preserve a visible fallback if the streamed model fails.
+11. **MUST** decide explicitly whether the streamed asset replaces the whole actor or only one part of it.
+12. **MUST NOT** hide the fallback visual before `EVENT_MODEL_LOAD` or equivalent wrapper success is observed.
+13. **MUST** separate gameplay transform from streamed-content fitting by using an outer anchor plus an inner content root.
 
 ## Verified SDK Behavior For `2.9.0-beta.2`
 
@@ -73,6 +76,34 @@ Copy these into your final app output:
 For Vite apps, place `viverse-symbol-anim.glb` under `public/assets/` so the build emits `dist/assets/viverse-symbol-anim.glb` without any runtime override.
 
 If the app already has a custom root service worker, keep that registration and import the Polygon Streaming worker inside it with `importScripts('./service-worker.js')` rather than trying to register two competing root workers.
+
+Register the worker explicitly at runtime. Do not only copy the file and wait on
+`navigator.serviceWorker.ready`; if no worker was registered yet, that await can stall before any
+Polygon Streaming log appears.
+
+```js
+async function ensurePolygonServiceWorker() {
+  if (!('serviceWorker' in navigator)) return false;
+  const candidates = ['/service-worker.js', './service-worker.js'];
+  for (const scriptUrl of candidates) {
+    try {
+      const registration = await navigator.serviceWorker.register(scriptUrl);
+      console.info('[PS] service worker registered', registration.scope);
+      await Promise.race([
+        navigator.serviceWorker.ready,
+        new Promise((_, reject) => setTimeout(() => reject(new Error('serviceWorker.ready timeout')), 2500)),
+      ]);
+      console.info('[PS] service worker ready');
+      return true;
+    } catch (error) {
+      console.warn('[PS] service worker registration failed', scriptUrl, error);
+    }
+  }
+  return false;
+}
+```
+
+Call this before `new StreamController(...)`, but log that PS bootstrap was requested before awaiting it.
 
 ### Step 3: Construct the controller
 
@@ -113,6 +144,12 @@ scene.add(modelAnchor);
 Attach gameplay movement to the outer anchor, not to streamed internals.
 
 Use the inner content root for post-load fitting and centering.
+
+Treat `modelAnchor.rotation` as the streamed asset's local orientation offset. If the gameplay actor
+already rotates toward movement, and the streamed model appears to face exactly backward while moving
+correctly, change this local yaw offset by 180 degrees instead of changing gameplay movement math. For
+example, `rotationDeg: [0, 180, 0]` may need to become `rotationDeg: [0, 0, 0]` for assets whose
+forward axis already matches the actor anchor.
 
 ### Step 5: Load the model
 
@@ -214,6 +251,8 @@ Do not leave this implicit. If only part of the fallback is hidden, the final ac
 9. On non-bundled pages that use the UMD build, the PS runtime can fail at startup if it runs before a global `THREE` exists. Load a classic Three.js global first, or inject the PS runtime from module code after `window.THREE = THREE` is set.
 10. If the app already registers its own root service worker, merge the PS worker into that file instead of letting the SDK compete for root-worker ownership.
 11. Bounding-box fitting and user tuning are separate steps. Fit first from `event.boundingBox`, then optionally apply a config multiplier such as `0.5` for art direction.
+12. Copying `/service-worker.js` into the build output without registering it can produce the exact symptom: no PS console logs after app startup and the fallback actor remains visible. Add a pre-await bootstrap log, register the worker, and use a timeout around `navigator.serviceWorker.ready`.
+13. If a streamed actor moves along the correct path but faces the opposite direction, the bug is usually the asset-local yaw offset, not the pathfinding or movement vector. Flip the streamed anchor yaw by 180 degrees (`rotationDeg`/`modelAnchor.rotation.y`) and keep gameplay rotation unchanged.
 
 ## Debugging Playbook
 
@@ -242,6 +281,20 @@ Check fallback policy:
 2. Is `keepTurretOverlay` or equivalent intentionally preserving part of the actor?
 3. Does the desired asset represent a full replacement or only a body replacement?
 4. Are fallback visuals being hidden too early, before wrapper success is confirmed?
+
+### Symptom: streamed actor moves correctly but faces backward
+
+Check orientation offset before changing AI/pathfinding code:
+
+1. Confirm the outer actor/anchor rotates correctly by temporarily showing the fallback direction marker.
+2. Confirm the streamed model is parented under that actor/anchor, not independently syncing world rotation.
+3. Adjust only the streamed asset's local yaw offset by 180 degrees:
+  - `rotationDeg: [0, 180, 0]` -> `rotationDeg: [0, 0, 0]`, or
+  - `rotationDeg: [0, 0, 0]` -> `rotationDeg: [0, 180, 0]`
+4. Rebuild and verify the published config contains the intended rotation value.
+
+Do not invert movement vectors or add `Math.PI` to gameplay actor rotation unless the fallback actor
+also faces the wrong direction. This correction belongs at the PS asset-presentation layer.
 
 ### Symptom: the SDK appears healthy but the fallback never swaps
 
@@ -276,6 +329,7 @@ If those counters advance, the problem has likely moved from transport into inte
 - [ ] `/lib/basis_transcoder.js` and `/lib/basis_transcoder.wasm` are reachable
 - [ ] `/assets/viverse-symbol-anim.glb` is reachable from the app root
 - [ ] Streamed content is centered/scaled using the emitted bounding box
+- [ ] Streamed content local yaw matches the gameplay actor's forward direction
 - [ ] Fallback is hidden only after wrapper success confirms the streamed model is usable
 - [ ] Any custom root service worker imports the PS worker instead of competing with it
 - [ ] Fallback policy matches the intended replacement mode

@@ -78,6 +78,16 @@ Use this skill when implementing or evolving the internal template system (regis
     into a template, scan the source to determine its "theme-swap readiness" level. If the source
     scores below Level 2, perform minimal modularization surgery before packaging.
 
+17. **Mobile support means touch-playable, not merely responsive.** A template with
+    `rulesets/*.json` `mobileFirst: true` must ship mobile interaction paths for every core action:
+    movement/camera, primary action, secondary action, menu/exit, and any mode-specific selection UI.
+    A desktop keyboard/mouse path plus CSS media queries is not enough.
+
+18. **In-game HUD must protect the avatar/camera focal area.** During active gameplay, panels,
+    tutorial notices, toast messages, leaderboards, and selection controls must not cover the central
+    play area on phone viewports. Use compact top HUD strips, small auto-fading toasts, bottom trays,
+    and explicit setup-vs-playing UI states instead of persistent center panels.
+
 ## Art Modularization Assessment
 
 When extracting a new template, run this assessment on the source code to determine how easy it
@@ -167,6 +177,66 @@ SceneBuilder.js functions + atmosphere in constructor. 3-5 edit locations for fu
 
 **flight-simulator-v1 → Level 3:** All visual constants in `src/core/Constants.js`.
 
+## Mobile Gameplay Support Assessment
+
+Run this assessment for every new or migrated game template before certification, especially if any
+ruleset declares `mobileFirst: true`.
+
+### Required Interaction Paths
+
+- **Movement:** provide touch movement controls for games that depend on keyboard movement. A
+    four-way pad is acceptable for minimum compliance; an analog joystick is preferred for continuous
+    3D movement.
+- **Camera/look:** preserve drag-to-look/orbit on the canvas or provide an equivalent touch camera
+    control. Do not let HUD overlays steal the entire touch surface.
+- **Primary/secondary actions:** expose tap targets for actions normally bound to keys (`Q`, `E`,
+    `F`, space, etc.). Minimum target size: 44px with at least 8px gap.
+- **Mode-specific selection:** replace desktop dropdowns used during gameplay with thumb-friendly
+    controls such as chip trays, carousels, radial menus, or bottom sheets. Keep dropdowns only for
+    setup/desktop fallback.
+- **Exit/menu:** provide an in-game way to quit, reset, or reopen settings without blocking the main
+    play surface.
+
+### HUD Layout Rules
+
+- Separate UI into **setup** and **playing** states. Setup panels may be larger bottom sheets; playing
+    HUD should be compact and non-blocking.
+- Keep active gameplay feedback as small toasts, not persistent message cards. Toasts should auto-fade
+    or stay compact enough to avoid the avatar/camera focal area.
+- Keep the center 50% width x 40% height of the viewport free of non-critical UI during gameplay.
+- Bottom gameplay controls should reserve fixed zones: movement on one side, actions on the other,
+    and contextual trays just above them.
+- Selection trays must not overlap movement/action controls and must support horizontal overflow for
+    many options.
+- Hide or collapse non-critical panels such as status lists, lobby panels, and leaderboards during
+    active gameplay on mobile.
+
+### Validation Checks
+
+Use executable checks after implementing mobile support:
+
+1. Build the template with its contract `buildConfig.command`.
+2. Run mobile viewport checks for at least phone-small, phone-tall, and tablet widths.
+3. Verify `document.documentElement.scrollWidth <= window.innerWidth + 1`.
+4. Verify core touch controls exist and are visible in gameplay state.
+5. Verify toast/panel/tray/control rectangles do not overlap each other or the central play area.
+6. If headless WebGL/canvas is unavailable, record that limitation and still validate DOM/RWD metrics;
+     use real-device smoke testing for final 3D rendering.
+
+### Hide-and-Seek Lesson
+
+The `hide-and-seek-v1` migration showed the common failure mode: it was responsive but still mobile
+hostile. The first mobile pass had a large setup panel, a message card like "You are back to your
+avatar form" covering the avatar/focal area, and prop selection hidden in a dropdown. The corrected
+pattern was:
+
+- compact mobile top HUD
+- small non-blocking toast near the top safe area
+- explicit `.setup` and `.playing` HUD states
+- touch movement pad wired into the same movement vector as keyboard input
+- bottom prop tray with large buttons, synced to the desktop dropdown
+- dropdown hidden on mobile during setup/gameplay where the tray is the intended interaction
+
 ## Template Checklist
 
 - [ ] Registry entry exists and template path is real
@@ -177,6 +247,11 @@ SceneBuilder.js functions + atmosphere in constructor. 3-5 edit locations for fu
 - [ ] Startup/bootstrap still launches the world after auth/bootstrap
 - [ ] Gameplay remains usable on short/mobile-height viewports
 - [ ] Secondary overlays do not obscure active play
+- [ ] `mobileFirst: true` templates provide touch controls for all core gameplay actions
+- [ ] Active gameplay HUD keeps the central play area clear on phone viewports
+- [ ] Gameplay selection UI uses mobile trays/chips/carousels instead of dropdown-only controls
+- [ ] Setup panels and active-play HUD have explicit states; large panels are hidden/collapsed during play
+- [ ] Mobile viewport metrics verify no horizontal overflow or HUD/control overlap
 - [ ] Run report contains template events and high-risk-write advisory reasons
 - [ ] `template.json` includes `buildConfig` with correct `type` (static or vite)
 - [ ] `enforcement.defaultMode` is `"enforce"` not `"audit"`
