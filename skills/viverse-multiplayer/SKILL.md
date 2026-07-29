@@ -33,7 +33,8 @@ Use when a project needs:
 2. [patterns/matchmaking-flow.md](patterns/matchmaking-flow.md)
 3. [patterns/robust-room-lifecycle.md](patterns/robust-room-lifecycle.md)
 4. [patterns/move-sync-reliability.md](patterns/move-sync-reliability.md)
-5. [examples/chess-move-sync.md](examples/chess-move-sync.md) for turn-based games
+5. [patterns/start-signal-redundancy.md](patterns/start-signal-redundancy.md) for any real-time/session game
+6. [examples/chess-move-sync.md](examples/chess-move-sync.md) for turn-based games
 
 ## Prerequisites
 
@@ -53,6 +54,9 @@ Use when a project needs:
 3. **MUST** run `setActor` after connect with a unique per-connect `session_id` (`accountId-timestamp-random`) and guard method availability (`mc.setActor?.(...)` or explicit `if (typeof mc.setActor === "function")`).
 4. **MUST** use **Session-Matching Alpha** to resolve local `actor_id` by matching local `session_id` against `mc.getMyRoomActors()` or `room.actors`.
 5. **MUST** initialize `MultiplayerClient` with `await mp.init({ modules: { general: { enabled: true } } })` before using `mp.general`.
+5A. **MUST NOT** treat `await mp.init(...)` resolving as "ready to send". `init()` calls `mediasoupclient.connect()` **without awaiting it** and returns immediately; the WebRTC chat DataProducer that carries `general` messages opens later. `sendChatMessage()` bails with `console.warn("sendChatMessage() | chat DataProducer not open")` and **no return value**, so early sends are silently discarded while your code believes they succeeded.
+5B. **MUST** gate the first send on `mp.onConnected(...)` (which chains to the MediasoupClient's `onMyDataProducerConnected`, fired from the DataProducer's `open` event), and **MUST** queue outbound messages until it fires. Register it synchronously after `init()` — the SDK does not replay a missed `open`. Add a timeout fallback so a missed event cannot deadlock the game.
+5C. **MUST NOT** rely on a single unacked packet for any state transition a player cannot recover from (game start above all). Provide at least two independent routes — see [patterns/start-signal-redundancy.md](patterns/start-signal-redundancy.md).
 6. **MUST NOT** call `mc.getActorId()` (non-existent API).
 7. **MUST NOT** depend on `updateRoom(...)` as a portable room-state API; use `setRoomProperties(...)` for room properties.
 8. **MUST** pass a raw room ID string to `joinRoom(...)` (not a room object).
@@ -248,6 +252,15 @@ try {
   mp = new MClient(roomId, appId, actorSessionId);
 }
 await mp.init({ modules: { general: { enabled: true } } });
+
+// REQUIRED: init() resolving does NOT mean you can send — it fires
+// mediasoupclient.connect() un-awaited and returns. Queue until the chat
+// DataProducer actually opens, or your first sends are silently discarded.
+let realtimeReady = false;
+const outbox = [];
+const flush = () => { realtimeReady = true; outbox.splice(0).forEach((d) => mp.general.sendMessage(d)); };
+try { mp.onConnected(flush); } catch (_) { /* throws pre-init */ }
+setTimeout(() => { if (!realtimeReady) flush(); }, 8000);   // fallback: never deadlock
 ```
 
 ### 5A) Template-Bound Projects
@@ -355,6 +368,10 @@ For collectible gameplay state (pickups, temporary buffs):
 
 - [ ] Two different users can create/join/start
 - [ ] Both sides receive game-start signal
+- [ ] No send happens before `mp.onConnected(...)` fires; pre-ready messages are queued and flushed, not dropped
+- [ ] `console.warn("... chat DataProducer not open")` never appears for a gameplay-critical packet
+- [ ] Game start survives a dead realtime channel (at least two independent start routes)
+- [ ] A joiner that misses every start packet still recovers (host replay and/or request-state retry)
 - [ ] Host leave closes room for joiners
 - [ ] Joiner leave does not break host's ability to restart
 - [ ] Move/state sync works for first move and late joiner catch-up
@@ -371,6 +388,18 @@ For collectible gameplay state (pickups, temporary buffs):
 
 ## Critical Gotchas
 
+- **`init()` resolving does NOT mean the transport is up.** This is the single most expensive gotcha in this SDK. `MultiplayerClient.init()` fires `mediasoupclient.connect()` un-awaited and returns; if you pass no `game`/`networkSync`/`actionSync`/`leaderboard` modules it skips its own awaits and resolves in ~0 ms. Everything sent before the chat DataProducer opens is dropped by `sendChatMessage()` with only a `console.warn`. Symptom: host logs a successful send, joiners receive nothing, and matchmaking looks perfectly healthy because create/join/start ride a different socket.
+- **Detecting the silent drop**: the warn is emitted **synchronously** inside `send()`, before any `await`. A flag set around the call therefore tells you whether the packet actually left, letting you requeue instead of reporting success:
+  ```javascript
+  let dropped = false;
+  const origWarn = console.warn.bind(console);
+  console.warn = (...a) => { if (a.some(x => typeof x === 'string' && x.includes('chat DataProducer not open'))) dropped = true; origWarn(...a); };
+  // ...
+  dropped = false;
+  mp.general.sendMessage(data);
+  if (dropped) { /* requeue; mark transport not-ready */ }
+  ```
+- **`general` is not a real `init` module.** `init()` only reads `modules.game`, `modules.networkSync`, `modules.actionSync`, `modules.leaderboard`. `{ modules: { general: { enabled: true } } }` is inert — harmless, and the general module works regardless because it is wired in the constructor. Do not "fix" a dead channel by enabling `game`/`networkSync`: those provision bots and room config server-side and change matchmaking behaviour.
 - **Session-Matching Alpha**: To find your `actor_id`, iterate `room.actors` and find the one where `actor.session_id === actorSessionId`.
 - **MANDATORY**: Do NOT call `getActorId()`.
 - Register/start handlers before calling `startGame` to avoid missed events.
@@ -390,5 +419,6 @@ For collectible gameplay state (pickups, temporary buffs):
 
 - [patterns/matchmaking-flow.md](patterns/matchmaking-flow.md)
 - [patterns/move-sync-reliability.md](patterns/move-sync-reliability.md)
+- [patterns/start-signal-redundancy.md](patterns/start-signal-redundancy.md)
 - [examples/chess-move-sync.md](examples/chess-move-sync.md)
 - [VIVERSE Matchmaking SDK Docs](https://docs.viverse.com/developer-tools/matchmaking-and-networking-sdk)

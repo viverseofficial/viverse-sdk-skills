@@ -128,6 +128,73 @@ Explicitly enable the General module when initializing MultiplayerClient:
 await mp.init({ modules: { general: { enabled: true } } });
 ```
 
+Note: `init()` only reads `modules.game`, `modules.networkSync`,
+`modules.actionSync` and `modules.leaderboard`, so the `general` flag is
+**inert**. Keep it as documentation of intent — the general module is wired in
+the constructor and works regardless. Do not enable `game`/`networkSync` to
+"fix" a dead channel: they provision bots and room config server-side.
+
+### 5A. Sends before the data channel opens are silently discarded (Critical)
+
+**Problem**: `await mp.init(...)` resolving does not mean you can send. Verified
+against `play-sdk/1.0.1`:
+
+- `init()` calls `this.mediasoupclient.connect(roomId, peerId)` **without
+  awaiting it**, then returns. With no `game`/`networkSync`/`actionSync`/
+  `leaderboard` modules it also skips its own awaits, so it resolves in ~0 ms.
+- The chat DataProducer that carries `general` traffic is created later, inside
+  `join()`, and its SCTP channel opens later still.
+- The send path is
+  `general.sendMessage → sdk.send → mediasoupclient.sendMessage → sendChatMessage`,
+  and `sendChatMessage` is:
+
+  ```javascript
+  async sendChatMessage(e) {
+    if (this._chatDataProducer) {
+      if (this._chatDataProducer.readyState !== "open") {
+        console.warn("sendChatMessage() | chat DataProducer not open");
+        return;                        // <-- no throw, no return value
+      }
+      try { this._chatDataProducer.send(e) } catch (t) { ... }
+    }
+  }
+  ```
+
+  If `_chatDataProducer` is null it returns with **no warning at all**.
+
+Symptom: the host logs a successful send, joiners receive nothing, and the lobby
+looks perfectly healthy because create/join/start ride the matchmaking socket.
+
+**Fix**: gate the first send on the real readiness signal and queue until then.
+
+```javascript
+await mp.init({ modules: { general: { enabled: true } } });
+
+// mp.onConnected -> mediasoupclient.onConnected -> onMyDataProducerConnected,
+// fired from the chat DataProducer's "open" event. Register synchronously after
+// init(): the SDK does NOT replay a missed open.
+let ready = false;
+const outbox = [];
+try {
+  mp.onConnected(() => { ready = true; outbox.splice(0).forEach(send); });
+} catch (_) { /* throws pre-init */ }
+
+// Fallback so a missed event cannot deadlock the game.
+setTimeout(() => { if (!ready) { ready = true; outbox.splice(0).forEach(send); } }, 8000);
+```
+
+Never queue positional/transform updates — they are worthless once stale. Queue
+state transitions (roles, phase, start, full-state) only.
+
+**Detecting a drop**: the warn fires synchronously inside `send()`, so a flag
+around the call reveals whether the packet actually left — see the Critical
+Gotchas section of [SKILL.md](../SKILL.md) for the console.warn hook. Requeue on
+a detected drop and mark the transport not-ready again.
+
+Do not stop at readiness gating: if the channel never comes up, the game still
+needs a start path that does not use it. See
+[start-signal-redundancy.md](start-signal-redundancy.md).
+
 ### 6. roomId Consistency
 
 Both creator and joiner must use the same `roomId`. Use `room.id || room.game_session` — these are typically equal from the matchmaking API.
