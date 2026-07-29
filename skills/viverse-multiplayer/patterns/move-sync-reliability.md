@@ -195,6 +195,55 @@ Do not stop at readiness gating: if the channel never comes up, the game still
 needs a start path that does not use it. See
 [start-signal-redundancy.md](start-signal-redundancy.md).
 
+### 5B. When the data channel never opens at all (Verified on prod)
+
+Readiness gating is not always enough. On hide-and-seek (2026-07-29) the chat
+DataProducer **never** opened: no `onConnected` within 8 s, and sends still
+dropping 26 s after `init()`. The producer object existed (so `join()` and
+`produceData()` both succeeded) but `readyState` never became `"open"` —
+consistent with ICE/DTLS never completing. Game code cannot inspect this: the
+public wrapper closes over the `MediasoupClient`, so `_sendTransport` and
+`_chatDataProducer` are unreachable.
+
+Meanwhile matchmaking was completely healthy. **Matchmaking and gameplay ride
+different transports, so a totally dead data channel is invisible from the
+lobby.**
+
+**Fallback**: the matchmaking client can carry low-rate state.
+
+| API | Who may call it | Use |
+|---|---|---|
+| `mc.setActorProperties(props)` | **any actor**, not host-only | per-player transform/state publish |
+| `mc.getMyRoomActors()` | any actor | read every actor's `properties` |
+| `mc.setRoomProperties(props)` | host/creator only | authoritative room state |
+| `mc.getRoomProperties()` | any actor | read room state |
+
+```javascript
+// publish (~3-4 Hz; one socket round trip each, so throttle and never overlap)
+await mc.setActorProperties({ avatarUrl, px, pz, pry, rl: role });
+
+// read: poll getMyRoomActors and translate into your existing message shape,
+// so no rendering/consumer code has to change
+for (const actor of actors) {
+  if (actor.session_id === mySessionId) continue;
+  const p = actor.properties || {};
+  handleMessage({ type: "POSITION", actorId: actor.session_id, x: +p.px, z: +p.pz, ry: +p.pry });
+}
+```
+
+Caveats:
+- `setActorProperties` **replaces** the property bag — carry existing fields
+  (e.g. `avatarUrl`) forward or you will drop them.
+- Budget a few Hz, not 10+. Fine for walking-pace games with interpolation;
+  not for twitch shooters.
+- Switch on **positive evidence** of failure (a detected drop, or no readiness
+  after a grace period), not optimistically — otherwise you pay socket traffic
+  when the fast path is healthy.
+
+Also beware: logging a queued/dropped 10 Hz transform every frame will flush a
+bounded diagnostic buffer in about a minute and erase the history you need.
+Sample or exclude high-rate message types from logs.
+
 ### 6. roomId Consistency
 
 Both creator and joiner must use the same `roomId`. Use `room.id || room.game_session` — these are typically equal from the matchmaking API.
