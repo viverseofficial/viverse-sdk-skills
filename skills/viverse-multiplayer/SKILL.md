@@ -53,6 +53,7 @@ Use when a project needs:
 2. **MUST** wait for connect signal (`onConnect`/`connect`) with timeout; do not block forever waiting on events.
 3. **MUST** run `setActor` after connect with a unique per-connect `session_id` (`accountId-timestamp-random`) and guard method availability (`mc.setActor?.(...)` or explicit `if (typeof mc.setActor === "function")`).
 4. **MUST** use **Session-Matching Alpha** to resolve local `actor_id` by matching local `session_id` against `mc.getMyRoomActors()` or `room.actors`.
+4A. **MUST** construct `MultiplayerClient` with **positional** arguments: `new MultiplayerClient(roomId, appId, actorSessionId)`. The signature is `(roomId, appId, userSessionId)` and it only throws when `roomId`/`appId` are falsy — **never on wrong argument types**. Passing an options object (`new MultiplayerClient(roomId, { app_id, token, session_id })`) therefore silently sets `appId` to an object and leaves `userSessionId` undefined, which the SDK replaces with a random id; `peerId` is then derived from that random id and no longer matches your matchmaking actor. The gateway accepts the WebSocket join and creates the chat DataProducer, but the transport never completes, so `readyState` stays non-open and **every** gameplay packet is silently discarded forever.
 5. **MUST** initialize `MultiplayerClient` with `await mp.init({ modules: { general: { enabled: true } } })` before using `mp.general`.
 5A. **MUST NOT** treat `await mp.init(...)` resolving as "ready to send". `init()` calls `mediasoupclient.connect()` **without awaiting it** and returns immediately; the WebRTC chat DataProducer that carries `general` messages opens later. `sendChatMessage()` bails with `console.warn("sendChatMessage() | chat DataProducer not open")` and **no return value**, so early sends are silently discarded while your code believes they succeeded.
 5B. **MUST** gate the first send on `mp.onConnected(...)` (which chains to the MediasoupClient's `onMyDataProducerConnected`, fired from the DataProducer's `open` event), and **MUST** queue outbound messages until it fires. Register it synchronously after `init()` — the SDK does not replay a missed `open`. Add a timeout fallback so a missed event cannot deadlock the game.
@@ -368,6 +369,7 @@ For collectible gameplay state (pickups, temporary buffs):
 
 - [ ] Two different users can create/join/start
 - [ ] Both sides receive game-start signal
+- [ ] `MultiplayerClient` is constructed positionally and `client.userSessionId` equals the matchmaking `actorSessionId`
 - [ ] No send happens before `mp.onConnected(...)` fires; pre-ready messages are queued and flushed, not dropped
 - [ ] `console.warn("... chat DataProducer not open")` never appears for a gameplay-critical packet
 - [ ] Game start survives a dead realtime channel (at least two independent start routes)
@@ -388,6 +390,7 @@ For collectible gameplay state (pickups, temporary buffs):
 
 ## Critical Gotchas
 
+- **The constructor is positional and fails silently if you pass an options object.** `new MultiplayerClient(roomId, appId, actorSessionId)`. There is no options-object overload. A `try { optionsForm } catch { positionalForm }` pattern is worthless here because wrong argument *types* do not throw — the options form "succeeds" and yields a client whose `appId` is an object and whose `peerId` derives from a random session id. Symptom: identical to a dead data channel (`chat DataProducer not open` forever) while matchmaking looks perfectly healthy. Verify with `client.userSessionId === yourActorSessionId` immediately after construction.
 - **`init()` resolving does NOT mean the transport is up.** This is the single most expensive gotcha in this SDK. `MultiplayerClient.init()` fires `mediasoupclient.connect()` un-awaited and returns; if you pass no `game`/`networkSync`/`actionSync`/`leaderboard` modules it skips its own awaits and resolves in ~0 ms. Everything sent before the chat DataProducer opens is dropped by `sendChatMessage()` with only a `console.warn`. Symptom: host logs a successful send, joiners receive nothing, and matchmaking looks perfectly healthy because create/join/start ride a different socket.
 - **Detecting the silent drop**: the warn is emitted **synchronously** inside `send()`, before any `await`. A flag set around the call therefore tells you whether the packet actually left, letting you requeue instead of reporting success:
   ```javascript
