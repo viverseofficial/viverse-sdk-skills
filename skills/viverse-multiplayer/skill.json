@@ -1,7 +1,7 @@
 {
   "id": "viverse-multiplayer",
   "name": "viverse-multiplayer",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "status": "active",
   "description": "VIVERSE Matchmaking & Play SDK integration for multiplayer games. Use when building online 2-player games, turn-based sync, room create/join, or custom state sharing.",
   "tags": [
@@ -26,7 +26,8 @@
     "SKILL.md",
     "patterns/matchmaking-flow.md",
     "patterns/move-sync-reliability.md",
-    "patterns/start-signal-redundancy.md"
+    "patterns/start-signal-redundancy.md",
+    "examples/tank-realtime-sync.md"
   ],
   "dependencies": [
     "bundle:resilience"

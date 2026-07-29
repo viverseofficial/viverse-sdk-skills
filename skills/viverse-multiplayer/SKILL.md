@@ -34,7 +34,8 @@ Use when a project needs:
 3. [patterns/robust-room-lifecycle.md](patterns/robust-room-lifecycle.md)
 4. [patterns/move-sync-reliability.md](patterns/move-sync-reliability.md)
 5. [patterns/start-signal-redundancy.md](patterns/start-signal-redundancy.md) for any real-time/session game
-6. [examples/chess-move-sync.md](examples/chess-move-sync.md) for turn-based games
+6. [examples/tank-realtime-sync.md](examples/tank-realtime-sync.md) for real-time/action games (verified working)
+7. [examples/chess-move-sync.md](examples/chess-move-sync.md) for turn-based games
 
 ## Prerequisites
 
@@ -53,7 +54,8 @@ Use when a project needs:
 2. **MUST** wait for connect signal (`onConnect`/`connect`) with timeout; do not block forever waiting on events.
 3. **MUST** run `setActor` after connect with a unique per-connect `session_id` (`accountId-timestamp-random`) and guard method availability (`mc.setActor?.(...)` or explicit `if (typeof mc.setActor === "function")`).
 4. **MUST** use **Session-Matching Alpha** to resolve local `actor_id` by matching local `session_id` against `mc.getMyRoomActors()` or `room.actors`.
-4A. **MUST** construct `MultiplayerClient` with **positional** arguments: `new MultiplayerClient(roomId, appId, actorSessionId)`. The signature is `(roomId, appId, userSessionId)` and it only throws when `roomId`/`appId` are falsy — **never on wrong argument types**. Passing an options object (`new MultiplayerClient(roomId, { app_id, token, session_id })`) therefore silently sets `appId` to an object and leaves `userSessionId` undefined, which the SDK replaces with a random id; `peerId` is then derived from that random id and no longer matches your matchmaking actor. The gateway accepts the WebSocket join and creates the chat DataProducer, but the transport never completes, so `readyState` stays non-open and **every** gameplay packet is silently discarded forever.
+4A. **MUST** prefer the official factory `await playClient.newMultiplayerClient(roomId, appId, actorSessionId)`. It forwards positionally to `new playSDK.MultiplayerClient(roomId, appId, userSessionId)` **and** guarantees the Play SDK script is loaded/initialised first — manual construction does not. Note `newMatchmakingClient`/`newMultiplayerClient` live on the **viverse-sdk** (`window.viverse`), while the `MultiplayerClient` class itself lives in **play-sdk**; both script tags are required.
+4B. **MUST** construct `MultiplayerClient` with **positional** arguments when constructing manually: `new MultiplayerClient(roomId, appId, actorSessionId)`. The signature is `(roomId, appId, userSessionId)` and it only throws when `roomId`/`appId` are falsy — **never on wrong argument types**. Passing an options object (`new MultiplayerClient(roomId, { app_id, token, session_id })`) therefore silently sets `appId` to an object and leaves `userSessionId` undefined, which the SDK replaces with a random id; `peerId` is then derived from that random id and no longer matches your matchmaking actor. The gateway accepts the WebSocket join and creates the chat DataProducer, but the transport never completes, so `readyState` stays non-open and **every** gameplay packet is silently discarded forever.
 5. **MUST** initialize `MultiplayerClient` with `await mp.init({ modules: { general: { enabled: true } } })` before using `mp.general`.
 5A. **MUST NOT** treat `await mp.init(...)` resolving as "ready to send". `init()` calls `mediasoupclient.connect()` **without awaiting it** and returns immediately; the WebRTC chat DataProducer that carries `general` messages opens later. `sendChatMessage()` bails with `console.warn("sendChatMessage() | chat DataProducer not open")` and **no return value**, so early sends are silently discarded while your code believes they succeeded.
 5B. **MUST** gate the first send on `mp.onConnected(...)` (which chains to the MediasoupClient's `onMyDataProducerConnected`, fired from the DataProducer's `open` event), and **MUST** queue outbound messages until it fires. Register it synchronously after `init()` — the SDK does not replay a missed `open`. Add a timeout fallback so a missed event cannot deadlock the game.
@@ -240,17 +242,23 @@ const MClient =
   window.play?.MultiplayerClient ||
   window.Play?.MultiplayerClient;
 if (!roomId) throw new Error("roomId is required");
+// PREFERRED: the official factory. It positionally forwards to
+// `new playSDK.MultiplayerClient(roomId, appId, userSessionId)` AND guarantees
+// the Play SDK script is loaded/initialised first, which manual construction
+// does not.
 let mp;
-try {
-  mp = new MClient(roomId, {
-    app_id: appId,
-    token: accessToken,
-    authorization: accessToken,
-    accessToken,
-    session_id: actorSessionId
-  });
-} catch (_) {
+if (typeof playClient?.newMultiplayerClient === "function") {
+  mp = await playClient.newMultiplayerClient(roomId, appId, actorSessionId);
+} else {
+  // Fallback: construct directly — still POSITIONAL. Never pass an options
+  // object; see gate 4A. The constructor does not throw on wrong argument
+  // types, so a try/catch cannot detect the mistake.
   mp = new MClient(roomId, appId, actorSessionId);
+}
+// Identity assertion: if these diverge, matchmaking and realtime are two
+// different peers and nothing will ever sync.
+if (mp.userSessionId !== actorSessionId) {
+  console.error("[MP] session id mismatch — realtime peer is not our actor", mp.userSessionId, actorSessionId);
 }
 await mp.init({ modules: { general: { enabled: true } } });
 
@@ -423,5 +431,6 @@ For collectible gameplay state (pickups, temporary buffs):
 - [patterns/matchmaking-flow.md](patterns/matchmaking-flow.md)
 - [patterns/move-sync-reliability.md](patterns/move-sync-reliability.md)
 - [patterns/start-signal-redundancy.md](patterns/start-signal-redundancy.md)
+- [examples/tank-realtime-sync.md](examples/tank-realtime-sync.md) — verified-working real-time transform sync
 - [examples/chess-move-sync.md](examples/chess-move-sync.md)
 - [VIVERSE Matchmaking SDK Docs](https://docs.viverse.com/developer-tools/matchmaking-and-networking-sdk)

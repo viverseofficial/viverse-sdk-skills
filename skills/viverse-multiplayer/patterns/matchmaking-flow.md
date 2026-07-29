@@ -152,17 +152,23 @@ After start (both master and non-master):
 const roomId = room?.id || room?.roomId || room?.game_session;
 if (!roomId) throw new Error("roomId is required");
 const MClient = v.play?.MultiplayerClient || v.Play?.MultiplayerClient || window.play?.MultiplayerClient || window.Play?.MultiplayerClient;
+// PREFERRED: the official factory. It positionally forwards to
+// `new playSDK.MultiplayerClient(roomId, appId, userSessionId)` AND guarantees
+// the Play SDK script is loaded/initialised first, which manual construction
+// does not.
 let mp;
-try {
-  mp = new MClient(roomId, {
-    app_id: appId,
-    token: accessToken,
-    authorization: accessToken,
-    accessToken,
-    session_id: actorSessionId
-  });
-} catch (_) {
+if (typeof playClient?.newMultiplayerClient === "function") {
+  mp = await playClient.newMultiplayerClient(roomId, appId, actorSessionId);
+} else {
+  // Fallback: construct directly — still POSITIONAL. Never pass an options
+  // object; see gate 4A. The constructor does not throw on wrong argument
+  // types, so a try/catch cannot detect the mistake.
   mp = new MClient(roomId, appId, actorSessionId);
+}
+// Identity assertion: if these diverge, matchmaking and realtime are two
+// different peers and nothing will ever sync.
+if (mp.userSessionId !== actorSessionId) {
+  console.error("[MP] session id mismatch — realtime peer is not our actor", mp.userSessionId, actorSessionId);
 }
 
 await mp.init({
