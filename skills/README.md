@@ -28,6 +28,7 @@ The agent auto-loads SKILL.md summaries on startup. When it detects a task match
 | [playcanvas-avatar-navigation](./playcanvas-avatar-navigation/) | Physics-based avatar movement in PlayCanvas + Ammo.js scenes |
 | [viverse-auth](./viverse-auth/) | VIVERSE Login SDK integration (SSO, user profiles) |
 | [viverse-avatar-sdk](./viverse-avatar-sdk/) | Loading VIVERSE user avatars (GLB/VRM) into 3D scenes |
+| [viverse-avatar-me-sdk](./viverse-avatar-me-sdk/) | Embedding the standalone Avatar Me Happy Path creator/selector and loading selected VRM avatars |
 | [viverse-r3f-foundation](./viverse-r3f-foundation/) | R3F + @react-three/viverse mini-game foundation for browser projects |
 | [viverse-r3f-profile-ui](./viverse-r3f-profile-ui/) | Profile/player-tag UI patterns using `useViverseProfile()` |
 | [viverse-threejs-vanilla-foundation](./viverse-threejs-vanilla-foundation/) | Vanilla Three.js + VIVERSE integration foundation without React |
