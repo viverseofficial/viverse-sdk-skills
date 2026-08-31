@@ -1,17 +1,19 @@
 ---
 name: viverse-pls-cli
-description: Upload and replace 3D model assets to VIVERSE using pls-cli. Use when the task involves uploading .zip/.glb/.obj files to VIVERSE, replacing existing assets, managing model conversion, or running pls-cli commands against stage/prod environments.
+description: Convert 3D models (.zip/.glb/.obj) to Polygon Streaming format on VIVERSE using pls-cli. Handles upload, replace, list, and delete operations. Use when the task involves converting models to Polygon Streaming, uploading assets, or managing assets on VIVERSE stage/prod environments.
 ---
 
-# pls-cli — VIVERSE Model Upload/Replace CLI
+# pls-cli — VIVERSE Polygon Streaming CLI
 
-Operational guide for AI agents running pls-cli to upload or replace 3D models on VIVERSE.
+Operational guide for AI agents running pls-cli to manage 3D model assets on VIVERSE.
 
 ## When to Activate
 
 - User wants to upload a model file (.zip, .glb, .obj) to VIVERSE
 - User wants to replace an existing asset by asset ID
-- Running smoke tests or integration tests against stage API
+- User wants to list assets in a group
+- User wants to delete an asset by ID
+- Running pls-cli operations against stage API
 - Debugging upload/conversion failures
 
 ---
@@ -184,7 +186,55 @@ Replace shares the same flags as upload except `--group` (originId is provided i
 
 ---
 
-## 5. Tag Management
+## 5. List Assets
+
+```bash
+# List all assets in your default group
+pls-cli list
+
+# With explicit group
+pls-cli list --group=<group-uuid>
+
+# Stage environment
+pls-cli list --group=<group-uuid> --stage
+
+# Machine-readable output (for agent parsing — recommended)
+pls-cli list --json
+```
+
+### List flags reference
+
+| Flag      | Values | Default       | Notes                                             |
+| --------- | ------ | ------------- | ------------------------------------------------- |
+| `--group` | UUID   | auto-selected | Omit to use your first group automatically        |
+| `--stage` | bool   | false         | Use staging environment                           |
+| `--json`  | bool   | false         | Write JSON to stdout; human messages go to stderr |
+
+---
+
+## 6. Delete Asset
+
+```bash
+# Delete an asset by ID
+pls-cli delete <asset-id>
+
+# Stage environment
+pls-cli delete <asset-id> --stage
+
+# Machine-readable output
+pls-cli delete <asset-id> --json
+```
+
+### Delete flags reference
+
+| Flag      | Values | Default | Notes                                             |
+| --------- | ------ | ------- | ------------------------------------------------- |
+| `--stage` | bool   | false   | Use staging environment                           |
+| `--json`  | bool   | false   | Write JSON to stdout; human messages go to stderr |
+
+---
+
+## 7. Tag Management
 
 Tags are labels you can attach to assets. You can create them, list them, and assign them to assets after upload.
 
@@ -264,7 +314,7 @@ pls-cli upload model.glb --group=<group-uuid> --tags=foo,bar --json
 
 ---
 
-## 6. Machine-Readable Output (--json)
+## 8. Machine-Readable Output (--json)
 
 Always pass `--json` when the result needs to be parsed programmatically.
 
@@ -327,6 +377,39 @@ When `--tags` is used, the upload JSON output includes a `"tags"` field:
 { "assetId": "asset-uuid", "tagUuids": ["tag-uuid-1", "tag-uuid-2"] }
 ```
 
+### List JSON output
+
+```json
+{
+  "assets": [
+    {
+      "id": "asset-uuid-1",
+      "name": "model.glb",
+      "status": "ready",
+      "createdAt": "2025-01-15T10:30:00Z"
+    },
+    {
+      "id": "asset-uuid-2",
+      "name": "scene.zip",
+      "status": "converting",
+      "createdAt": "2025-01-15T11:00:00Z"
+    }
+  ]
+}
+```
+
+### Delete JSON output
+
+```json
+{ "assetId": "asset-uuid", "deleted": true }
+```
+
+### Delete JSON output (failure)
+
+```json
+{ "assetId": "asset-uuid", "deleted": false }
+```
+
 ### Replace JSON output
 
 ```json
@@ -368,25 +451,32 @@ asset_id=$(echo "$result" | python3 -c "import sys,json; print(json.load(sys.std
 
 ---
 
-## 7. What the CLI Does Internally
+## 9. What the CLI Does Internally
 
 Understanding this helps debug failures:
 
 ```
-1. Validate file (format, size, count)
-2. POST /management/asset  →  get { id, uploadUrl }
-3. PUT $uploadUrl  (S3 direct upload, shows progress bar on stderr)
-4. POST /management/asset/:id/convert
-5. WebSocket wss://{domain}/management/user/ws  →  stream conversion progress
-6. Exit 0 on "ready", exit 1 on "failed"
-6.5. (optional) If --tags provided: resolve tag names → create missing tags → PUT /management/asset/:id/tags
-```
+Upload / Replace flow:
+  1. Validate file (format, size, count)
+  2. POST /management/asset  →  get { id, uploadUrl }
+  3. PUT $uploadUrl  (S3 direct upload, shows progress bar on stderr)
+  4. POST /management/asset/:id/convert
+  5. WebSocket wss://{domain}/management/user/ws  →  stream conversion progress
+  6. Exit 0 on "ready", exit 1 on "failed"
+  6.5. (optional) If --tags provided: resolve tag names → create missing tags → PUT /management/asset/:id/tags
 
-Replace uses `PUT /management/asset/:originId` instead of POST at step 2.
+  Replace uses PUT /management/asset/:originId instead of POST at step 2.
+
+List:
+  GET /management/assets?group={uuid}  →  return asset list
+
+Delete:
+  DELETE /management/asset/:id  →  remove asset
+```
 
 ---
 
-## 8. Supported File Formats
+## 10. Supported File Formats
 
 | Format | Notes                         |
 | ------ | ----------------------------- |
@@ -399,22 +489,7 @@ Max file size: 500 MB per file (FREE tier limit from API).
 
 ---
 
-## 9. Running Tests
-
-```bash
-# Unit + integration tests (race detection)
-go test -race ./...
-
-# Stage E2E tests (requires credentials)
-source .env
-go test -v -timeout 300s -run '^TestStage' ./cmd/pls-cli/
-```
-
-Tests auto-skip when `PLS_CLI_TEST_EMAIL` / `PLS_CLI_TEST_PASSWORD` are unset.
-
----
-
-## 10. Common Failures and Fixes
+## 11. Common Failures and Fixes
 
 | Symptom                                              | Cause                                          | Fix                                                                      |
 | ---------------------------------------------------- | ---------------------------------------------- | ------------------------------------------------------------------------ |
@@ -426,10 +501,11 @@ Tests auto-skip when `PLS_CLI_TEST_EMAIL` / `PLS_CLI_TEST_PASSWORD` are unset.
 | Conversion `status: "failed"`                        | Model file corrupted or unsupported            | Check `failedType` and `errorCode` in JSON output                        |
 | Binary not found                                     | pls-cli not installed                          | Install from GitHub Releases (see Section 0)                             |
 | Dev build fails at login                             | No client ID burned in                         | Install the official release binary from GitHub Releases (see Section 0) |
+| `404 Not Found` on delete                            | Asset ID doesn't exist or already deleted      | Verify the asset ID with `pls-cli list`                                  |
 
 ---
 
-## 11. Environments
+## 12. Environments
 
 | Env        | API base                           | WS base                          | Login flag |
 | ---------- | ---------------------------------- | -------------------------------- | ---------- |
