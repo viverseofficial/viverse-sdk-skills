@@ -15,20 +15,19 @@ Use this skill when all of these are true:
 2. The user wants to stream a Polygon Streaming `.xrg` asset at runtime.
 3. The goal is to mount the streamed model into an existing `THREE.Group` or scene anchor.
 4. The project needs reliable success/error signals and predictable fallback behavior.
-5. The project is not PlayCanvas.
+5. The project is not PlayCanvas. (See [viverse-polygon-streaming-playcanvas skill](../viverse-polygon-streaming-playcanvas/) for integrating into a PlayCanvas project).
 
 Do not use this skill for direct `.glb` loading without Polygon Streaming or for PlayCanvas-only flows.
 
 ## Preflight Checklist
 
-- [ ] `npm install -S @polygon-streaming/web-player-threejs@2.9.0-beta.2`
+- [ ] `npm install -S @polygon-streaming/web-player-threejs`
 - [ ] `npm install -S three`
 - [ ] The app has a live `camera`, `renderer`, `scene`, and a **stable `THREE.Vector3` `cameraTarget` that already exists before `new StreamController` / first `addModel`**
 - [ ] `/service-worker.js` is published at the web root
 - [ ] The app registers the Polygon Streaming service worker at runtime before constructing/loading streams
 - [ ] `/lib/basis_transcoder.js` is published at the web root
 - [ ] `/lib/basis_transcoder.wasm` is published at the web root
-- [ ] `/assets/viverse-symbol-anim.glb` is published at the web root
 - [ ] The streaming URL resolves to an `.xrg` asset
 
 ## Mandatory Compliance Gates
@@ -38,8 +37,7 @@ Do not use this skill for direct `.glb` loading without Polygon Streaming or for
 3. **MUST** register the Polygon Streaming service worker at runtime; copying it into `dist` is not enough.
 4. **MUST** log before any service-worker await so bootstrap stalls are visible in console.
 5. **MUST** call `streamController.update()` every frame after `renderer.render(...)`.
-6. **MUST** use the exported beta wrapper signature for `2.9.0-beta.2`:
-   `streamController.addModel(url, sceneGroup, options)`
+6. **MUST** use the exported wrapper signature: `streamController.addModel(url, sceneGroup, options)`
 7. **MUST NOT** call the internal object-form API directly through the exported wrapper.
 8. **MUST** wire success and failure through the wrapper event layer on `StreamController`.
 9. **MUST NOT** treat the user-passed `onModelLoaded` callback as the primary app-level success source.
@@ -55,21 +53,22 @@ Do not use this skill for direct `.glb` loading without Polygon Streaming or for
 19. **MUST NOT** start two large `.xrg` `addModel` calls on the same tick after the service worker becomes ready. Queue them; prefer the currently visible variant only (for example medieval now, technology later).
 20. **MUST NOT** parse the original full-size `.glb` as a parallel fallback while streaming that same asset. Gameplay can proceed with an empty/cheap placeholder; load the GLB only if `EVENT_MODEL_LOAD_ERROR` fires.
 21. **MUST** register `/service-worker.js` on the **app iframe origin** (VIVERSE preview is `*-preview.world.viverse.app`). Do **not** register a root PS worker on `www.viverse.com`. `hostname.endsWith('viverse.com')` does **not** match `world.viverse.app`.
+22. **MUST** treat `showLoadingModel` (default `true`) as opt-out, not opt-in. Override the placeholder with `loadingModelUrl` only if you want a custom one; set `showLoadingModel: false` if the app draws its own loading visual (for example the local fallback from gate 10). Decide this explicitly rather than inheriting the default.
 
-## Verified SDK Behavior For `2.9.0-beta.2`
+## Verified SDK
 
-- The exported wrapper emits `EVENT_MODEL_LOAD` and `EVENT_MODEL_LOAD_ERROR`.
-- In the installed `2.9.0-beta.2` build, those resolve to `model-load` and `model-load-error`.
+- The exported wrapper emits `EVENT_MODEL_LOAD` and `EVENT_MODEL_LOAD_ERROR`. Those resolve to `model-load` and `model-load-error`.
 - The SDK wrapper can wrap or replace user-supplied `onModelLoaded` and `onModelLoadError` callbacks.
 - For app integration, the wrapper event on `StreamController` is the safer hook.
 - If the model finishes loading internally but the app listens to `model-loaded` instead of `model-load`, the UI can look stuck even though the SDK succeeded.
+- `showLoadingModel` (default `true`) controls whether Polygon Streaming shows a built-in loading placeholder model while the `.xrg` streams in. `loadingModelUrl` replaces that placeholder with your own model URL. Because `showLoadingModel` is on by default, the placeholder asset must be reachable out of the box unless you opt out.
 
 ## Implementation Workflow
 
 ### Step 1: Install the SDK
 
 ```bash
-npm install -S @polygon-streaming/web-player-threejs@2.9.0-beta.2 three
+npm install -S @polygon-streaming/web-player-threejs three
 ```
 
 ### Step 2: Publish required static files
@@ -79,9 +78,6 @@ Copy these into your final app output:
 - `node_modules/@polygon-streaming/web-player-threejs/dist/service-worker.js` -> `/service-worker.js`
 - `node_modules/three/examples/jsm/libs/basis/basis_transcoder.js` -> `/lib/basis_transcoder.js`
 - `node_modules/three/examples/jsm/libs/basis/basis_transcoder.wasm` -> `/lib/basis_transcoder.wasm`
-- `public/assets/viverse-symbol-anim.glb` -> `/assets/viverse-symbol-anim.glb`
-
-For Vite apps, place `viverse-symbol-anim.glb` under `public/assets/` so the build emits `dist/assets/viverse-symbol-anim.glb` without any runtime override.
 
 Copy the service worker and Basis files for **both** `vite build` and `vite dev`. `writeBundle` alone is not enough for local testing:
 
@@ -322,26 +318,23 @@ A wall-clock "if not loaded in 12s, fetch the GLB" timer is harmful: a long hitc
 
 ## Known Gotchas
 
-1. `2.9.0-beta.2` still tries to load `/assets/viverse-symbol-anim.glb` as an internal loading animation. That is separate from your XRG.
-2. The stable fix is to ship that GLB locally at `/assets/viverse-symbol-anim.glb`; do not monkey-patch `StreamController.addLoadingModel()` unless you are debugging the SDK itself.
-3. A failed loading mascot does not prove the streamed XRG failed.
-4. The exported wrapper uses positional arguments even though the internal loader uses an object shape.
-5. If `addModel()` resolves and network `206` requests happen, do not assume the model failed. Confirm the wrapper event name first.
-6. If the streamed model loads but looks absent, check post-load fitting before blaming the URL.
-7. Keep a fallback mesh or procedural object during integration.
-8. A parented anchor is safer than a floating world-space mount that is manually re-synced every frame.
-9. On non-bundled pages that use the UMD build, the PS runtime can fail at startup if it runs before a global `THREE` exists. Load a classic Three.js global first, or inject the PS runtime from module code after `window.THREE = THREE` is set.
-10. If the app already registers its own root service worker, merge the PS worker into that file instead of letting the SDK compete for root-worker ownership.
-11. Bounding-box fitting and user tuning are separate steps. Fit first from `event.boundingBox`, then optionally apply a config multiplier such as `0.5` for art direction.
-12. Copying `/service-worker.js` into the build output without registering it can produce the exact symptom: no PS console logs after app startup and the fallback actor remains visible. Add a pre-await bootstrap log, register the worker, and use a timeout around `navigator.serviceWorker.ready`.
-13. If a streamed actor moves along the correct path but faces the opposite direction, the bug is usually the asset-local yaw offset, not the pathfinding or movement vector. Flip the streamed anchor yaw by 180 degrees (`rotationDeg`/`modelAnchor.rotation.y`) and keep gameplay rotation unchanged.
-14. A black screen / stuck loading overlay after enabling PS is often an uncaught throw while constructing `StreamController`, not a failed XRG. First suspect: `cameraTarget` read from `undefined` controls during scene `constructor`. Keep a Vector3 fallback and never let PS throw out of game bootstrap.
-15. Sharing one `StreamController` across enemies and world meshes is required (two controllers fight over the same renderer). Route `model-load` by `event.modelIndex`.
-16. `curl -I -H 'Range: bytes=0-15'` still returns **200**. Use a real `GET` with Range to assert **206**.
-17. Two controllers fight over renderer, triangle budget, and the root service worker. One controller; many `addModel`s.
-18. Two large `addModel`s unblocked by the same `serviceWorker.ready` can freeze the game loop. Console clue: `[Violation] 'requestAnimationFrame' handler took 106288ms` right after `[PS] service worker ready`, then a gap with no app logs. Chrome also attributes background-tab wait to rAF, so confirm whether the iframe stayed visible.
-19. `service-worker.js: There has been a problem with sending traffic records: Failed to fetch` is SDK telemetry. It does not mean the XRG failed and must not block gameplay.
-20. VIVERSE preview loads the game in an iframe on `*.world.viverse.app`. Register the PS worker there. A worker on `www.viverse.com` would intercept the host shell.
+1. The exported wrapper uses positional arguments even though the internal loader uses an object shape.
+2. If `addModel()` resolves and network `206` requests happen, do not assume the model failed. Confirm the wrapper event name first.
+3. If the streamed model loads but looks absent, check post-load fitting before blaming the URL.
+4. Keep a fallback mesh or procedural object during integration.
+5. A parented anchor is safer than a floating world-space mount that is manually re-synced every frame.
+6. On non-bundled pages that use the UMD build, the PS runtime can fail at startup if it runs before a global `THREE` exists. Load a classic Three.js global first, or inject the PS runtime from module code after `window.THREE = THREE` is set.
+7. If the app already registers its own root service worker, merge the PS worker into that file instead of letting the SDK compete for root-worker ownership.
+8. Bounding-box fitting and user tuning are separate steps. Fit first from `event.boundingBox`, then optionally apply a config multiplier such as `0.5` for art direction.
+9. Copying `/service-worker.js` into the build output without registering it can produce the exact symptom: no PS console logs after app startup and the fallback actor remains visible. Add a pre-await bootstrap log, register the worker, and use a timeout around `navigator.serviceWorker.ready`.
+10. If a streamed actor moves along the correct path but faces the opposite direction, the bug is usually the asset-local yaw offset, not the pathfinding or movement vector. Flip the streamed anchor yaw by 180 degrees (`rotationDeg`/`modelAnchor.rotation.y`) and keep gameplay rotation unchanged.
+11. A black screen / stuck loading overlay after enabling PS is often an uncaught throw while constructing `StreamController`, not a failed XRG. First suspect: `cameraTarget` read from `undefined` controls during scene `constructor`. Keep a Vector3 fallback and never let PS throw out of game bootstrap.
+12. Sharing one `StreamController` across enemies and world meshes is required (two controllers fight over the same renderer). Route `model-load` by `event.modelIndex`.
+13. `curl -I -H 'Range: bytes=0-15'` still returns **200**. Use a real `GET` with Range to assert **206**.
+14. Two controllers fight over renderer, triangle budget, and the root service worker. One controller; many `addModel`s.
+15. Two large `addModel`s unblocked by the same `serviceWorker.ready` can freeze the game loop. Console clue: `[Violation] 'requestAnimationFrame' handler took 106288ms` right after `[PS] service worker ready`, then a gap with no app logs. Chrome also attributes background-tab wait to rAF, so confirm whether the iframe stayed visible.
+16. `service-worker.js: There has been a problem with sending traffic records: Failed to fetch` is SDK telemetry. It does not mean the XRG failed and must not block gameplay.
+17. VIVERSE preview loads the game in an iframe on `*.world.viverse.app`. Register the PS worker there. A worker on `www.viverse.com` would intercept the host shell.
 
 ## Debugging Playbook
 
@@ -443,7 +436,6 @@ If those counters advance, the problem has likely moved from transport into inte
 - [ ] Network shows `.xrg` or downstream streamable asset requests
 - [ ] `/service-worker.js` is requested from the app root
 - [ ] `/lib/basis_transcoder.js` and `/lib/basis_transcoder.wasm` are reachable
-- [ ] `/assets/viverse-symbol-anim.glb` is reachable from the app root
 - [ ] Fit mode is explicit: `authored` keeps source transform; `bbox` uses the emitted bounding box
 - [ ] Streamed content local yaw matches the gameplay actor's forward direction
 - [ ] Fallback is hidden only after wrapper success confirms the streamed model is usable
@@ -454,3 +446,4 @@ If those counters advance, the problem has likely moved from transport into inte
 - [ ] Original full GLB is not fetched in parallel with the XRG
 - [ ] Preview iframe origin (`*.world.viverse.app`) owns `/service-worker.js`, not `www.viverse.com`
 - [ ] Fallback stays visible if load fails
+- [ ] `showLoadingModel` behavior matches intent (default placeholder, custom `loadingModelUrl`, or explicitly disabled)
