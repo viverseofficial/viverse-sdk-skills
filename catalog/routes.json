@@ -207,6 +207,26 @@
     },
     {
       "intent": [
+        "polygon streaming runtime",
+        "streamcontroller script",
+        "xrg loading",
+        "streamable-model:load",
+        "streamable-model:load-error",
+        "streamable-model:play-animation",
+        "basis transcoder",
+        "ammo wasm",
+        "embedded collider",
+        "service-worker.js",
+        "playcanvas polygon streaming",
+        "playcanvas script component",
+        "runtime streaming"
+      ],
+      "skills": [
+        "viverse-polygon-streaming-playcanvas"
+      ]
+    },
+    {
+      "intent": [
         "polygon streaming",
         "pls-cli",
         "glb convert",

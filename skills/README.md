@@ -39,7 +39,8 @@ The agent auto-loads SKILL.md summaries on startup. When it detects a task match
 | [viverse-key-protection-lambda](./viverse-key-protection-lambda/) | Protect API keys with Play Lambda env/script/invoke boundaries, plus manual-approval CI sync flow |
 | [viverse-utility-app](./viverse-utility-app/) | Build mobile-first utility tools and widgets using blank-webapp-v1 (no Lambda) or lambda-tool-v1 (Lambda-backed APIs) |
 | [viverse-world-publishing](./viverse-world-publishing/) | Publishing PlayCanvas projects to VIVERSE Worlds |
-| [viverse-polygon-streaming-threejs](./viverse-polygon-streaming-threejs/) | Minimal Polygon Streaming `.xrg` loading in vanilla Three.js using the official beta SDK |
+| [viverse-polygon-streaming-playcanvas](./viverse-polygon-streaming-playcanvas/) | Polygon Streaming `.xrg` loading in PlayCanvas using the NPM package |
+| [viverse-polygon-streaming-threejs](./viverse-polygon-streaming-threejs/) | Polygon Streaming `.xrg` loading in  Three.js using the NPM package |
 | [vrma-animation-retargeting](./vrma-animation-retargeting/) | VRMA animation retargeting for VIVERSE avatars |
 | [viverse-pls-cli](./viverse-pls-cli/) | Upload and replace 3D model assets (.zip/.glb/.obj) to VIVERSE via pls-cli |
 | [viverse-i18n](./viverse-i18n/) | Detect user language via `_htc_lang_code` cookie, minimal `t()` translation system for browser games |

@@ -1,6 +1,6 @@
 {
   "version": "0.1.0",
-  "generated_at": "2026-06-06T03:45:18.723Z",
+  "generated_at": "2026-09-21T09:00:35.201Z",
   "skills": [
     {
       "id": "playcanvas-asset-art",
@@ -55,12 +55,16 @@
       "path": "skills/viverse-multiplayer/skill.json"
     },
     {
-      "id": "viverse-polygon-streaming-threejs",
-      "path": "skills/viverse-polygon-streaming-threejs/skill.json"
-    },
-    {
       "id": "viverse-pls-cli",
       "path": "skills/viverse-pls-cli/skill.json"
+    },
+    {
+      "id": "viverse-polygon-streaming-playcanvas",
+      "path": "skills/viverse-polygon-streaming-playcanvas/skill.json"
+    },
+    {
+      "id": "viverse-polygon-streaming-threejs",
+      "path": "skills/viverse-polygon-streaming-threejs/skill.json"
     },
     {
       "id": "viverse-r3f-foundation",
