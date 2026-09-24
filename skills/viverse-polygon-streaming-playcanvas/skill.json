@@ -1,0 +1,25 @@
+{
+  "id": "viverse-polygon-streaming-playcanvas",
+  "name": "viverse-polygon-streaming-playcanvas",
+  "version": "1.0.0",
+  "status": "active",
+  "description": "Runtime Polygon Streaming .xrg integration for PlayCanvas apps built on @polygon-streaming/web-player-playcanvas: script-component setup (streamController/streamableModel), automatic service-worker registration vs manual file publishing, Ammo/Basis WASM prerequisites for embedded colliders and KTX2 textures, and entity-level load/error/animation events.",
+  "tags": [
+    "viverse",
+    "playcanvas",
+    "polygon-streaming",
+    "xrg",
+    "streamcontroller",
+    "script-component",
+    "runtime-streaming"
+  ],
+  "prerequisites": [
+    "PlayCanvas project (npm/ESM, not Editor-only workflow)",
+    "@polygon-streaming/web-player-playcanvas (peer: playcanvas \"1 - 2\")",
+    "Ability to publish files at the app web root"
+  ],
+  "entrypoint": "SKILL.md",
+  "dependencies": [
+    "bundle:resilience"
+  ]
+}
