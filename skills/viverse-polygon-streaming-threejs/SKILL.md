@@ -19,6 +19,8 @@ Use this skill when all of these are true:
 
 Do not use this skill for direct `.glb` loading without Polygon Streaming or for PlayCanvas-only flows.
 
+To reuse assets from a published starter-world catalog in an existing game, or to hold level start behind a `model-load` loading screen, continue with [viverse-pls-starter-world](../viverse-pls-starter-world/).
+
 ## Preflight Checklist
 
 - [ ] `npm install -S @polygon-streaming/web-player-threejs`
