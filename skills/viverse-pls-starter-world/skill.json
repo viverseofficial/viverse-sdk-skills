@@ -1,7 +1,7 @@
 {
   "id": "viverse-pls-starter-world",
   "name": "viverse-pls-starter-world",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "status": "experimental",
   "description": "Adopt assets from a Polygon Streaming starter-world repository (Medieval Starter 100 in dkatz23/PolygonStreamingWorlds) into an existing Three.js game: reach the private repo, read the catalog and saved-scene formats, fix stream URLs, mount and fit streamed buildings per level, keep them out of gameplay lanes, gate stage start on model-load, and verify headlessly.",
   "tags": [
@@ -24,6 +24,7 @@
     "SKILL.md",
     "patterns/adopt-buildings-into-a-game.md",
     "patterns/stage-loading-gate.md",
+    "patterns/performance-and-memory.md",
     "patterns/verification-recipes.md"
   ],
   "dependencies": [

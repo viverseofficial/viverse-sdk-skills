@@ -69,7 +69,7 @@ Full code in [patterns/adopt-buildings-into-a-game.md](./patterns/adopt-building
 2. **One anchor + one fit group per building.** The anchor carries position and yaw. The stream fills the inner fit group, which stays hidden until `model-load`, then is scaled to `catalog height × placement scale` from `event.boundingBox`, centred on x/z, and grounded on `minY`.
 3. **Load one at a time**, low initial detail (`initialTrianglePercent ≈ 0.02`), `castShadows: false`.
 4. **Map levels to layouts by mode, not by stage number.** The game had only two physical layouts (front corridor for stages 1–3, four-gate siege for 4–10); each gets its own placement list, created the first time it is shown.
-5. **Hide, never remove.** The shared session routes events by `modelIndex`; removing models shifts those indices. Toggle `visible` when the mode changes.
+5. **Hide by default; unload only with the cleanup.** Hiding a layout is safe and bounded in memory, but hidden models stay resident and keep taking streaming budget. Unloading with `removeModel` works only if you handle three SDK traps (the wrapper has no `models`, removal is asynchronous, and the SDK keeps every removed model alive in `promo.queued`); see [patterns/performance-and-memory.md](./patterns/performance-and-memory.md). Without them, unloading never happens or leaks ~170-200 MB of JS heap per 15-building layout.
 6. **Keep gameplay readable.** Express keep-out rules (enemy lanes, keep ring, emplacements, island rim, terrace edges) as **unit tests over the layout data**, and feed the same footprints as exclusion zones to any procedural vegetation or skyline so nothing grows through a building.
 7. **Budget.** 12–16 buildings per layout was comfortable; each is 7–15 MB at full quality and shares one triangle budget with the rest of the scene.
 
@@ -84,7 +84,15 @@ Full code in [patterns/stage-loading-gate.md](./patterns/stage-loading-gate.md).
 - **Cancel** on reset or when a newer wave starts. Hide the overlay synchronously in `cancel`, and let the late promise `then` check it is still the current handle so it cannot hide a newer overlay.
 - Progress is **bursty**: the SDK completes the initial batch together, so the count may jump 0 → N. Add a sweep animation on `transform` (compositor-driven) so the screen never looks frozen while the main thread decodes.
 
-## 6. Verify without trusting a background tab
+## 6. Performance and memory
+
+Streamed scenery multiplies the cost of things that look harmless. Full detail, numbers and the diagnosis recipe in [patterns/performance-and-memory.md](./patterns/performance-and-memory.md):
+
+- **Never toggle a light's `visible` at runtime.** It recompiles every lit material (14 s without the village, 55 s with it, under software GL). Fade by `intensity` instead and test that the visible light count never changes.
+- **Keep the SDK budgets: 5M triangles desktop, 3M mobile.** Give scenery a small `initialTrianglePercent` (a share of the whole budget) and a low `qualityPriority`.
+- **`removeModel` traps:** `controller.models` is undefined on the exported wrapper; `modelIndex` is an add counter, not a list position; removal is async; and the SDK retains every removed model through `promo.queued`/`promo.inflight`. **SDK 2.9.2 behaves the same as 2.9.0-beta.2** here.
+
+## 7. Verify without trusting a background tab
 
 See [patterns/verification-recipes.md](./patterns/verification-recipes.md). Short version: drive a **dedicated headless Chromium** (software GL flags), not a shared browser tab, and prove four cases: normal start, a stage whose layout is not loaded yet, stalled streaming (timeout), and failed assets.
 
@@ -111,4 +119,7 @@ See [patterns/verification-recipes.md](./patterns/verification-recipes.md). Shor
 - [ ] Failed buildings count as settled; timeout starts the stage; cancel hides the overlay
 - [ ] Loading text translated in every shipped locale
 - [ ] Headless runs cover normal, not-yet-loaded layout, stalled and failed streaming
+- [ ] No pooled light changes `visible` at runtime (visible light count is constant)
+- [ ] Budgets are 5M desktop / 3M mobile; scenery has a small `initialTrianglePercent` and low `qualityPriority`
+- [ ] If layouts are unloaded: engine found through the wrapper, removal awaited, removed model dropped from `promo.*`, `parent.clear()` after removal, and a `WeakRef` test shows removed models are collected
 - [ ] Temporary debug hooks removed

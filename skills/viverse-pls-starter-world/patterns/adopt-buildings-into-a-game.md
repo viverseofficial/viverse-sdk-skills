@@ -92,7 +92,7 @@ export function createVillage({ session, layout, heightAt = () => 0, parent = nu
 
 `session.addModel` here is the project's wrapper around the shared controller that maps `model-load` / `model-load-error` back to the owner by `modelIndex`. Keep that routing.
 
-## 3. Layouts per mode, hide never remove
+## 3. Layouts per mode: hide by default
 
 ```js
 _syncVillage(mode) {
@@ -106,11 +106,11 @@ _syncVillage(mode) {
       parent: this.scene,
     });
   }
-  for (const [k, v] of Object.entries(this._villages)) v.setVisible(k === key);   // toggle, don't unload
+  for (const [k, v] of Object.entries(this._villages)) v.setVisible(k === key);   // toggle; unloading needs the cleanup in performance-and-memory.md
 }
 ```
 
-Why hide, not remove: the shared session maps events by `modelIndex`, and the SDK splices its model list on removal, which shifts indices under live owners.
+Why hide by default: it is simple and its memory is bounded. Removal itself does not disturb event routing (`modelIndex` is a monotonic add counter), but unloading has three SDK traps (no `models` on the wrapper, asynchronous removal, and the SDK retaining removed models through `promo.queued`) that are covered in [performance-and-memory.md](./performance-and-memory.md). Hidden models also keep taking streaming budget, so unload layouts for modes that are not coming back soon only after that cleanup is in place and verified.
 
 ## 4. Keep-out rules as tests, not as eyeballing
 
@@ -138,5 +138,5 @@ Then reuse the same footprints as **exclusion zones** for procedural content: pa
 ## Known limits
 
 - Portrait cameras show only edge buildings.
-- Both layouts stay in memory once shown (they are hidden, not unloaded).
+- Hidden layouts stay in memory unless you unload them with the cleanup from performance-and-memory.md.
 - Per-stage variants (intact, burning, ruined) and objective-centred hamlets were not built.

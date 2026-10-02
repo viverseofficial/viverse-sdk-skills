@@ -1,7 +1,7 @@
 {
   "id": "viverse-polygon-streaming-threejs",
   "name": "viverse-polygon-streaming-threejs",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "status": "active",
   "description": "Runtime Polygon Streaming .xrg integration for browser-based Three.js apps, including one shared StreamController, serialized/visible-only addModel, no parallel full-GLB fallback, wrapper events, authored vs bbox fitting, cameraTarget lifecycle, and VIVERSE preview service-worker origin.",
   "tags": [
