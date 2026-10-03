@@ -1,0 +1,29 @@
+{
+  "id": "non-humanoid-animation-retargeting",
+  "name": "non-humanoid-animation-retargeting",
+  "version": "0.1.0",
+  "status": "active",
+  "description": "Retarget and tune creature animation across non-humanoid rigs, including quadrupeds, dragons, snakes, and multi-neck characters, with deformation, attack direction, ground contact, and hero-creature review guidance.",
+  "tags": [
+    "animation",
+    "retargeting",
+    "creature",
+    "non-humanoid",
+    "quadruped",
+    "dragon",
+    "snake",
+    "skinning",
+    "rigging",
+    "threejs",
+    "viverse"
+  ],
+  "prerequisites": [
+    "Source animation clips and a target non-humanoid character rig",
+    "A 3D runtime or DCC tool for inspecting skeletal motion and mesh deformation"
+  ],
+  "entrypoint": "SKILL.md",
+  "read_order": [
+    "SKILL.md"
+  ],
+  "dependencies": []
+}
