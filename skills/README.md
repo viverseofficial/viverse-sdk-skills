@@ -42,6 +42,7 @@ The agent auto-loads SKILL.md summaries on startup. When it detects a task match
 | [viverse-polygon-streaming-playcanvas](./viverse-polygon-streaming-playcanvas/) | Polygon Streaming `.xrg` loading in PlayCanvas using the NPM package |
 | [viverse-polygon-streaming-threejs](./viverse-polygon-streaming-threejs/) | Polygon Streaming `.xrg` loading in  Three.js using the NPM package |
 | [vrma-animation-retargeting](./vrma-animation-retargeting/) | VRMA animation retargeting for VIVERSE avatars |
+| [viverse-pls-starter-world](./viverse-pls-starter-world/) | Adopt assets from a Polygon Streaming starter-world repo (Medieval Starter 100) into an existing Three.js game: catalog/scene formats, `model.xrg` URLs, per-level layouts, and a stage loading gate on `model-load` |
 | [viverse-pls-cli](./viverse-pls-cli/) | Upload and replace 3D model assets (.zip/.glb/.obj) to VIVERSE via pls-cli |
 | [viverse-i18n](./viverse-i18n/) | Detect user language via `_htc_lang_code` cookie, minimal `t()` translation system for browser games |
 

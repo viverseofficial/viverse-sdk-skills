@@ -346,6 +346,24 @@
       "skills": [
         "threejs-racing-ai-driver"
       ]
+    },
+    {
+      "intent": [
+        "starter world",
+        "polygon streaming worlds",
+        "medieval starter",
+        "starter catalog",
+        "pls catalog",
+        "decorate map with streamed buildings",
+        "village buildings",
+        "stage loading screen",
+        "streamed scenery loading",
+        "wait for model-load",
+        "dkatz23"
+      ],
+      "skills": [
+        "viverse-pls-starter-world"
+      ]
     }
   ]
 }

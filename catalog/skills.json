@@ -1,6 +1,6 @@
 {
   "version": "0.1.0",
-  "generated_at": "2026-09-21T09:00:35.201Z",
+  "generated_at": "2026-10-01T23:12:09.789Z",
   "skills": [
     {
       "id": "playcanvas-asset-art",
@@ -57,6 +57,10 @@
     {
       "id": "viverse-pls-cli",
       "path": "skills/viverse-pls-cli/skill.json"
+    },
+    {
+      "id": "viverse-pls-starter-world",
+      "path": "skills/viverse-pls-starter-world/skill.json"
     },
     {
       "id": "viverse-polygon-streaming-playcanvas",
