@@ -364,6 +364,50 @@
       "skills": [
         "viverse-pls-starter-world"
       ]
+    },
+    {
+      "intent": [
+        "creature animation",
+        "non-humanoid animation",
+        "creature rig retargeting",
+        "animal animation retargeting",
+        "quadruped animation",
+        "dragon animation",
+        "snake animation",
+        "multi-neck creature",
+        "mesh2motion",
+        "3d volume skinning",
+        "creature attack direction",
+        "creature ground contact",
+        "hero creature animation",
+        "非人形動畫",
+        "生物動畫",
+        "多頭骨架",
+        "咬擊方向",
+        "巨獸攻防配對",
+        "serpent animation",
+        "serpentine rig",
+        "creature bite",
+        "hero creature counter"
+      ],
+      "skills": [
+        "non-humanoid-animation-retargeting"
+      ]
+    },
+    {
+      "intent": [
+        "mixamo",
+        "fbx animation",
+        "bind pose",
+        "elbow twist",
+        "wrist twist",
+        "rig retargeting",
+        "骨架重定向",
+        "手肘反折"
+      ],
+      "skills": [
+        "mixamo-animation-retargeting"
+      ]
     }
   ]
 }

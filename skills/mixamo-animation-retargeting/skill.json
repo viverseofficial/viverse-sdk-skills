@@ -1,0 +1,28 @@
+{
+  "id": "mixamo-animation-retargeting",
+  "name": "mixamo-animation-retargeting",
+  "version": "0.1.0",
+  "status": "active",
+  "description": "Transfer finished humanoid animations to another character rig and verify the full motion, contacts, and prop grip against the source.",
+  "tags": [
+    "mixamo",
+    "animation",
+    "retargeting",
+    "skeleton",
+    "rigging",
+    "threejs",
+    "viverse",
+    "avatar",
+    "motion"
+  ],
+  "prerequisites": [
+    "Humanoid source and target rigs",
+    "Animation clip files",
+    "A Three.js or equivalent animation runtime"
+  ],
+  "entrypoint": "SKILL.md",
+  "read_order": [
+    "SKILL.md"
+  ],
+  "dependencies": []
+}

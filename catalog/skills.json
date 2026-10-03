@@ -3,6 +3,14 @@
   "generated_at": "2026-10-01T23:12:09.789Z",
   "skills": [
     {
+      "id": "mixamo-animation-retargeting",
+      "path": "skills/mixamo-animation-retargeting/skill.json"
+    },
+    {
+      "id": "non-humanoid-animation-retargeting",
+      "path": "skills/non-humanoid-animation-retargeting/skill.json"
+    },
+    {
       "id": "playcanvas-asset-art",
       "path": "skills/playcanvas-asset-art/skill.json"
     },

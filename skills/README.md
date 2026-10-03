@@ -41,6 +41,8 @@ The agent auto-loads SKILL.md summaries on startup. When it detects a task match
 | [viverse-world-publishing](./viverse-world-publishing/) | Publishing PlayCanvas projects to VIVERSE Worlds |
 | [viverse-polygon-streaming-playcanvas](./viverse-polygon-streaming-playcanvas/) | Polygon Streaming `.xrg` loading in PlayCanvas using the NPM package |
 | [viverse-polygon-streaming-threejs](./viverse-polygon-streaming-threejs/) | Polygon Streaming `.xrg` loading in  Three.js using the NPM package |
+| [mixamo-animation-retargeting](./mixamo-animation-retargeting/) | Transfer finished humanoid (Mixamo) animations to another character rig and verify motion, contacts, and prop grip |
+| [non-humanoid-animation-retargeting](./non-humanoid-animation-retargeting/) | Retargeting and tuning creature animation for quadrupeds, dragons, snakes, and other non-humanoid rigs |
 | [vrma-animation-retargeting](./vrma-animation-retargeting/) | VRMA animation retargeting for VIVERSE avatars |
 | [viverse-pls-starter-world](./viverse-pls-starter-world/) | Adopt assets from a Polygon Streaming starter-world repo (Medieval Starter 100) into an existing Three.js game: catalog/scene formats, `model.xrg` URLs, per-level layouts, and a stage loading gate on `model-load` |
 | [viverse-pls-cli](./viverse-pls-cli/) | Upload and replace 3D model assets (.zip/.glb/.obj) to VIVERSE via pls-cli |
