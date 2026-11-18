@@ -25,21 +25,42 @@ When the user names an operation, proceed with that operation rather than showin
 
 ```bash
 which pls-cli || ls ~/bin/pls-cli 2>/dev/null || ls /usr/local/bin/pls-cli 2>/dev/null
-pls-cli version 2>/dev/null || true
 ```
 
-If a binary exists, still check the version. Do **not** keep `v1.0.0` when a newer release is available.
+If found, go to **Check for updates**. Otherwise, install it.
+
+### Check for updates
+
+Run this once per session, before the first pls-cli command:
+
+```bash
+INSTALLED=$(pls-cli version | awk '{print $2}')   # e.g. v1.2.0, or "dev" for a local build
+LATEST=$(curl -fsSL -o /dev/null -w '%{url_effective}' \
+  https://github.com/ViveportSoftware/pls-cli/releases/latest | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$')
+echo "installed=$INSTALLED latest=$LATEST"
+```
+
+Check these in order:
+
+- `LATEST` is empty (offline or GitHub unreachable): say the check was skipped and continue.
+- `INSTALLED` is `dev`: a local build. Don't offer an update — the user is building from source.
+- `INSTALLED` equals `LATEST`: up to date, continue.
+- Otherwise: tell the user both versions and ask before updating.
+  On their OK, reinstall with the steps below, writing over the existing binary
+  (`command -v pls-cli` shows where it is) instead of `~/bin/pls-cli`.
+
+An installed `v1.x` cannot log in with the commands in Section 2 (`--password-stdin` and
+`PLS_CLI_PASSWORD` need `v2.0.0` or later), so recommend the update strongly.
 
 ### Install from GitHub Releases (recommended)
 
-Pin to a checked GitHub release. As of 2026-09, use **`v1.2.0`**. Confirm the latest tag at `https://github.com/ViveportSoftware/pls-cli/releases` before installing; never default to `v1.0.0`.
-
-Detect OS and architecture, then download the correct binary:
+Detect OS and architecture, then download the latest release binary:
 
 ```bash
 OS=$(uname -s | tr '[:upper:]' '[:lower:]')   # darwin or linux
 ARCH=$(uname -m)                               # x86_64 or arm64
-VERSION="v1.2.0"                               # verified 2026-09; bump after checking GitHub Releases
+VERSION=$(curl -fsSL -o /dev/null -w '%{url_effective}' \
+  https://github.com/ViveportSoftware/pls-cli/releases/latest | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$')
 
 # Normalise arch name
 case "$ARCH" in
@@ -105,16 +126,17 @@ There is **no token env var** — you must log in first with `pls-cli login`.
 
 ### Login (saves credentials to ~/.pls-cli/credentials.json)
 
+Since `v2.0.0` there is no `--password` flag. Pass the password through the `PLS_CLI_PASSWORD`
+env var (or pipe it with `--password-stdin`) so it never appears in the process arguments:
+
 ```bash
 # Stage
-pls-cli login --stage \
-  --email="$PLS_CLI_TEST_EMAIL" \
-  --password="$PLS_CLI_TEST_PASSWORD"
+PLS_CLI_PASSWORD="$PLS_CLI_TEST_PASSWORD" pls-cli login --stage \
+  --email="$PLS_CLI_TEST_EMAIL"
 
 # Production
-pls-cli login \
-  --email="$PLS_CLI_TEST_EMAIL" \
-  --password="$PLS_CLI_TEST_PASSWORD"
+PLS_CLI_PASSWORD="$PLS_CLI_TEST_PASSWORD" pls-cli login \
+  --email="$PLS_CLI_TEST_EMAIL"
 ```
 
 ### Verify login succeeded
@@ -413,7 +435,8 @@ Max file size: 500 MB per file (FREE tier limit from API).
 | `list --json` empty / invalid JSON, exit 0           | `--group` omitted                              | Pass `--group=<uuid>`; human `list` without `--group` auto-selects       |
 | Built XRG 404                                        | Used account id from `status` as URL prefix    | Use the **group** UUID in `/polygon_file/<group>/<assetId>/model.xrg`    |
 | Binary not found                                     | pls-cli not installed                          | Install from GitHub Releases (see Section 0)                             |
-| Installed `v1.0.0` while GitHub has newer            | Skill/docs pin went stale                      | Install the current release (v1.2.0 as of 2026-09)                       |
+| `unknown flag: --password`                           | pls-cli `v2.0.0`+ removed the flag             | Use `PLS_CLI_PASSWORD` or `--password-stdin` (see Section 2)             |
+| Installed version older than GitHub latest           | Binary not updated                             | Run **Check for updates** (Section 0)                                    |
 | Dev build fails at login                             | No client ID burned in                         | Install the official release binary from GitHub Releases (see Section 0) |
 | `404 Not Found` on delete                            | Asset ID doesn't exist or already deleted      | Verify the asset ID with `pls-cli list`                                  |
 
