@@ -5,8 +5,8 @@
       "profiles": ["upload", "replace"],
       "phases": ["upload", "replace", "verify", "fix"],
       "type": "forbidden_any",
-      "pattern": "--email=['\"]?[^$\\s]{1,}['\"]?|--password=['\"]?[^$\\s]{1,}['\"]?",
-      "message": "Never pass credentials as literal values in shell commands — use env vars ($PLS_CLI_TEST_EMAIL, $PLS_CLI_TEST_PASSWORD).",
+      "pattern": "--email=(?!['\"]?\\$)\\S|--password=",
+      "message": "Never pass credentials as literal values in shell commands, and never use --password (removed in pls-cli v2.0.0) — use $PLS_CLI_TEST_EMAIL and PLS_CLI_PASSWORD=\"$PLS_CLI_TEST_PASSWORD\".",
       "severity": "high"
     },
     {
